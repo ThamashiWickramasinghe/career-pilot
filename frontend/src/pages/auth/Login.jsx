@@ -34,11 +34,13 @@ export default function Login() {
           <h1 className="text-3xl font-bold text-indigo-600">Career Pilot</h1>
           <p className="text-gray-500 mt-2">Sign in to your account</p>
         </div>
+
         {error && (
           <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm">
             {error}
           </div>
         )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
@@ -51,6 +53,7 @@ export default function Login() {
               placeholder="you@example.com"
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
             <input
@@ -62,6 +65,17 @@ export default function Login() {
               placeholder="••••••••"
             />
           </div>
+
+          {/* Forgot Password Link */}
+          <div className="text-right">
+            <Link
+              to="/forgot-password"
+              className="text-sm text-indigo-600 hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
@@ -70,6 +84,7 @@ export default function Login() {
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
+
         <p className="text-center text-sm text-gray-500 mt-6">
           Don't have an account?{' '}
           <Link to="/register" className="text-indigo-600 font-medium hover:underline">

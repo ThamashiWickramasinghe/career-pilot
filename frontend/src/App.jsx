@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
+import ForgotPassword from './pages/auth/ForgotPassword'
+import ResetPassword from './pages/auth/ResetPassword'
 import JobSeekerDashboard from './pages/jobseeker/Dashboard'
 import InstructorDashboard from './pages/instructor/Dashboard'
 import AdminDashboard from './pages/admin/Dashboard'
@@ -26,28 +28,26 @@ function App() {
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-          {/* Job Seeker Routes */}
           <Route path="/dashboard" element={
             <ProtectedRoute allowedRoles={['job_seeker']}>
               <JobSeekerDashboard />
             </ProtectedRoute>
           } />
 
-          {/* Instructor Routes */}
           <Route path="/instructor/dashboard" element={
             <ProtectedRoute allowedRoles={['instructor']}>
               <InstructorDashboard />
             </ProtectedRoute>
           } />
 
-          {/* Admin Routes */}
           <Route path="/admin/dashboard" element={
             <ProtectedRoute allowedRoles={['admin']}>
               <AdminDashboard />
             </ProtectedRoute>
           } />
-
         </Routes>
       </BrowserRouter>
     </AuthProvider>

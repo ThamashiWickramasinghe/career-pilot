@@ -6,10 +6,12 @@ class User(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     full_name = db.Column(db.String(100), nullable=False)
+    username = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.Enum('job_seeker', 'instructor', 'admin'), 
+    role = db.Column(db.Enum('job_seeker', 'instructor', 'admin'),
                      nullable=False, default='job_seeker')
+    current_post = db.Column(db.String(100), nullable=True)
     
     # Job seeker profile fields
     skills = db.Column(db.Text, nullable=True)
@@ -17,20 +19,26 @@ class User(db.Model):
     experience_years = db.Column(db.Integer, default=0)
     bio = db.Column(db.Text, nullable=True)
     
+    # Password reset
+    reset_token = db.Column(db.String(255), nullable=True)
+    reset_token_expiry = db.Column(db.DateTime, nullable=True)
+    
     # Account status
     is_active = db.Column(db.Boolean, default=True)
     is_approved = db.Column(db.Boolean, default=True)
     
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, 
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow,
                            onupdate=datetime.utcnow)
     
     def to_dict(self):
         return {
             'id': self.id,
             'full_name': self.full_name,
+            'username': self.username,
             'email': self.email,
             'role': self.role,
+            'current_post': self.current_post,
             'skills': self.skills,
             'education': self.education,
             'experience_years': self.experience_years,
