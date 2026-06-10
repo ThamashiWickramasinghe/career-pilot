@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
+import PostContent from './PostContent'
+import ManageContent from './ManageContent'
 
 export default function InstructorDashboard() {
   const { user, logout } = useAuth()
@@ -310,120 +312,26 @@ export default function InstructorDashboard() {
             </div>
           )}
 
-          {/* ── POST CONTENT ── */}
-          {activeTab === 'post-content' && (
-            <div>
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">📤 Post Content</h2>
-                <p className="text-gray-500 mt-1">Upload learning materials for job seekers</p>
-              </div>
-              <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 max-w-2xl">
-                <div className="space-y-5">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Content Title</label>
-                    <input type="text"
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-                      placeholder="e.g. React.js for Beginners" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
-                    <textarea rows={3}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-                      placeholder="Describe your content..." />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Content Type</label>
-                      <select className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white">
-                        <option>Video Upload</option>
-                        <option>PDF Document</option>
-                        <option>Google Drive Link</option>
-                        <option>YouTube Link</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Category</label>
-                      <select className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white">
-                        <option>Web Development</option>
-                        <option>Data Science</option>
-                        <option>UI/UX Design</option>
-                        <option>DevOps</option>
-                        <option>Cybersecurity</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Upload File or Paste Link</label>
-                    <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:border-teal-400 transition cursor-pointer"
-                      style={{background: '#f0fdf4'}}>
-                      <div className="text-4xl mb-3">📁</div>
-                      <p className="text-sm font-medium text-gray-600">Drag & drop file here or click to browse</p>
-                      <p className="text-xs text-gray-400 mt-1">Supports PDF, MP4, or paste Google Drive / YouTube link</p>
-                    </div>
-                  </div>
-                  <button className="w-full py-3 rounded-xl font-semibold text-white"
-                    style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
-                    Submit for Admin Approval →
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+{/* ── POST CONTENT ── */}
+{activeTab === 'post-content' && (
+  <div>
+    <div className="mb-6">
+      <h2 className="text-2xl font-bold text-gray-800 text-center">Upload learning materials for job seekers</h2>
+    </div>
+    <PostContent onSuccess={() => setActiveTab('manage-content')} />
+  </div>
+)}
 
-          {/* ── MANAGE CONTENT ── */}
-          {activeTab === 'manage-content' && (
-            <div>
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">📋 Manage Content</h2>
-                <p className="text-gray-500 mt-1">View and manage all your uploaded materials</p>
-              </div>
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="p-4 border-b border-gray-100 flex justify-between items-center">
-                  <input type="text" placeholder="Search content..."
-                    className="border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 w-64" />
-                </div>
-                <table className="w-full">
-                  <thead style={{background: '#f0fdf4'}}>
-                    <tr>
-                      {['Title', 'Type', 'Students', 'Status', 'Actions'].map(h => (
-                        <th key={h} className="px-6 py-3 text-left text-xs font-semibold text-gray-600">{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {[
-                      { title: 'React.js for Beginners', type: '🎥 Video', students: 45, status: 'Approved' },
-                      { title: 'Python Data Science', type: '📄 PDF', students: 32, status: 'Approved' },
-                      { title: 'UI/UX Design Basics', type: '🔗 Drive Link', students: 0, status: 'Pending' },
-                      { title: 'Node.js Advanced', type: '🎥 Video', students: 18, status: 'Approved' },
-                    ].map((item, i) => (
-                      <tr key={i} className="hover:bg-gray-50 transition">
-                        <td className="px-6 py-4 text-sm font-medium text-gray-800">{item.title}</td>
-                        <td className="px-6 py-4 text-sm text-gray-500">{item.type}</td>
-                        <td className="px-6 py-4 text-sm text-gray-500">{item.students}</td>
-                        <td className="px-6 py-4">
-                          <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
-                            item.status === 'Approved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-                          }`}>
-                            {item.status}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex gap-2">
-                            <button className="text-xs px-3 py-1 rounded-lg text-white font-medium"
-                              style={{background: '#0891b2'}}>Edit</button>
-                            <button className="text-xs px-3 py-1 rounded-lg text-white font-medium"
-                              style={{background: '#ef4444'}}>Delete</button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
+{/* ── MANAGE CONTENT ── */}
+{activeTab === 'manage-content' && (
+  <div>
+    <div className="mb-6">
+      <h2 className="text-2xl font-bold text-gray-800">📋 Manage Content</h2>
+      <p className="text-gray-500 mt-1">View your uploaded materials and re-access requests</p>
+    </div>
+    <ManageContent />
+  </div>
+)}
           {/* ── POST JOB ── */}
           {activeTab === 'post-job' && (
             <div>

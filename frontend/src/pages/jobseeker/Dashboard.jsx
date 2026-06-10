@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
+import LearningHub from './LearningHub'
 
 export default function JobSeekerDashboard() {
   const { user, logout } = useAuth()
@@ -387,17 +388,15 @@ export default function JobSeekerDashboard() {
           )}
 
           {/* ── LEARNING ── */}
-          {activeTab === 'learning' && (
-            <div className="bg-white rounded-2xl p-10 shadow-sm border border-gray-100 text-center">
-              <div className="text-7xl mb-5">📚</div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3">Learning Hub</h3>
-              <p className="text-gray-500 max-w-md mx-auto">Browse courses uploaded by instructors with time-limited access control</p>
-              <div className="inline-block mt-5 px-5 py-2.5 rounded-full text-sm font-semibold text-white"
-                style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
-                Coming Soon 🔧
-              </div>
-            </div>
-          )}
+{activeTab === 'learning' && (
+  <div>
+    <div className="mb-6">
+      <h2 className="text-2xl font-bold text-gray-800">📚 Learning Hub</h2>
+      <p className="text-gray-500 mt-1">Browse and access learning materials from instructors</p>
+    </div>
+    <LearningHub />
+  </div>
+)}
 
           {/* ── JOBS ── */}
           {activeTab === 'jobs' && (

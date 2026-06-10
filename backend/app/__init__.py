@@ -18,7 +18,7 @@ def create_app():
     jwt.init_app(app)
     mail.init_app(app)
 
-    # Fix CORS — allow all origins
+    # Fix CORS
     CORS(app)
 
     # Create upload folder
@@ -28,5 +28,8 @@ def create_app():
     # Register blueprints
     from app.routes.auth import auth_bp
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
+
+    from app.routes.learning import learning_bp
+    app.register_blueprint(learning_bp, url_prefix='/api/learning')
 
     return app
