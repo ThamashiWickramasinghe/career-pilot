@@ -341,3 +341,16 @@ def get_all_content_admin():
         LearningContent.created_at.desc()
     ).all()
     return jsonify({'content': [c.to_dict() for c in contents]}), 200
+
+# ── GET COMMENTS FOR CONTENT (Instructor view) ────────
+@learning_bp.route('/content/<int:content_id>/comments', methods=['GET'])
+@jwt_required()
+def get_content_comments(content_id):
+    user_id, user_role = get_user_from_token()
+    if not user_id:
+        return jsonify({'message': 'Invalid token'}), 422
+
+    comments = ContentComment.query.filter_by(content_id=content_id)\
+        .order_by(ContentComment.created_at.desc()).all()
+
+    return jsonify({'comments': [c.to_dict() for c in comments]}), 200

@@ -6,6 +6,9 @@ export default function ManageContent() {
   const [loading, setLoading] = useState(true)
   const [reAccessRequests, setReAccessRequests] = useState([])
   const [activeSection, setActiveSection] = useState('content')
+  const [selectedContent, setSelectedContent] = useState(null)
+  const [comments, setComments] = useState([])
+  const [commentsLoading, setCommentsLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
@@ -33,11 +36,29 @@ export default function ManageContent() {
     }
   }
 
+  const fetchComments = async (contentId) => {
+    setCommentsLoading(true)
+    try {
+      const res = await API.get(`/learning/content/${contentId}/comments`)
+      setComments(res.data.comments)
+    } catch (err) {
+      setError('Failed to load comments')
+    }
+    setCommentsLoading(false)
+  }
+
+  const viewComments = (content) => {
+    setSelectedContent(content)
+    fetchComments(content.id)
+    setActiveSection('comments')
+  }
+
   const respondToRequest = async (requestId, action) => {
     try {
       await API.post(`/learning/reaccess/${requestId}/respond`, { action })
       setSuccess(`Request ${action} successfully!`)
       fetchReAccessRequests()
+      setTimeout(() => setSuccess(''), 3000)
     } catch (err) {
       setError('Failed to respond to request')
     }
@@ -72,6 +93,13 @@ export default function ManageContent() {
           style={activeSection === 'requests' ? {background: 'linear-gradient(135deg, #0f4c35, #10b981)'} : {}}>
           🔄 Re-Access Requests ({reAccessRequests.length})
         </button>
+        {activeSection === 'comments' && selectedContent && (
+          <button
+            className="px-4 py-2 rounded-xl text-sm font-medium text-white"
+            style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
+            💬 Comments — {selectedContent.title}
+          </button>
+        )}
       </div>
 
       {/* My Content */}
@@ -93,7 +121,7 @@ export default function ManageContent() {
               <table className="w-full">
                 <thead style={{background: '#f0fdf4'}}>
                   <tr>
-                    {['Content', 'Type', 'Category', 'Status', 'Date'].map(h => (
+                    {['Content', 'Type', 'Category', 'Status', 'Date', 'Actions'].map(h => (
                       <th key={h} className="px-6 py-3 text-left text-xs font-semibold text-gray-600">{h}</th>
                     ))}
                   </tr>
@@ -134,12 +162,83 @@ export default function ManageContent() {
                       <td className="px-6 py-4 text-sm text-gray-500">
                         {new Date(item.created_at).toLocaleDateString()}
                       </td>
+                      <td className="px-6 py-4">
+                        <button
+                          onClick={() => viewComments(item)}
+                          className="text-xs px-3 py-1.5 rounded-lg text-white font-medium"
+                          style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
+                          💬 View Comments
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Comments View */}
+      {activeSection === 'comments' && selectedContent && (
+        <div>
+          <button
+            onClick={() => setActiveSection('content')}
+            className="flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium text-sm mb-5">
+            ← Back to My Content
+          </button>
+
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-5">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+                style={{background: '#d1fae5'}}>
+                {selectedContent.content_type === 'video_link' ? '🎥' :
+                 selectedContent.content_type === 'pdf' ? '📄' : '📝'}
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-800">{selectedContent.title}</h3>
+                <p className="text-sm text-gray-500">{selectedContent.category} · {selectedContent.content_type === 'video_link' ? 'Video' : selectedContent.content_type === 'pdf' ? 'PDF' : 'Notes'}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <h3 className="font-bold text-gray-800 text-lg mb-5">
+              💬 Student Comments ({comments.length})
+            </h3>
+
+            {commentsLoading ? (
+              <div className="text-center py-10">
+                <div className="text-4xl mb-3 animate-pulse">💬</div>
+                <p className="text-gray-500">Loading comments...</p>
+              </div>
+            ) : comments.length === 0 ? (
+              <div className="text-center py-10">
+                <div className="text-5xl mb-3">💬</div>
+                <p className="text-gray-500">No comments yet on this content</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {comments.map((c) => (
+                  <div key={c.id} className="flex gap-3">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
+                      style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
+                      {c.user_name?.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-1 p-3 rounded-xl" style={{background: '#f0fdf4'}}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-sm font-semibold text-gray-800">{c.user_name}</span>
+                        <span className="text-xs text-gray-400">
+                          {new Date(c.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-700">{c.comment}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
