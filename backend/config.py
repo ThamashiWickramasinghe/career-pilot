@@ -32,3 +32,4 @@ class Config:
     # File Upload
     UPLOAD_FOLDER = 'uploads'
     MAX_CONTENT_LENGTH = 100 * 1024 * 1024
+
