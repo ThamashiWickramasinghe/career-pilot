@@ -80,11 +80,11 @@ def login():
     if not user.is_active:
         return jsonify({'message': 'Account is deactivated'}), 403
 
-    token = create_access_token(identity={
-        'id': user.id,
-        'email': user.email,
-        'role': user.role
-    })
+    token = create_access_token(identity=str(user.id), additional_claims={
+    'email': user.email,
+    'role': user.role,
+    'id': user.id
+})
 
     return jsonify({
         'message': 'Login successful',
@@ -97,8 +97,9 @@ def login():
 @auth_bp.route('/me', methods=['GET'])
 @jwt_required()
 def get_current_user():
-    current_user = get_jwt_identity()
-    user = User.query.get(current_user['id'])
+    from flask_jwt_extended import get_jwt
+    claims = get_jwt()
+    user = User.query.get(claims.get('id'))
     if not user:
         return jsonify({'message': 'User not found'}), 404
     return jsonify({'user': user.to_dict()}), 200

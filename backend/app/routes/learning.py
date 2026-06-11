@@ -5,6 +5,7 @@ from app.models.learning import LearningContent, ContentAccess, ReAccessRequest,
 from app.models.user import User
 from datetime import datetime, timedelta
 import os
+import json
 from werkzeug.utils import secure_filename
 
 learning_bp = Blueprint('learning', __name__)
@@ -18,13 +19,31 @@ def allowed_file(filename, allowed):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed
 
 
+def get_user_from_token():
+    try:
+        from flask_jwt_extended import get_jwt
+        identity = get_jwt_identity()
+        claims = get_jwt()
+        user_id = claims.get('id') or identity
+        user_role = claims.get('role')
+        print(f"DEBUG identity: {identity}, claims: {claims}")
+        return int(user_id), user_role
+    except Exception as e:
+        print(f"DEBUG error: {e}")
+        return None, None
+
+
 # ── INSTRUCTOR: POST CONTENT ──────────────────────────
 @learning_bp.route('/upload', methods=['POST'])
 @jwt_required()
 def upload_content():
-    current_user = get_jwt_identity()
-    if current_user['role'] != 'instructor':
-        return jsonify({'message': 'Instructors only'}), 403
+    user_id, user_role = get_user_from_token()
+    print(f"DEBUG upload - user_id: {user_id}, user_role: {user_role}")
+
+    if not user_id:
+        return jsonify({'message': 'Invalid token - no user id'}), 422
+    if user_role != 'instructor':
+        return jsonify({'message': f'Instructors only. Your role: {user_role}'}), 403
 
     title = request.form.get('title')
     description = request.form.get('description')
@@ -41,7 +60,6 @@ def upload_content():
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     os.makedirs(THUMBNAIL_FOLDER, exist_ok=True)
 
-    # Handle thumbnail upload
     if 'thumbnail' in request.files:
         thumb = request.files['thumbnail']
         if thumb and allowed_file(thumb.filename, ALLOWED_IMG):
@@ -49,7 +67,6 @@ def upload_content():
             thumb.save(os.path.join(THUMBNAIL_FOLDER, filename))
             thumbnail_path = f"uploads/thumbnails/{filename}"
 
-    # Handle PDF upload
     if 'pdf_file' in request.files:
         pdf = request.files['pdf_file']
         if pdf and allowed_file(pdf.filename, ALLOWED_PDF):
@@ -65,7 +82,7 @@ def upload_content():
         drive_link=drive_link,
         thumbnail=thumbnail_path,
         file_path=file_path,
-        instructor_id=current_user['id'],
+        instructor_id=user_id,
         is_approved=False
     )
 
@@ -78,7 +95,7 @@ def upload_content():
     }), 201
 
 
-# ── GET ALL APPROVED CONTENT (Job Seekers) ────────────
+# ── GET ALL APPROVED CONTENT ──────────────────────────
 @learning_bp.route('/content', methods=['GET'])
 @jwt_required()
 def get_all_content():
@@ -94,26 +111,28 @@ def get_all_content():
 @learning_bp.route('/content/<int:content_id>', methods=['GET'])
 @jwt_required()
 def get_content(content_id):
-    current_user = get_jwt_identity()
+    user_id, user_role = get_user_from_token()
+    if not user_id:
+        return jsonify({'message': 'Invalid token'}), 422
+
     content = LearningContent.query.get_or_404(content_id)
 
-    if not content.is_approved and current_user['role'] == 'job_seeker':
+    if not content.is_approved and user_role == 'job_seeker':
         return jsonify({'message': 'Content not available'}), 403
 
-    # Check access for job seeker
     has_access = True
     access_info = None
-    if current_user['role'] == 'job_seeker' and content.content_type == 'video_link':
+
+    if user_role == 'job_seeker' and content.content_type == 'video_link':
         access = ContentAccess.query.filter_by(
-            user_id=current_user['id'],
+            user_id=user_id,
             content_id=content_id,
             is_active=True
         ).first()
 
         if not access:
-            # Grant first-time access for 30 days
             new_access = ContentAccess(
-                user_id=current_user['id'],
+                user_id=user_id,
                 content_id=content_id,
                 expires_at=datetime.utcnow() + timedelta(days=30)
             )
@@ -142,15 +161,17 @@ def get_content(content_id):
 @learning_bp.route('/content/<int:content_id>/comment', methods=['POST'])
 @jwt_required()
 def add_comment(content_id):
-    current_user = get_jwt_identity()
-    data = request.get_json()
+    user_id, user_role = get_user_from_token()
+    if not user_id:
+        return jsonify({'message': 'Invalid token'}), 422
 
+    data = request.get_json()
     if not data.get('comment'):
         return jsonify({'message': 'Comment is required'}), 400
 
     comment = ContentComment(
         content_id=content_id,
-        user_id=current_user['id'],
+        user_id=user_id,
         comment=data['comment']
     )
     db.session.add(comment)
@@ -166,15 +187,16 @@ def add_comment(content_id):
 @learning_bp.route('/reaccess', methods=['POST'])
 @jwt_required()
 def request_reaccess():
-    current_user = get_jwt_identity()
-    data = request.get_json()
+    user_id, user_role = get_user_from_token()
+    if not user_id:
+        return jsonify({'message': 'Invalid token'}), 422
 
+    data = request.get_json()
     if not data.get('content_id'):
         return jsonify({'message': 'Content ID required'}), 400
 
-    # Check if request already pending
     existing = ReAccessRequest.query.filter_by(
-        user_id=current_user['id'],
+        user_id=user_id,
         content_id=data['content_id'],
         status='pending'
     ).first()
@@ -183,7 +205,7 @@ def request_reaccess():
         return jsonify({'message': 'Request already pending'}), 409
 
     req = ReAccessRequest(
-        user_id=current_user['id'],
+        user_id=user_id,
         content_id=data['content_id'],
         message=data.get('message', '')
     )
@@ -200,8 +222,10 @@ def request_reaccess():
 @learning_bp.route('/reaccess/requests', methods=['GET'])
 @jwt_required()
 def get_reaccess_requests():
-    current_user = get_jwt_identity()
-    if current_user['role'] not in ['instructor', 'admin']:
+    user_id, user_role = get_user_from_token()
+    if not user_id:
+        return jsonify({'message': 'Invalid token'}), 422
+    if user_role not in ['instructor', 'admin']:
         return jsonify({'message': 'Not authorized'}), 403
 
     requests = ReAccessRequest.query.filter_by(status='pending').all()
@@ -212,8 +236,10 @@ def get_reaccess_requests():
 @learning_bp.route('/reaccess/<int:request_id>/respond', methods=['POST'])
 @jwt_required()
 def respond_reaccess(request_id):
-    current_user = get_jwt_identity()
-    if current_user['role'] not in ['instructor', 'admin']:
+    user_id, user_role = get_user_from_token()
+    if not user_id:
+        return jsonify({'message': 'Invalid token'}), 422
+    if user_role not in ['instructor', 'admin']:
         return jsonify({'message': 'Not authorized'}), 403
 
     data = request.get_json()
@@ -227,7 +253,6 @@ def respond_reaccess(request_id):
     req.responded_at = datetime.utcnow()
 
     if action == 'approved':
-        # Grant another 30 days
         access = ContentAccess.query.filter_by(
             user_id=req.user_id,
             content_id=req.content_id
@@ -251,8 +276,10 @@ def respond_reaccess(request_id):
 @learning_bp.route('/admin/pending', methods=['GET'])
 @jwt_required()
 def get_pending_content():
-    current_user = get_jwt_identity()
-    if current_user['role'] != 'admin':
+    user_id, user_role = get_user_from_token()
+    if not user_id:
+        return jsonify({'message': 'Invalid token'}), 422
+    if user_role != 'admin':
         return jsonify({'message': 'Admins only'}), 403
 
     contents = LearningContent.query.filter_by(is_approved=False).all()
@@ -263,8 +290,10 @@ def get_pending_content():
 @learning_bp.route('/admin/content/<int:content_id>/review', methods=['POST'])
 @jwt_required()
 def review_content(content_id):
-    current_user = get_jwt_identity()
-    if current_user['role'] != 'admin':
+    user_id, user_role = get_user_from_token()
+    if not user_id:
+        return jsonify({'message': 'Invalid token'}), 422
+    if user_role != 'admin':
         return jsonify({'message': 'Admins only'}), 403
 
     data = request.get_json()
@@ -275,7 +304,7 @@ def review_content(content_id):
 
     content = LearningContent.query.get_or_404(content_id)
     content.is_approved = (action == 'approve')
-    content.approved_by = current_user['id']
+    content.approved_by = user_id
     content.approved_at = datetime.utcnow()
 
     db.session.commit()
@@ -286,12 +315,29 @@ def review_content(content_id):
 @learning_bp.route('/my-content', methods=['GET'])
 @jwt_required()
 def get_my_content():
-    current_user = get_jwt_identity()
-    if current_user['role'] != 'instructor':
+    user_id, user_role = get_user_from_token()
+    if not user_id:
+        return jsonify({'message': 'Invalid token'}), 422
+    if user_role != 'instructor':
         return jsonify({'message': 'Instructors only'}), 403
 
     contents = LearningContent.query.filter_by(
-        instructor_id=current_user['id']
+        instructor_id=user_id
     ).order_by(LearningContent.created_at.desc()).all()
 
+    return jsonify({'content': [c.to_dict() for c in contents]}), 200
+
+# ── ADMIN: GET ALL CONTENT ────────────────────────────
+@learning_bp.route('/admin/all', methods=['GET'])
+@jwt_required()
+def get_all_content_admin():
+    user_id, user_role = get_user_from_token()
+    if not user_id:
+        return jsonify({'message': 'Invalid token'}), 422
+    if user_role != 'admin':
+        return jsonify({'message': 'Admins only'}), 403
+
+    contents = LearningContent.query.order_by(
+        LearningContent.created_at.desc()
+    ).all()
     return jsonify({'content': [c.to_dict() for c in contents]}), 200

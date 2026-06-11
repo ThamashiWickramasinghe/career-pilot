@@ -20,6 +20,7 @@ class Config:
     
     # JWT
     JWT_ACCESS_TOKEN_EXPIRES = False
+    JWT_IDENTITY_CLAIM = 'sub'
     
     # Mail
     MAIL_SERVER = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
@@ -31,3 +32,4 @@ class Config:
     # File Upload
     UPLOAD_FOLDER = 'uploads'
     MAX_CONTENT_LENGTH = 100 * 1024 * 1024
+

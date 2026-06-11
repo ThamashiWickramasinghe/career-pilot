@@ -50,9 +50,13 @@ export default function PostContent({ onSuccess }) {
       if (thumbnail) formData.append('thumbnail', thumbnail)
       if (pdfFile) formData.append('pdf_file', pdfFile)
 
-      await API.post('/learning/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
+      const token = localStorage.getItem('token')
+await API.post('/learning/upload', formData, {
+  headers: {
+    'Content-Type': 'multipart/form-data',
+    'Authorization': `Bearer ${token}`
+  }
+})
 
       setSuccess('Content submitted for admin approval!')
       setForm({
