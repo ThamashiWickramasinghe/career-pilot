@@ -20,6 +20,7 @@ class Config:
     
     # JWT
     JWT_ACCESS_TOKEN_EXPIRES = False
+    JWT_IDENTITY_CLAIM = 'sub'
     
     # Mail
     MAIL_SERVER = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
