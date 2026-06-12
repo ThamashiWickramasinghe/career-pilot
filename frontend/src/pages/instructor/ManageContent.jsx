@@ -11,6 +11,10 @@ export default function ManageContent() {
   const [commentsLoading, setCommentsLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [editItem, setEditItem] = useState(null)
+  const [editForm, setEditForm] = useState({})
+  const [editLoading, setEditLoading] = useState(false)
+  const [deleteLoading, setDeleteLoading] = useState(null)
 
   useEffect(() => {
     fetchMyContent()
@@ -62,6 +66,44 @@ export default function ManageContent() {
     } catch (err) {
       setError('Failed to respond to request')
     }
+  }
+
+  const startEdit = (item) => {
+    setEditItem(item)
+    setEditForm({
+      title: item.title,
+      description: item.description || '',
+      category: item.category,
+      drive_link: item.drive_link || '',
+    })
+  }
+
+  const saveEdit = async () => {
+    setEditLoading(true)
+    try {
+      await API.put(`/learning/content/${editItem.id}`, editForm)
+      setSuccess('Content updated successfully!')
+      setEditItem(null)
+      fetchMyContent()
+      setTimeout(() => setSuccess(''), 3000)
+    } catch (err) {
+      setError('Failed to update content')
+    }
+    setEditLoading(false)
+  }
+
+  const deleteContent = async (contentId) => {
+    if (!window.confirm('Are you sure you want to delete this content?')) return
+    setDeleteLoading(contentId)
+    try {
+      await API.delete(`/learning/content/${contentId}`)
+      setSuccess('Content deleted successfully!')
+      fetchMyContent()
+      setTimeout(() => setSuccess(''), 3000)
+    } catch (err) {
+      setError('Failed to delete content')
+    }
+    setDeleteLoading(null)
   }
 
   return (
@@ -163,12 +205,26 @@ export default function ManageContent() {
                         {new Date(item.created_at).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4">
-                        <button
-                          onClick={() => viewComments(item)}
-                          className="text-xs px-3 py-1.5 rounded-lg text-white font-medium"
-                          style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
-                          💬 View Comments
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => viewComments(item)}
+                            className="text-xs px-3 py-1.5 rounded-lg text-white font-medium"
+                            style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
+                            💬 Comments
+                          </button>
+                          <button
+                            onClick={() => startEdit(item)}
+                            className="text-xs px-3 py-1.5 rounded-lg text-white font-medium"
+                            style={{background: '#0891b2'}}>
+                            ✏️ Edit
+                          </button>
+                          <button
+                            onClick={() => deleteContent(item.id)}
+                            className="text-xs px-3 py-1.5 rounded-lg text-white font-medium"
+                            style={{background: '#ef4444'}}>
+                            🗑️ Delete
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -290,6 +346,68 @@ export default function ManageContent() {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {editItem && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-xl">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="font-bold text-gray-800 text-lg">✏️ Edit Content</h3>
+              <button onClick={() => setEditItem(null)}
+                className="text-gray-400 hover:text-gray-600 text-xl font-bold">✕</button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Title</label>
+                <input type="text" value={editForm.title}
+                  onChange={(e) => setEditForm({...editForm, title: e.target.value})}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500" />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
+                <textarea rows={3} value={editForm.description}
+                  onChange={(e) => setEditForm({...editForm, description: e.target.value})}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500" />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Category</label>
+                <select value={editForm.category}
+                  onChange={(e) => setEditForm({...editForm, category: e.target.value})}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                  {['Web Development','Mobile Development','Software Engineering','Data Science','Machine Learning & AI','Database & SQL','UI/UX Design','Graphic Design','DevOps & Cloud','Cybersecurity','Networking','Programming Fundamentals','Python','Java','JavaScript','React & Frontend','Node.js & Backend','Flutter & Dart','Project Management','Business Analysis','Quality Assurance','Other'].map(c => (
+                    <option key={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+
+              {editItem.content_type === 'video_link' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Google Drive Link</label>
+                  <input type="url" value={editForm.drive_link}
+                    onChange={(e) => setEditForm({...editForm, drive_link: e.target.value})}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    placeholder="https://drive.google.com/file/d/..." />
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-2">
+                <button onClick={saveEdit} disabled={editLoading}
+                  className="flex-1 py-3 rounded-xl font-semibold text-white disabled:opacity-50"
+                  style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
+                  {editLoading ? 'Saving...' : 'Save Changes'}
+                </button>
+                <button onClick={() => setEditItem(null)}
+                  className="px-6 py-3 rounded-xl font-semibold border-2 border-gray-200 text-gray-600 hover:bg-gray-50">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -354,3 +354,51 @@ def get_content_comments(content_id):
         .order_by(ContentComment.created_at.desc()).all()
 
     return jsonify({'comments': [c.to_dict() for c in comments]}), 200
+
+# ── INSTRUCTOR: UPDATE CONTENT ────────────────────────
+@learning_bp.route('/content/<int:content_id>', methods=['PUT'])
+@jwt_required()
+def update_content(content_id):
+    user_id, user_role = get_user_from_token()
+    if not user_id:
+        return jsonify({'message': 'Invalid token'}), 422
+    if user_role != 'instructor':
+        return jsonify({'message': 'Instructors only'}), 403
+
+    content = LearningContent.query.get_or_404(content_id)
+
+    if content.instructor_id != user_id:
+        return jsonify({'message': 'Not authorized'}), 403
+
+    data = request.get_json()
+    content.title = data.get('title', content.title)
+    content.description = data.get('description', content.description)
+    content.category = data.get('category', content.category)
+    content.drive_link = data.get('drive_link', content.drive_link)
+    content.is_approved = False
+
+    db.session.commit()
+    return jsonify({
+        'message': 'Content updated successfully',
+        'content': content.to_dict()
+    }), 200
+
+
+# ── INSTRUCTOR: DELETE CONTENT ────────────────────────
+@learning_bp.route('/content/<int:content_id>', methods=['DELETE'])
+@jwt_required()
+def delete_content(content_id):
+    user_id, user_role = get_user_from_token()
+    if not user_id:
+        return jsonify({'message': 'Invalid token'}), 422
+    if user_role != 'instructor':
+        return jsonify({'message': 'Instructors only'}), 403
+
+    content = LearningContent.query.get_or_404(content_id)
+
+    if content.instructor_id != user_id:
+        return jsonify({'message': 'Not authorized'}), 403
+
+    db.session.delete(content)
+    db.session.commit()
+    return jsonify({'message': 'Content deleted successfully'}), 200
