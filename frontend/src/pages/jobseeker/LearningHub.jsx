@@ -7,8 +7,11 @@ const CATEGORIES = ['All', 'Web Development', 'Data Science', 'UI/UX Design', 'D
 export default function LearningHub() {
   const { user } = useAuth()
   const [contents, setContents] = useState([])
+  const [filteredContents, setFilteredContents] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState('All')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [contentType, setContentType] = useState('All')
   const [selectedContent, setSelectedContent] = useState(null)
   const [comments, setComments] = useState([])
   const [newComment, setNewComment] = useState('')
@@ -21,18 +24,53 @@ export default function LearningHub() {
 
   useEffect(() => {
     fetchContent()
-  }, [selectedCategory])
+  }, [])
+
+  useEffect(() => {
+    applyFilters()
+  }, [contents, selectedCategory, searchQuery, contentType])
 
   const fetchContent = async () => {
     setLoading(true)
     try {
-      const params = selectedCategory !== 'All' ? `?category=${selectedCategory}` : ''
-      const res = await API.get(`/learning/content${params}`)
+      const res = await API.get('/learning/content')
       setContents(res.data.content)
     } catch (err) {
       setError('Failed to load content')
     }
     setLoading(false)
+  }
+
+  const applyFilters = () => {
+    let filtered = [...contents]
+
+    // Category filter
+    if (selectedCategory !== 'All') {
+      filtered = filtered.filter(c => c.category === selectedCategory)
+    }
+
+    // Content type filter
+    if (contentType !== 'All') {
+      filtered = filtered.filter(c => {
+        if (contentType === 'Video') return c.content_type === 'video_link'
+        if (contentType === 'PDF') return c.content_type === 'pdf'
+        if (contentType === 'Notes') return c.content_type === 'note'
+        return true
+      })
+    }
+
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(c =>
+        c.title.toLowerCase().includes(query) ||
+        c.description?.toLowerCase().includes(query) ||
+        c.instructor_name?.toLowerCase().includes(query) ||
+        c.category?.toLowerCase().includes(query)
+      )
+    }
+
+    setFilteredContents(filtered)
   }
 
   const openContent = async (content) => {
@@ -80,12 +118,20 @@ export default function LearningHub() {
     return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
   }
 
+  const clearFilters = () => {
+    setSearchQuery('')
+    setSelectedCategory('All')
+    setContentType('All')
+  }
+
+  const hasActiveFilters = searchQuery || selectedCategory !== 'All' || contentType !== 'All'
+
+  // ── CONTENT DETAIL VIEW ──
   if (selectedContent) {
     const daysLeft = accessInfo ? getDaysRemaining(accessInfo.expires_at) : 0
 
     return (
       <div className="min-h-screen" style={{background: '#f0fdf4'}}>
-        {/* Header */}
         <div className="bg-white border-b border-gray-100 px-6 py-4 flex items-center gap-4 shadow-sm">
           <button onClick={() => setSelectedContent(null)}
             className="flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium text-sm">
@@ -105,10 +151,7 @@ export default function LearningHub() {
             </div>
           )}
 
-          {/* Content Card */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
-
-            {/* Thumbnail */}
             <div className="relative w-full h-64 flex items-center justify-center"
               style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
               {selectedContent.thumbnail ? (
@@ -124,8 +167,6 @@ export default function LearningHub() {
                   <p className="text-white font-medium">{selectedContent.title}</p>
                 </div>
               )}
-
-              {/* Access badge */}
               {selectedContent.content_type === 'video_link' && (
                 <div className="absolute top-4 right-4">
                   {hasAccess ? (
@@ -162,7 +203,6 @@ export default function LearningHub() {
                 </span>
               </div>
 
-              {/* Access Content Button */}
               {hasAccess ? (
                 <div>
                   {selectedContent.content_type === 'video_link' && selectedContent.drive_link && (
@@ -234,13 +274,11 @@ export default function LearningHub() {
             </div>
           </div>
 
-          {/* Comments Section */}
+          {/* Comments */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <h2 className="font-bold text-gray-800 text-lg mb-5">
               💬 Comments ({comments.length})
             </h2>
-
-            {/* Add Comment */}
             <div className="flex gap-3 mb-6">
               <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
                 style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
@@ -260,13 +298,9 @@ export default function LearningHub() {
                 </button>
               </div>
             </div>
-
-            {/* Comments List */}
             <div className="space-y-4">
               {comments.length === 0 ? (
-                <p className="text-gray-400 text-sm text-center py-4">
-                  No comments yet. Be the first to comment!
-                </p>
+                <p className="text-gray-400 text-sm text-center py-4">No comments yet.</p>
               ) : (
                 comments.map((c) => (
                   <div key={c.id} className="flex gap-3">
@@ -293,6 +327,7 @@ export default function LearningHub() {
     )
   }
 
+  // ── MAIN LIST VIEW ──
   return (
     <div>
       {error && (
@@ -301,20 +336,104 @@ export default function LearningHub() {
         </div>
       )}
 
-      {/* Category Filter */}
-      <div className="flex gap-2 flex-wrap mb-6">
-        {CATEGORIES.map(cat => (
-          <button key={cat}
-            onClick={() => setSelectedCategory(cat)}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition ${
-              selectedCategory === cat
-                ? 'text-white'
-                : 'bg-white text-gray-600 border border-gray-200 hover:border-teal-400'
-            }`}
-            style={selectedCategory === cat ? {background: 'linear-gradient(135deg, #0f4c35, #10b981)'} : {}}>
-            {cat}
-          </button>
-        ))}
+      {/* Search + Filters Bar */}
+      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-6">
+
+        {/* Search Input */}
+        <div className="relative mb-4">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">🔍</span>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm"
+            placeholder="Search by title, description, instructor or category..."
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg">
+              ✕
+            </button>
+          )}
+        </div>
+
+        {/* Filter Row */}
+        <div className="flex flex-wrap items-center gap-3">
+
+          {/* Content Type Filter */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-gray-500">Type:</span>
+            <div className="flex gap-1.5">
+              {['All', 'Video', 'PDF', 'Notes'].map(type => (
+                <button key={type}
+                  onClick={() => setContentType(type)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
+                    contentType === type ? 'text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                  style={contentType === type ? {background: 'linear-gradient(135deg, #0f4c35, #10b981)'} : {}}>
+                  {type === 'Video' ? '🎥' : type === 'PDF' ? '📄' : type === 'Notes' ? '📝' : ''} {type}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Clear filters */}
+          {hasActiveFilters && (
+            <button
+              onClick={clearFilters}
+              className="ml-auto text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1">
+              ✕ Clear filters
+            </button>
+          )}
+        </div>
+
+        {/* Category Filter */}
+        <div className="flex flex-wrap gap-2 mt-3">
+          {CATEGORIES.map(cat => (
+            <button key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition ${
+                selectedCategory === cat
+                  ? 'text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+              style={selectedCategory === cat ? {background: 'linear-gradient(135deg, #0f4c35, #10b981)'} : {}}>
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Results count */}
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-sm text-gray-500">
+          {loading ? 'Loading...' : `${filteredContents.length} result${filteredContents.length !== 1 ? 's' : ''} found`}
+          {hasActiveFilters && (
+            <span className="ml-2 text-teal-600 font-medium">
+              (filtered)
+            </span>
+          )}
+        </p>
+        {hasActiveFilters && (
+          <div className="flex items-center gap-2 text-xs text-gray-500">
+            {selectedCategory !== 'All' && (
+              <span className="px-2 py-1 rounded-full bg-teal-100 text-teal-700 font-medium">
+                📁 {selectedCategory}
+              </span>
+            )}
+            {contentType !== 'All' && (
+              <span className="px-2 py-1 rounded-full bg-teal-100 text-teal-700 font-medium">
+                {contentType === 'Video' ? '🎥' : contentType === 'PDF' ? '📄' : '📝'} {contentType}
+              </span>
+            )}
+            {searchQuery && (
+              <span className="px-2 py-1 rounded-full bg-teal-100 text-teal-700 font-medium">
+                🔍 "{searchQuery}"
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Content Grid */}
@@ -323,15 +442,30 @@ export default function LearningHub() {
           <div className="text-5xl mb-4 animate-pulse">📚</div>
           <p className="text-gray-500">Loading content...</p>
         </div>
-      ) : contents.length === 0 ? (
+      ) : filteredContents.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-2xl border border-gray-100">
-          <div className="text-6xl mb-4">📭</div>
-          <h3 className="text-xl font-bold text-gray-800 mb-2">No content yet</h3>
-          <p className="text-gray-500 text-sm">Check back later for new learning materials</p>
+          <div className="text-6xl mb-4">
+            {hasActiveFilters ? '🔍' : '📭'}
+          </div>
+          <h3 className="text-xl font-bold text-gray-800 mb-2">
+            {hasActiveFilters ? 'No results found' : 'No content yet'}
+          </h3>
+          <p className="text-gray-500 text-sm mb-4">
+            {hasActiveFilters
+              ? 'Try changing your search or filters'
+              : 'Check back later for new learning materials'}
+          </p>
+          {hasActiveFilters && (
+            <button onClick={clearFilters}
+              className="px-5 py-2 rounded-xl text-sm font-semibold text-white"
+              style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
+              Clear all filters
+            </button>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {contents.map(content => (
+          {filteredContents.map(content => (
             <div key={content.id}
               onClick={() => openContent(content)}
               className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-md transition hover:-translate-y-0.5">
