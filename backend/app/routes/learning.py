@@ -303,7 +303,12 @@ def review_content(content_id):
         return jsonify({'message': 'Action must be approve or reject'}), 400
 
     content = LearningContent.query.get_or_404(content_id)
-    content.is_approved = (action == 'approve')
+    if action == 'approve':
+        content.is_approved = True
+        content.is_rejected = False
+    else:
+        content.is_approved = False
+        content.is_rejected = True
     content.approved_by = user_id
     content.approved_at = datetime.utcnow()
 

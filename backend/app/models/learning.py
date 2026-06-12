@@ -25,6 +25,7 @@ class LearningContent(db.Model):
 
     # Admin approval
     is_approved = db.Column(db.Boolean, default=False)
+    is_rejected = db.Column(db.Boolean, default=False)
     approved_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     approved_at = db.Column(db.DateTime, nullable=True)
 
@@ -43,6 +44,7 @@ class LearningContent(db.Model):
             'instructor_id': self.instructor_id,
             'instructor_name': self.instructor.full_name if self.instructor else None,
             'is_approved': self.is_approved,
+            'is_rejected': self.is_rejected,
             'created_at': str(self.created_at)
         }
 

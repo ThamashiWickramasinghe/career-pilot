@@ -519,17 +519,21 @@ export default function AdminDashboard() {
                 <p className="text-gray-500 mt-1">Review and approve instructor uploaded materials</p>
               </div>
 
-              <div className="flex gap-3 mb-5">
+              <div className="flex gap-3 mb-5 flex-wrap">
                 {['all', 'pending', 'approved', 'rejected'].map(f => (
                   <button key={f}
                     onClick={() => setContentFilter(f)}
-                    className={`px-4 py-2 rounded-xl text-sm font-medium transition capitalize ${
+                    className={`px-4 py-2 rounded-xl text-sm font-medium transition ${
                       contentFilter === f ? 'text-white' : 'bg-white text-gray-600 border border-gray-200'
                     }`}
                     style={contentFilter === f ? {background: 'linear-gradient(135deg, #0f4c35, #10b981)'} : {}}>
-                    {f === 'all' ? 'All Content' :
-                     f === 'pending' ? `⏳ Pending (${allContent.filter(i => !i.is_approved && !i.is_rejected).length})` :
-                     f === 'approved' ? '✅ Approved' : '❌ Rejected'}
+                    {f === 'all'
+                      ? `All Content (${allContent.length})`
+                      : f === 'pending'
+                      ? `⏳ Pending (${allContent.filter(i => !i.is_approved && !i.is_rejected).length})`
+                      : f === 'approved'
+                      ? `✅ Approved (${allContent.filter(i => i.is_approved).length})`
+                      : `❌ Rejected (${allContent.filter(i => i.is_rejected).length})`}
                   </button>
                 ))}
               </div>
@@ -596,7 +600,7 @@ export default function AdminDashboard() {
                             </span>
                           </td>
                           <td className="px-5 py-4">
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 flex-wrap">
                               {!item.is_approved && !item.is_rejected && (
                                 <button
                                   onClick={() => handleContentReview(item.id, 'approve')}
@@ -606,6 +610,22 @@ export default function AdminDashboard() {
                                 </button>
                               )}
                               {!item.is_approved && !item.is_rejected && (
+                                <button
+                                  onClick={() => handleContentReview(item.id, 'reject')}
+                                  className="text-xs px-3 py-1 rounded-lg text-white font-medium"
+                                  style={{background: '#ef4444'}}>
+                                  ❌ Reject
+                                </button>
+                              )}
+                              {item.is_rejected && !item.is_approved && (
+                                <button
+                                  onClick={() => handleContentReview(item.id, 'approve')}
+                                  className="text-xs px-3 py-1 rounded-lg text-white font-medium"
+                                  style={{background: '#10b981'}}>
+                                  ✅ Approve
+                                </button>
+                              )}
+                              {item.is_approved && (
                                 <button
                                   onClick={() => handleContentReview(item.id, 'reject')}
                                   className="text-xs px-3 py-1 rounded-lg text-white font-medium"
