@@ -2,8 +2,11 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import API from '../../utils/api'
 
-const CATEGORIES = ['All', 'Web Development', 'Data Science', 'UI/UX Design', 'DevOps', 'Cybersecurity', 'Mobile Development']
-
+const CATEGORIES = [
+  'Web Development', 'Data Science', 'UI/UX Design',
+  'DevOps', 'Cybersecurity', 'Mobile Development', 
+  'Software Engineering', 'Database & SQL', 'Other'
+]
 export default function LearningHub() {
   const { user } = useAuth()
   const [contents, setContents] = useState([])

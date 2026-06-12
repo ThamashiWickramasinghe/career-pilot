@@ -3,7 +3,8 @@ import API from '../../utils/api'
 
 const CATEGORIES = [
   'Web Development', 'Data Science', 'UI/UX Design',
-  'DevOps', 'Cybersecurity', 'Mobile Development'
+  'DevOps', 'Cybersecurity', 'Mobile Development', 
+  'Software Engineering', 'Database & SQL', 'Other'
 ]
 
 export default function PostContent({ onSuccess }) {
