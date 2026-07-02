@@ -32,7 +32,7 @@ def register():
     if User.query.filter_by(username=data['username']).first():
         return jsonify({'message': 'Username already taken'}), 409
 
-    if data['role'] not in ['job_seeker', 'instructor']:
+    if data['role'] not in ['job_seeker', 'instructor', 'company']:
         return jsonify({'message': 'Invalid role'}), 400
 
     hashed = bcrypt.hashpw(
@@ -41,13 +41,14 @@ def register():
     ).decode('utf-8')
 
     new_user = User(
-        full_name=data['full_name'],
-        username=data['username'],
-        email=data['email'],
-        password=hashed,
-        role=data['role'],
-        current_post=data.get('current_post', None)
-    )
+    full_name=data['full_name'],
+    username=data['username'],
+    email=data['email'],
+    password=hashed,
+    role=data['role'],
+    current_post=data.get('current_post', None),
+    company_name=data.get('company_name', None)
+)
 
     db.session.add(new_user)
     db.session.commit()

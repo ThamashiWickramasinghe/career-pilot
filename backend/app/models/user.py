@@ -9,8 +9,14 @@ class User(db.Model):
     username = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.Enum('job_seeker', 'instructor', 'admin'),
-                     nullable=False, default='job_seeker')
+    role = db.Column(db.Enum('job_seeker', 'instructor', 'admin', 'company'),
+                 nullable=False, default='job_seeker')
+
+            # Company specific fields
+    company_name = db.Column(db.String(200), nullable=True)
+    company_description = db.Column(db.Text, nullable=True)
+    company_website = db.Column(db.String(200), nullable=True)
+    company_location = db.Column(db.String(200), nullable=True)
     current_post = db.Column(db.String(100), nullable=True)
     
     # Job seeker profile fields
@@ -43,6 +49,10 @@ class User(db.Model):
             'education': self.education,
             'experience_years': self.experience_years,
             'bio': self.bio,
+            'company_name': self.company_name,
+            'company_description': self.company_description,
+            'company_website': self.company_website,
+            'company_location': self.company_location,
             'is_active': self.is_active,
             'created_at': str(self.created_at)
         }
