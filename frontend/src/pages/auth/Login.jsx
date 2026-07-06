@@ -19,8 +19,9 @@ export default function Login() {
       login(res.data.user, res.data.token)
       const role = res.data.user.role
       if (role === 'admin') navigate('/admin/dashboard')
-      else if (role === 'instructor') navigate('/instructor/dashboard')
-      else navigate('/dashboard')
+    else if (role === 'instructor') navigate('/instructor/dashboard')
+    else if (role === 'company') navigate('/company/dashboard')
+    else navigate('/dashboard')
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed')
     }

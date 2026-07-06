@@ -1,14 +1,25 @@
 import { useState } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import API from '../../utils/api'
 
-export default function ResetPassword() {
-  const { token } = useParams()
-  const navigate = useNavigate()
-  const [form, setForm] = useState({ password: '', confirm_password: '' })
+const POST_OPTIONS = [
+  { group: '👨‍🎓 Student', options: ['Undergraduate', 'Postgraduate'] },
+  { group: '💻 Development', options: ['Software Engineer', 'Frontend Developer', 'Backend Developer', 'Full Stack Developer', 'Mobile Developer'] },
+  { group: '🎨 Design', options: ['UI/UX Designer', 'Graphic Designer'] },
+  { group: '📊 Data', options: ['Data Scientist', 'Data Analyst', 'Machine Learning Engineer'] },
+  { group: '☁️ Infrastructure', options: ['DevOps Engineer', 'Cloud Engineer', 'Cybersecurity Analyst'] },
+  { group: '🔍 Other', options: ['QA Engineer', 'Project Manager', 'Business Analyst', 'IT Support'] },
+]
+
+export default function Register() {
+  const [form, setForm] = useState({
+    full_name: '', username: '', email: '',
+    password: '', confirm_password: '',
+    current_post: '', role: 'job_seeker'
+  })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [success, setSuccess] = useState(false)
+  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -16,18 +27,13 @@ export default function ResetPassword() {
       setError('Passwords do not match')
       return
     }
-    if (form.password.length < 6) {
-      setError('Password must be at least 6 characters')
-      return
-    }
     setLoading(true)
     setError('')
     try {
-      await API.post('/auth/reset-password', { ...form, token })
-      setSuccess(true)
-      setTimeout(() => navigate('/login'), 3000)
+      await API.post('/auth/register', form)
+      navigate('/login')
     } catch (err) {
-      setError(err.response?.data?.message || 'Reset failed')
+      setError(err.response?.data?.message || 'Registration failed')
     }
     setLoading(false)
   }
@@ -50,21 +56,21 @@ export default function ResetPassword() {
         <div className="relative z-10 w-full">
           {/* Logo */}
           <div className="w-20 h-20 bg-white bg-opacity-20 rounded-3xl flex items-center justify-center text-4xl mb-5 mx-auto backdrop-blur-sm border border-white border-opacity-30">
-            🔑
+            🚀
           </div>
-          <h1 className="text-4xl font-bold text-white mb-3">Set New Password</h1>
+          <h1 className="text-4xl font-bold text-white mb-3">Career Pilot</h1>
           <p className="text-green-100 text-base leading-relaxed max-w-xs mx-auto mb-10">
-            Choose a strong password to keep your Career Pilot account secure
+            Join thousands of professionals building their dream careers
           </p>
 
-          {/* Password tips */}
+          {/* Feature list */}
           <div className="space-y-5 text-left max-w-xs mx-auto">
             {[
-              { icon: '✅', title: 'At least 6 characters', desc: 'Longer passwords are more secure' },
-              { icon: '🔤', title: 'Mix letters and numbers', desc: 'Combine uppercase, lowercase & digits' },
-              { icon: '🔒', title: 'Avoid common words', desc: "Don't use your name or birthday" },
-              { icon: '🔄', title: 'Never reuse passwords', desc: 'Use a unique password for each account' },
-              { icon: '🛡️', title: 'Keep it private', desc: 'Never share your password with anyone' },
+              { icon: '🤖', title: 'AI Job Matching', desc: 'Find jobs that perfectly match your skills' },
+              { icon: '📊', title: 'Skill Gap Analysis', desc: 'Discover what skills you need to grow' },
+              { icon: '🗺️', title: 'Career Roadmap', desc: 'Get a personalized step-by-step career path' },
+              { icon: '🏆', title: 'Skill Challenges', desc: 'Test yourself and earn achievement badges' },
+              { icon: '📚', title: 'Learning Hub', desc: 'Access curated courses and study materials' },
             ].map((item) => (
               <div key={item.title} className="flex items-start gap-4">
                 <span className="text-2xl mt-0.5 flex-shrink-0">{item.icon}</span>
@@ -75,123 +81,178 @@ export default function ResetPassword() {
               </div>
             ))}
           </div>
+
+          {/* Stats */}
+          <div className="flex gap-6 mt-10 justify-center">
+            <div className="text-center">
+              <p className="text-white text-2xl font-bold">500+</p>
+              <p className="text-green-200 text-xs">Job Matches</p>
+            </div>
+            <div className="w-px bg-white bg-opacity-30"></div>
+            <div className="text-center">
+              <p className="text-white text-2xl font-bold">50+</p>
+              <p className="text-green-200 text-xs">Courses</p>
+            </div>
+            <div className="w-px bg-white bg-opacity-30"></div>
+            <div className="text-center">
+              <p className="text-white text-2xl font-bold">100+</p>
+              <p className="text-green-200 text-xs">Challenges</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Right Side */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50">
-        <div className="w-full max-w-md">
+      {/* Right Side — Register Form */}
+      <div className="w-full lg:w-3/5 flex items-center justify-center p-8 bg-gray-50 overflow-y-auto">
+        <div className="w-full max-w-lg py-8">
 
           {/* Mobile logo */}
-          <div className="lg:hidden text-center mb-8">
+          <div className="lg:hidden text-center mb-6">
             <span className="text-3xl">🚀</span>
             <h1 className="text-2xl font-bold text-teal-700 mt-2">Career Pilot</h1>
           </div>
 
-          {success ? (
-            /* Success State */
-            <div className="text-center">
-              <div className="w-24 h-24 rounded-full flex items-center justify-center text-5xl mx-auto mb-6"
-                style={{background: 'linear-gradient(135deg, #d1fae5, #a7f3d0)'}}>
-                ✅
-              </div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-3">
-                Password Reset Successful!
-              </h2>
-              <p className="text-gray-500 text-sm mb-2">
-                Your password has been updated successfully.
-              </p>
-              <p className="text-gray-400 text-xs">
-                Redirecting to login page in 3 seconds...
-              </p>
-              <Link
-                to="/login"
-                className="inline-block mt-6 px-6 py-2.5 rounded-xl font-semibold text-white text-sm"
-                style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
-                Go to Login →
-              </Link>
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-gray-800">Create account</h2>
+            <p className="text-gray-500 mt-2">Fill in your details to get started</p>
+          </div>
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl mb-5 text-sm flex items-center gap-2">
+              <span>⚠️</span> {error}
             </div>
-          ) : (
-            <>
-              <div className="mb-8">
-                <h2 className="text-3xl font-bold text-gray-800">New Password</h2>
-                <p className="text-gray-500 mt-2">
-                  Enter and confirm your new password below
-                </p>
-              </div>
-
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl mb-5 text-sm flex items-center gap-2">
-                  <span>⚠️</span> {error}
-                </div>
-              )}
-
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    New Password
-                  </label>
-                  <input
-                    type="password" required value={form.password}
-                    onChange={(e) => setForm({ ...form, password: e.target.value })}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white transition"
-                    placeholder="Min. 6 characters"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Confirm New Password
-                  </label>
-                  <input
-                    type="password" required value={form.confirm_password}
-                    onChange={(e) => setForm({ ...form, confirm_password: e.target.value })}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white transition"
-                    placeholder="Re-enter new password"
-                  />
-                </div>
-
-                {/* Password strength indicator */}
-                {form.password && (
-                  <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-gray-500">Password strength</span>
-                      <span className={
-                        form.password.length >= 10 ? 'text-green-600 font-medium' :
-                        form.password.length >= 6 ? 'text-yellow-600 font-medium' :
-                        'text-red-500 font-medium'
-                      }>
-                        {form.password.length >= 10 ? 'Strong' :
-                         form.password.length >= 6 ? 'Medium' : 'Weak'}
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-1.5">
-                      <div
-                        className="h-1.5 rounded-full transition-all duration-300"
-                        style={{
-                          width: form.password.length >= 10 ? '100%' :
-                                 form.password.length >= 6 ? '60%' : '25%',
-                          background: form.password.length >= 10 ? '#10b981' :
-                                      form.password.length >= 6 ? '#f59e0b' : '#ef4444'
-                        }}>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                <button
-                  type="submit" disabled={loading}
-                  className="w-full py-3 rounded-xl font-semibold text-white transition disabled:opacity-50"
-                  style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
-                  {loading ? 'Resetting...' : 'Reset Password →'}
-                </button>
-              </form>
-            </>
           )}
 
-          <p className="text-center text-sm text-gray-500 mt-8">
+          <form onSubmit={handleSubmit} className="space-y-4">
+
+            {/* Full Name + Username */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Full Name
+                </label>
+                <input
+                  type="text" required value={form.full_name}
+                  onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white transition"
+                  placeholder="Enter Name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Username
+                </label>
+                <input
+                  type="text" required value={form.username}
+                  onChange={(e) => setForm({ ...form, username: e.target.value })}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white transition"
+                  placeholder="Enter User Name"
+                />
+              </div>
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Email Address
+              </label>
+              <input
+                type="email" required value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white transition"
+                placeholder="Example@gmail.com"
+              />
+            </div>
+
+            {/* Current Post + Role */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Current Post
+                </label>
+                <select
+                  value={form.current_post}
+                  onChange={(e) => setForm({ ...form, current_post: e.target.value })}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white transition">
+                  <option value="">Select post</option>
+                  {POST_OPTIONS.map((group) => (
+                    <optgroup key={group.group} label={group.group}>
+                      {group.options.map((opt) => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  I am registering as
+                </label>
+                <select
+                  value={form.role}
+                  onChange={(e) => setForm({ ...form, role: e.target.value })}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white transition">
+                  <option value="job_seeker">Job Seeker</option>
+                  <option value="instructor">Instructor</option>
+                  <option value="company">Company</option>
+              </select>
+              </div>
+            </div>
+
+            {/* Company Name — only show if role is company */}
+            {form.role === 'company' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Company Name
+                </label>
+                <input
+                  type="text"
+                  value={form.company_name || ''}
+                  onChange={(e) => setForm({ ...form, company_name: e.target.value })}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white transition"
+                  placeholder="e.g. TechCorp Lanka"
+                />
+              </div>
+            )}
+
+            {/* Password + Confirm */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Password
+                </label>
+                <input
+                  type="password" required value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white transition"
+                  placeholder="Min. 6 characters"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Confirm Password
+                </label>
+                <input
+                  type="password" required value={form.confirm_password}
+                  onChange={(e) => setForm({ ...form, confirm_password: e.target.value })}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white transition"
+                  placeholder="Re-enter password"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit" disabled={loading}
+              className="w-full py-3 rounded-xl font-semibold text-white transition disabled:opacity-50 mt-2"
+              style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
+              {loading ? 'Creating account...' : 'Create Account →'}
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-gray-500 mt-6">
+            Already have an account?{' '}
             <Link to="/login" className="text-teal-600 font-semibold hover:underline">
-              ← Back to login
+              Sign in here
             </Link>
           </p>
         </div>

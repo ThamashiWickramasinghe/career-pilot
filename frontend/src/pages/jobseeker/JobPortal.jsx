@@ -1,0 +1,546 @@
+import { useState, useEffect } from 'react'
+import { useAuth } from '../../context/AuthContext'
+import API from '../../utils/api'
+
+const CATEGORIES = [
+  'All', 'Software Engineering', 'Web Development', 'Mobile Development',
+  'Data Science', 'UI/UX Design', 'DevOps & Cloud', 'Cybersecurity',
+  'Machine Learning & AI', 'Database & SQL', 'Project Management',
+  'Quality Assurance', 'Other'
+]
+
+const JOB_TYPES = ['All', 'Full Time', 'Part Time', 'Internship', 'Remote', 'Contract']
+
+export default function JobPortal() {
+  const { user } = useAuth()
+  const [jobs, setJobs] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [selectedJob, setSelectedJob] = useState(null)
+  const [applying, setApplying] = useState(false)
+  const [coverLetter, setCoverLetter] = useState('')
+  const [myApplications, setMyApplications] = useState([])
+  const [activeSection, setActiveSection] = useState('browse')
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+
+  // Filters
+  const [search, setSearch] = useState('')
+  const [category, setCategory] = useState('All')
+  const [jobType, setJobType] = useState('All')
+  const [location, setLocation] = useState('')
+
+  useEffect(() => {
+    fetchJobs()
+    fetchMyApplications()
+  }, [])
+
+  useEffect(() => {
+    fetchJobs()
+  }, [category, jobType])
+
+  const fetchJobs = async () => {
+    setLoading(true)
+    try {
+      const params = new URLSearchParams()
+      if (category !== 'All') params.append('category', category)
+      if (jobType !== 'All') params.append('job_type', jobType)
+      if (search) params.append('search', search)
+      if (location) params.append('location', location)
+
+      const res = await API.get(`/jobs/all?${params}`)
+      setJobs(res.data.jobs)
+    } catch (err) {
+      setError('Failed to load jobs')
+    }
+    setLoading(false)
+  }
+
+  const fetchMyApplications = async () => {
+    try {
+      const res = await API.get('/jobs/my-applications')
+      setMyApplications(res.data.applications)
+    } catch (err) {
+      console.error('Failed to load applications')
+    }
+  }
+
+  const handleApply = async () => {
+    setApplying(true)
+    setError('')
+    try {
+      await API.post(`/jobs/${selectedJob.id}/apply`, {
+        cover_letter: coverLetter
+      })
+      setSuccess('Application submitted successfully! 🎉')
+      setCoverLetter('')
+      setSelectedJob(null)
+      fetchMyApplications()
+      setTimeout(() => setSuccess(''), 3000)
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to apply')
+    }
+    setApplying(false)
+  }
+
+  const isApplied = (jobId) => {
+    return myApplications.some(a => a.job_id === jobId)
+  }
+
+  const hasActiveFilters = search || category !== 'All' || jobType !== 'All' || location
+
+  const clearFilters = () => {
+    setSearch('')
+    setCategory('All')
+    setJobType('All')
+    setLocation('')
+  }
+
+  // ── JOB DETAIL VIEW ──
+  if (selectedJob) {
+    return (
+      <div>
+        <button onClick={() => setSelectedJob(null)}
+          className="flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium text-sm mb-5">
+          ← Back to Job Portal
+        </button>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl mb-4 text-sm">
+            ⚠️ {error}
+          </div>
+        )}
+        {success && (
+          <div className="bg-green-50 border border-green-200 text-green-700 p-3 rounded-xl mb-4 text-sm">
+            ✅ {success}
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          {/* Job Details */}
+          <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div className="flex items-start justify-between gap-4 mb-6">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-bold text-white flex-shrink-0"
+                  style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
+                  {selectedJob.company_name?.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-800">{selectedJob.title}</h1>
+                  <p className="text-teal-600 font-medium">{selectedJob.company_name}</p>
+                </div>
+              </div>
+              {isApplied(selectedJob.id) ? (
+                <span className="px-4 py-2 rounded-xl text-sm font-semibold bg-green-100 text-green-700 flex-shrink-0">
+                  ✅ Applied
+                </span>
+              ) : (
+                <button
+                  onClick={() => document.getElementById('apply-section').scrollIntoView({behavior: 'smooth'})}
+                  className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white flex-shrink-0"
+                  style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
+                  Apply Now →
+                </button>
+              )}
+            </div>
+
+            {/* Job Meta */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+              {[
+                { icon: '📍', label: 'Location', value: selectedJob.location },
+                { icon: '⏰', label: 'Job Type', value: selectedJob.job_type },
+                { icon: '📁', label: 'Category', value: selectedJob.category },
+                { icon: '💰', label: 'Salary', value: selectedJob.salary_range || 'Not specified' },
+              ].map(item => (
+                <div key={item.label} className="p-3 rounded-xl" style={{background: '#f0fdf4'}}>
+                  <p className="text-xs text-gray-500 mb-1">{item.icon} {item.label}</p>
+                  <p className="text-sm font-semibold text-gray-800">{item.value}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Required Skills */}
+            <div className="mb-6">
+              <h3 className="font-bold text-gray-800 mb-3">🛠️ Required Skills</h3>
+              <div className="flex flex-wrap gap-2">
+                {selectedJob.required_skills?.split(',').map(skill => (
+                  <span key={skill}
+                    className="text-sm px-3 py-1 rounded-full font-medium"
+                    style={{background: '#d1fae5', color: '#065f46'}}>
+                    {skill.trim()}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Experience */}
+            {selectedJob.experience && (
+              <div className="mb-6">
+                <h3 className="font-bold text-gray-800 mb-2">📊 Experience Required</h3>
+                <p className="text-sm text-gray-600 bg-gray-50 px-4 py-2 rounded-xl">{selectedJob.experience}</p>
+              </div>
+            )}
+
+            {/* Description */}
+            <div className="mb-6">
+              <h3 className="font-bold text-gray-800 mb-3">📋 Job Description</h3>
+              <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
+                {selectedJob.description}
+              </p>
+            </div>
+
+            {/* Deadline */}
+            {selectedJob.deadline && (
+              <div className="p-3 rounded-xl bg-yellow-50 border border-yellow-200 text-sm text-yellow-700 mb-6">
+                ⏰ Application deadline: <strong>{new Date(selectedJob.deadline).toLocaleDateString()}</strong>
+              </div>
+            )}
+
+            {/* Apply Section */}
+            {!isApplied(selectedJob.id) && (
+              <div id="apply-section" className="border-t border-gray-100 pt-6">
+                <h3 className="font-bold text-gray-800 mb-4">✍️ Apply for this Job</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Cover Letter <span className="text-gray-400">(optional)</span>
+                    </label>
+                    <textarea
+                      value={coverLetter}
+                      onChange={(e) => setCoverLetter(e.target.value)}
+                      rows={4}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      placeholder="Tell the company why you're a great fit for this role..." />
+                  </div>
+                  <button
+                    onClick={handleApply}
+                    disabled={applying}
+                    className="w-full py-3 rounded-xl font-semibold text-white disabled:opacity-50"
+                    style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
+                    {applying ? 'Submitting...' : 'Submit Application →'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Company Info Sidebar */}
+          <div className="space-y-4">
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+              <h3 className="font-bold text-gray-800 mb-4">🏢 About Company</h3>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold text-white"
+                  style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
+                  {selectedJob.company_name?.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-800">{selectedJob.company_name}</p>
+                  <p className="text-xs text-gray-400">IT Company</p>
+                </div>
+              </div>
+              <div className="space-y-2 text-sm text-gray-600">
+                <p>📍 {selectedJob.location}</p>
+                <p>💼 {selectedJob.applications_count} applications</p>
+                <p>📅 Posted {new Date(selectedJob.created_at).toLocaleDateString()}</p>
+              </div>
+            </div>
+
+            {/* Similar jobs */}
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+              <h3 className="font-bold text-gray-800 mb-4">💡 Similar Jobs</h3>
+              <div className="space-y-3">
+                {jobs.filter(j => j.id !== selectedJob.id && j.category === selectedJob.category).slice(0, 3).map(j => (
+                  <div key={j.id}
+                    onClick={() => setSelectedJob(j)}
+                    className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded-xl transition">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+                      style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
+                      {j.company_name?.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-800">{j.title}</p>
+                      <p className="text-xs text-gray-400">{j.company_name}</p>
+                    </div>
+                  </div>
+                ))}
+                {jobs.filter(j => j.id !== selectedJob.id && j.category === selectedJob.category).length === 0 && (
+                  <p className="text-sm text-gray-400">No similar jobs found</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ── MAIN JOB PORTAL VIEW ──
+  return (
+    <div>
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl mb-4 text-sm">
+          ⚠️ {error}
+        </div>
+      )}
+      {success && (
+        <div className="fixed top-6 right-6 z-50 bg-green-500 text-white px-5 py-3 rounded-xl shadow-lg text-sm font-medium">
+          ✅ {success}
+        </div>
+      )}
+
+      {/* Section Tabs */}
+      <div className="flex gap-3 mb-6">
+        <button onClick={() => setActiveSection('browse')}
+          className={`px-4 py-2 rounded-xl text-sm font-medium transition ${
+            activeSection === 'browse' ? 'text-white' : 'bg-white text-gray-600 border border-gray-200'
+          }`}
+          style={activeSection === 'browse' ? {background: 'linear-gradient(135deg, #0f4c35, #10b981)'} : {}}>
+          🔍 Browse Jobs ({jobs.length})
+        </button>
+        <button onClick={() => setActiveSection('applications')}
+          className={`px-4 py-2 rounded-xl text-sm font-medium transition ${
+            activeSection === 'applications' ? 'text-white' : 'bg-white text-gray-600 border border-gray-200'
+          }`}
+          style={activeSection === 'applications' ? {background: 'linear-gradient(135deg, #0f4c35, #10b981)'} : {}}>
+          📝 My Applications ({myApplications.length})
+        </button>
+      </div>
+
+      {/* BROWSE JOBS */}
+      {activeSection === 'browse' && (
+        <div>
+          {/* Search + Filters */}
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-6">
+
+            {/* Search */}
+            <div className="relative mb-4">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">🔍</span>
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && fetchJobs()}
+                className="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm"
+                placeholder="Search by job title, skills or keywords..."
+              />
+              {search && (
+                <button onClick={() => { setSearch(''); fetchJobs() }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">✕</button>
+              )}
+            </div>
+
+            {/* Filter Row */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+              {/* Location */}
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm">📍</span>
+                <input
+                  type="text"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && fetchJobs()}
+                  className="w-full border border-gray-200 rounded-xl pl-8 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm"
+                  placeholder="Location..." />
+              </div>
+
+              {/* Job Type */}
+              <select value={jobType} onChange={(e) => setJobType(e.target.value)}
+                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm bg-white">
+                {JOB_TYPES.map(t => <option key={t}>{t}</option>)}
+              </select>
+
+              {/* Search Button */}
+              <button onClick={fetchJobs}
+                className="py-2.5 rounded-xl text-sm font-semibold text-white"
+                style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
+                🔍 Search Jobs
+              </button>
+            </div>
+
+            {/* Category Filter */}
+            <div className="flex flex-wrap gap-2">
+              {CATEGORIES.map(cat => (
+                <button key={cat}
+                  onClick={() => setCategory(cat)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-medium transition ${
+                    category === cat ? 'text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                  style={category === cat ? {background: 'linear-gradient(135deg, #0f4c35, #10b981)'} : {}}>
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {hasActiveFilters && (
+              <button onClick={clearFilters}
+                className="mt-3 text-xs text-red-500 hover:text-red-600 font-medium">
+                ✕ Clear all filters
+              </button>
+            )}
+          </div>
+
+          {/* Results */}
+          <p className="text-sm text-gray-500 mb-4">
+            {loading ? 'Loading...' : `${jobs.length} job${jobs.length !== 1 ? 's' : ''} found`}
+          </p>
+
+          {loading ? (
+            <div className="text-center py-20 bg-white rounded-2xl border border-gray-100">
+              <div className="text-5xl mb-4 animate-pulse">💼</div>
+              <p className="text-gray-500">Loading jobs...</p>
+            </div>
+          ) : jobs.length === 0 ? (
+            <div className="text-center py-20 bg-white rounded-2xl border border-gray-100">
+              <div className="text-6xl mb-4">🔍</div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">No jobs found</h3>
+              <p className="text-gray-500 text-sm mb-4">Try different search terms or filters</p>
+              <button onClick={clearFilters}
+                className="px-5 py-2 rounded-xl text-sm font-semibold text-white"
+                style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
+                Clear Filters
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {jobs.map(job => (
+                <div key={job.id}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition cursor-pointer"
+                  onClick={() => setSelectedJob(job)}>
+                  <div className="flex items-start gap-4">
+                    {/* Company Logo */}
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold text-white flex-shrink-0"
+                      style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
+                      {job.company_name?.charAt(0).toUpperCase()}
+                    </div>
+
+                    {/* Job Info */}
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <h3 className="font-bold text-gray-800 text-lg">{job.title}</h3>
+                          <p className="text-teal-600 font-medium text-sm">{job.company_name}</p>
+                        </div>
+                        {isApplied(job.id) && (
+                          <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-700 font-medium flex-shrink-0">
+                            ✅ Applied
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex flex-wrap gap-2 mt-2 mb-3">
+                        <span className="text-xs px-2.5 py-1 rounded-full bg-teal-100 text-teal-700 font-medium">
+                          {job.job_type}
+                        </span>
+                        <span className="text-xs px-2.5 py-1 rounded-full bg-gray-100 text-gray-600">
+                          📍 {job.location}
+                        </span>
+                        <span className="text-xs px-2.5 py-1 rounded-full bg-gray-100 text-gray-600">
+                          📁 {job.category}
+                        </span>
+                        {job.salary_range && (
+                          <span className="text-xs px-2.5 py-1 rounded-full bg-yellow-100 text-yellow-700">
+                            💰 {job.salary_range}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Skills */}
+                      <div className="flex flex-wrap gap-1.5 mb-3">
+                        {job.required_skills?.split(',').slice(0, 5).map(skill => (
+                          <span key={skill}
+                            className="text-xs px-2 py-0.5 rounded-full"
+                            style={{background: '#d1fae5', color: '#065f46'}}>
+                            {skill.trim()}
+                          </span>
+                        ))}
+                        {job.required_skills?.split(',').length > 5 && (
+                          <span className="text-xs text-gray-400">
+                            +{job.required_skills.split(',').length - 5} more
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex gap-4 text-xs text-gray-400">
+                          <span>📝 {job.applications_count} applications</span>
+                          <span>📅 {new Date(job.created_at).toLocaleDateString()}</span>
+                          {job.deadline && (
+                            <span>⏰ Deadline: {new Date(job.deadline).toLocaleDateString()}</span>
+                          )}
+                        </div>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setSelectedJob(job) }}
+                          className="text-xs px-4 py-1.5 rounded-lg text-white font-medium"
+                          style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
+                          View & Apply →
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* MY APPLICATIONS */}
+      {activeSection === 'applications' && (
+        <div>
+          {myApplications.length === 0 ? (
+            <div className="text-center py-20 bg-white rounded-2xl border border-gray-100">
+              <div className="text-6xl mb-4">📝</div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">No applications yet</h3>
+              <p className="text-gray-500 text-sm mb-4">Browse jobs and start applying!</p>
+              <button onClick={() => setActiveSection('browse')}
+                className="px-5 py-2 rounded-xl text-sm font-semibold text-white"
+                style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
+                Browse Jobs
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {myApplications.map(app => (
+                <div key={app.id}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                  <div className="flex items-start gap-4">
+                    <div className="w-11 h-11 rounded-xl flex items-center justify-center text-xl font-bold text-white flex-shrink-0"
+                      style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
+                      {app.company_name?.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h3 className="font-bold text-gray-800">{app.job_title}</h3>
+                          <p className="text-teal-600 text-sm">{app.company_name}</p>
+                        </div>
+                        <span className={`text-xs px-3 py-1 rounded-full font-medium flex-shrink-0 ${
+                          app.status === 'Hired' ? 'bg-green-100 text-green-700' :
+                          app.status === 'Shortlisted' ? 'bg-blue-100 text-blue-700' :
+                          app.status === 'Rejected' ? 'bg-red-100 text-red-600' :
+                          'bg-yellow-100 text-yellow-700'
+                        }`}>
+                          {app.status === 'Hired' ? '🎉' :
+                           app.status === 'Shortlisted' ? '⭐' :
+                           app.status === 'Rejected' ? '❌' : '⏳'} {app.status}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-2">
+                        Applied on {new Date(app.applied_at).toLocaleDateString()}
+                      </p>
+                      {app.cover_letter && (
+                        <p className="text-xs text-gray-500 mt-2 italic">
+                          "{app.cover_letter.substring(0, 100)}..."
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}

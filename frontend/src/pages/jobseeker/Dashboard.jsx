@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import LearningHub from './LearningHub'
+import JobPortal from './JobPortal'
 
 export default function JobSeekerDashboard() {
   const { user, logout } = useAuth()
@@ -361,18 +362,16 @@ export default function JobSeekerDashboard() {
             </div>
           )}
 
-          {/* ── AI JOBS ── */}
-          {activeTab === 'ai-jobs' && (
-            <div className="bg-white rounded-2xl p-10 shadow-sm border border-gray-100 text-center">
-              <div className="text-7xl mb-5">🤖</div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3">AI Job Matching Engine</h3>
-              <p className="text-gray-500 max-w-md mx-auto">Personalized job recommendations built with Scikit-learn — no external AI API</p>
-              <div className="inline-block mt-5 px-5 py-2.5 rounded-full text-sm font-semibold text-white"
-                style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
-                In Development 🔧
-              </div>
+          {/* ── JOBS ── */}
+          {activeTab === 'jobs' && (
+          <div>
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">💼 Job Portal</h2>
+              <p className="text-gray-500 mt-1">Browse and apply for IT job vacancies</p>
             </div>
-          )}
+            <JobPortal />
+          </div>
+        )}
 
           {/* ── ROADMAP ── */}
           {activeTab === 'roadmap' && (
@@ -398,19 +397,7 @@ export default function JobSeekerDashboard() {
   </div>
 )}
 
-          {/* ── JOBS ── */}
-          {activeTab === 'jobs' && (
-            <div className="bg-white rounded-2xl p-10 shadow-sm border border-gray-100 text-center">
-              <div className="text-7xl mb-5">💼</div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3">Job Vacancies</h3>
-              <p className="text-gray-500 max-w-md mx-auto">Search and apply for jobs posted by instructors and companies</p>
-              <div className="inline-block mt-5 px-5 py-2.5 rounded-full text-sm font-semibold text-white"
-                style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
-                Coming Soon 🔧
-              </div>
-            </div>
-          )}
-
+          
           {/* ── CHALLENGES ── */}
           {activeTab === 'challenges' && (
             <div className="bg-white rounded-2xl p-10 shadow-sm border border-gray-100 text-center">

@@ -7,6 +7,7 @@ import ResetPassword from './pages/auth/ResetPassword'
 import JobSeekerDashboard from './pages/jobseeker/Dashboard'
 import InstructorDashboard from './pages/instructor/Dashboard'
 import AdminDashboard from './pages/admin/Dashboard'
+import CompanyDashboard from './pages/company/Dashboard'
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth()
@@ -40,6 +41,12 @@ function App() {
           <Route path="/instructor/dashboard" element={
             <ProtectedRoute allowedRoles={['instructor']}>
               <InstructorDashboard />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/company/dashboard" element={
+            <ProtectedRoute allowedRoles={['company']}>
+              <CompanyDashboard />
             </ProtectedRoute>
           } />
 
