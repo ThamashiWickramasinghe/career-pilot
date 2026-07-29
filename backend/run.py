@@ -4,6 +4,7 @@ app = create_app()
 
 from flask import send_from_directory
 import os
+from app.models.quiz import QuizCategory, QuizQuestion, QuizAttempt
 
 @app.route('/uploads/<path:filename>')
 def uploaded_file(filename):

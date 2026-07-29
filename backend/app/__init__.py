@@ -45,4 +45,7 @@ def create_app():
     from app.routes.job import job_bp
     app.register_blueprint(job_bp, url_prefix="/api/jobs")
 
+    from app.routes.quiz import quiz_bp
+    app.register_blueprint(quiz_bp, url_prefix='/api/quiz')
+
     return app

@@ -1,0 +1,30 @@
+[33m24fe565[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/feature/job-portal[m[33m, [m[1;31morigin/develop[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m, [m[1;32mfeature/job-portal[m[33m, [m[1;32mdevelop[m[33m)[m complete company dashboard and job portal - company post jobs, job seeker browse and apply
+[33m77fb960[m Add new user role
+[33m9708cf0[m[33m ([m[1;31morigin/feature/learning-hub[m[33m, [m[1;32mfeature/learning-hub[m[33m)[m fix: add is_rejected field to content model, fix reject button
+[33mef725d8[m add edit and delete content for instructor
+[33m7958e91[m expand learning hub categories
+[33m4338b9e[m add search and filter to learning hub
+[33m004e0de[m feat: instructor can view student comments on content
+[33mf18296a[m fix: serve uploaded files for thumbnail images
+[33m7ee94c9[m Merge branch 'main' into feature/learning-hub
+[33mc9bd210[m Merge branch 'main' into develop
+[33m41fd31f[m Merge branch 'main' into feature/learning-hub
+[33mddb031c[m fix PostContent merge conflict
+[33m0d23de4[m resolve merge conflict in PostContent.jsx
+[33m2c14d8c[m Edit postcontent.jsx file
+[33m2f4d1a3[m resolve merge conflict in PostContent.jsx
+[33mfd98bd2[m feat: admin content approval system with real data
+[33m047d914[m feat: admin content approval system with real data
+[33mde969a5[m complete learning hub - upload, access, comments, re-access system
+[33mcc293e9[m Updated admin dashboard
+[33m827c9eb[m instructor dashboard updated
+[33m7a1c16d[m updated job seeker dashboard
+[33m28217bf[m redesign login, register, forgot password and reset password pages with green teal theme
+[33m38e75c6[m enhanced register form, forgot password, reset password pages
+[33md3419a8[m Merge branch 'feature/auth' into develop
+[33m6baebcf[m add job seeker, instructor and admin dashboards
+[33m926c719[m setup React frontend with login and register pages
+[33m1da0132[m[33m ([m[1;31morigin/feature/auth[m[33m, [m[1;32mfeature/auth[m[33m)[m complete authentication system - register, login, JWT
+[33m0546a74[m feat: setup backend folder structure and install packages
+[33m5afe261[m chore: initialize project folder structure
+[33m82d2417[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/ai-core[m[33m, [m[1;31morigin/feature/skill-challenge[m[33m, [m[1;31morigin/feature/career-roadmap[m[33m, [m[1;31morigin/feature/ai-core[m[33m, [m[1;31morigin/feature/admin-dashboard[m[33m, [m[1;32mfeature/skill-challenge[m[33m, [m[1;32mfeature/career-roadmap[m[33m, [m[1;32mfeature/admin-dashboard[m[33m)[m Initial commit
