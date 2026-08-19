@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import API from '../../utils/api'
 import Quiz from './Quiz'
+import AIResults from './AIResults'
 
 const CATEGORIES = [
   'All', 'Software Engineering', 'Web Development', 'Mobile Development',
@@ -21,6 +22,7 @@ export default function JobPortal() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [showQuiz, setShowQuiz] = useState(false)
+  const [showAIResults, setShowAIResults] = useState(false)
   const [quizResult, setQuizResult] = useState(null)
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('All')
@@ -78,7 +80,7 @@ export default function JobPortal() {
   const handleQuizComplete = (result) => {
     setQuizResult(result)
     setShowQuiz(false)
-    setActiveSection('browse')
+    setShowAIResults(true)
   }
 
   const isApplied = (jobId) => myApplications.some(a => a.job_id === jobId)
@@ -90,6 +92,19 @@ export default function JobPortal() {
         return scoreB - scoreA
       })
     : jobs
+
+  // ── AI RESULTS VIEW ──
+  if (showAIResults && quizResult) {
+    return (
+      <AIResults
+        quizData={quizResult}
+        onBack={() => {
+          setShowAIResults(false)
+          setActiveSection('browse')
+        }}
+      />
+    )
+  }
 
   // ── QUIZ VIEW ──
   if (showQuiz) {
@@ -113,10 +128,19 @@ export default function JobPortal() {
           ← Back to Job Portal
         </button>
 
-        {error && <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl mb-4 text-sm">⚠️ {error}</div>}
-        {success && <div className="bg-green-50 border border-green-200 text-green-700 p-3 rounded-xl mb-4 text-sm">✅ {success}</div>}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl mb-4 text-sm">
+            ⚠️ {error}
+          </div>
+        )}
+        {success && (
+          <div className="bg-green-50 border border-green-200 text-green-700 p-3 rounded-xl mb-4 text-sm">
+            ✅ {success}
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Job Details */}
           <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
             <div className="flex items-start justify-between gap-4 mb-6">
               <div className="flex items-center gap-4">
@@ -130,9 +154,12 @@ export default function JobPortal() {
                 </div>
               </div>
               {isApplied(selectedJob.id) ? (
-                <span className="px-4 py-2 rounded-xl text-sm font-semibold bg-green-100 text-green-700">✅ Applied</span>
+                <span className="px-4 py-2 rounded-xl text-sm font-semibold bg-green-100 text-green-700">
+                  ✅ Applied
+                </span>
               ) : (
-                <button onClick={() => document.getElementById('apply-section').scrollIntoView({behavior: 'smooth'})}
+                <button
+                  onClick={() => document.getElementById('apply-section').scrollIntoView({behavior: 'smooth'})}
                   className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white"
                   style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
                   Apply Now →
@@ -140,6 +167,7 @@ export default function JobPortal() {
               )}
             </div>
 
+            {/* Job Meta */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
               {[
                 { icon: '📍', label: 'Location', value: selectedJob.location },
@@ -154,6 +182,7 @@ export default function JobPortal() {
               ))}
             </div>
 
+            {/* Required Skills */}
             <div className="mb-6">
               <h3 className="font-bold text-gray-800 mb-3">🛠️ Required Skills</h3>
               <div className="flex flex-wrap gap-2">
@@ -166,18 +195,33 @@ export default function JobPortal() {
               </div>
             </div>
 
+            {/* Experience */}
             {selectedJob.experience && (
               <div className="mb-6">
                 <h3 className="font-bold text-gray-800 mb-2">📊 Experience Required</h3>
-                <p className="text-sm text-gray-600 bg-gray-50 px-4 py-2 rounded-xl">{selectedJob.experience}</p>
+                <p className="text-sm text-gray-600 bg-gray-50 px-4 py-2 rounded-xl">
+                  {selectedJob.experience}
+                </p>
               </div>
             )}
 
+            {/* Description */}
             <div className="mb-6">
               <h3 className="font-bold text-gray-800 mb-3">📋 Job Description</h3>
-              <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{selectedJob.description}</p>
+              <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
+                {selectedJob.description}
+              </p>
             </div>
 
+            {/* Deadline */}
+            {selectedJob.deadline && (
+              <div className="p-3 rounded-xl bg-yellow-50 border border-yellow-200 text-sm text-yellow-700 mb-6">
+                ⏰ Application deadline:{' '}
+                <strong>{new Date(selectedJob.deadline).toLocaleDateString()}</strong>
+              </div>
+            )}
+
+            {/* Apply Section */}
             {!isApplied(selectedJob.id) && (
               <div id="apply-section" className="border-t border-gray-100 pt-6">
                 <h3 className="font-bold text-gray-800 mb-4">✍️ Apply for this Job</h3>
@@ -186,7 +230,9 @@ export default function JobPortal() {
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
                       Cover Letter <span className="text-gray-400">(optional)</span>
                     </label>
-                    <textarea value={coverLetter} onChange={(e) => setCoverLetter(e.target.value)}
+                    <textarea
+                      value={coverLetter}
+                      onChange={(e) => setCoverLetter(e.target.value)}
                       rows={4}
                       className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500"
                       placeholder="Tell the company why you're a great fit..." />
@@ -201,6 +247,7 @@ export default function JobPortal() {
             )}
           </div>
 
+          {/* Sidebar */}
           <div className="space-y-4">
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
               <h3 className="font-bold text-gray-800 mb-4">🏢 About Company</h3>
@@ -218,6 +265,33 @@ export default function JobPortal() {
                 <p>📍 {selectedJob.location}</p>
                 <p>💼 {selectedJob.applications_count} applications</p>
                 <p>📅 Posted {new Date(selectedJob.created_at).toLocaleDateString()}</p>
+              </div>
+            </div>
+
+            {/* Similar Jobs */}
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+              <h3 className="font-bold text-gray-800 mb-4">💡 Similar Jobs</h3>
+              <div className="space-y-3">
+                {jobs
+                  .filter(j => j.id !== selectedJob.id && j.category === selectedJob.category)
+                  .slice(0, 3)
+                  .map(j => (
+                    <div key={j.id}
+                      onClick={() => setSelectedJob(j)}
+                      className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded-xl transition">
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+                        style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
+                        {j.company_name?.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-800">{j.title}</p>
+                        <p className="text-xs text-gray-400">{j.company_name}</p>
+                      </div>
+                    </div>
+                  ))}
+                {jobs.filter(j => j.id !== selectedJob.id && j.category === selectedJob.category).length === 0 && (
+                  <p className="text-sm text-gray-400">No similar jobs found</p>
+                )}
               </div>
             </div>
           </div>
@@ -238,23 +312,28 @@ export default function JobPortal() {
       {/* Section Tabs */}
       <div className="flex gap-3 mb-6">
         <button onClick={() => setActiveSection('browse')}
-          className={`px-4 py-2 rounded-xl text-sm font-medium transition ${activeSection === 'browse' ? 'text-white' : 'bg-white text-gray-600 border border-gray-200'}`}
+          className={`px-4 py-2 rounded-xl text-sm font-medium transition ${
+            activeSection === 'browse' ? 'text-white' : 'bg-white text-gray-600 border border-gray-200'
+          }`}
           style={activeSection === 'browse' ? {background: 'linear-gradient(135deg, #0f4c35, #10b981)'} : {}}>
           🔍 Browse Jobs ({jobs.length})
         </button>
         <button onClick={() => setActiveSection('applications')}
-          className={`px-4 py-2 rounded-xl text-sm font-medium transition ${activeSection === 'applications' ? 'text-white' : 'bg-white text-gray-600 border border-gray-200'}`}
+          className={`px-4 py-2 rounded-xl text-sm font-medium transition ${
+            activeSection === 'applications' ? 'text-white' : 'bg-white text-gray-600 border border-gray-200'
+          }`}
           style={activeSection === 'applications' ? {background: 'linear-gradient(135deg, #0f4c35, #10b981)'} : {}}>
           📝 My Applications ({myApplications.length})
         </button>
       </div>
 
+      {/* ── BROWSE SECTION ── */}
       {activeSection === 'browse' && (
         <div>
-          {/* TOP ROW: Quiz button LEFT, Search RIGHT */}
+          {/* TOP ROW: Quiz LEFT, Search RIGHT */}
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-5">
 
-            {/* Quiz Button — LEFT, bigger and prominent */}
+            {/* Quiz Button — LEFT */}
             <div className="lg:col-span-2">
               <div className="h-full rounded-2xl p-5 text-white relative overflow-hidden"
                 style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
@@ -268,13 +347,19 @@ export default function JobPortal() {
                       <p className="text-green-200 text-xs mb-3">
                         Jobs ranked by your skill match
                       </p>
+                      <div className="flex gap-2 mb-2">
+                        <button onClick={() => setShowAIResults(true)}
+                          className="flex-1 bg-white text-teal-700 text-xs py-2 rounded-lg font-bold hover:bg-green-50 transition">
+                          🤖 View AI Analysis
+                        </button>
+                      </div>
                       <div className="flex gap-2">
                         <button onClick={() => setShowQuiz(true)}
-                          className="flex-1 bg-white bg-opacity-20 text-white text-xs py-2 rounded-lg font-medium hover:bg-opacity-30 transition border border-white border-opacity-30">
+                          className="flex-1 bg-white bg-opacity-20 text-white text-xs py-1.5 rounded-lg font-medium hover:bg-opacity-30 transition border border-white border-opacity-30">
                           Retake Quiz
                         </button>
                         <button onClick={() => setQuizResult(null)}
-                          className="flex-1 bg-white bg-opacity-20 text-white text-xs py-2 rounded-lg font-medium hover:bg-opacity-30 transition border border-white border-opacity-30">
+                          className="flex-1 bg-white bg-opacity-20 text-white text-xs py-1.5 rounded-lg font-medium hover:bg-opacity-30 transition border border-white border-opacity-30">
                           Show All Jobs
                         </button>
                       </div>
@@ -284,13 +369,16 @@ export default function JobPortal() {
                       <div className="text-3xl mb-2">🧠</div>
                       <h3 className="font-bold text-base mb-1">Take Career Quiz</h3>
                       <p className="text-green-200 text-xs mb-3">
-                        Answer 140 questions across 14 IT categories. We'll rank the most suitable jobs for you!
+                        Answer 140 questions across 14 IT categories.
+                        AI will predict your career and rank the most suitable jobs!
                       </p>
                       <button onClick={() => setShowQuiz(true)}
                         className="w-full bg-white text-teal-700 text-sm py-2 rounded-xl font-bold hover:bg-green-50 transition">
                         🚀 Start Quiz Now
                       </button>
-                      <p className="text-green-300 text-xs mt-2 text-center">Optional · Takes ~30 minutes</p>
+                      <p className="text-green-300 text-xs mt-2 text-center">
+                        Optional · Takes ~30 minutes
+                      </p>
                     </>
                   )}
                 </div>
@@ -308,25 +396,35 @@ export default function JobPortal() {
                 </div>
               )}
 
+              {/* Search Input */}
               <div className="relative mb-3">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
-                <input type="text" value={search}
+                <input
+                  type="text"
+                  value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && fetchJobs()}
                   className="w-full border border-gray-200 rounded-xl pl-9 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm"
-                  placeholder="Search by job title, skills or keywords..." />
+                  placeholder="Search by job title, skills or keywords..."
+                />
               </div>
 
+              {/* Filter Row */}
               <div className="grid grid-cols-3 gap-2 mb-3">
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs">📍</span>
-                  <input type="text" value={location}
+                  <input
+                    type="text"
+                    value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && fetchJobs()}
                     className="w-full border border-gray-200 rounded-xl pl-7 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 text-xs"
-                    placeholder="Location..." />
+                    placeholder="Location..."
+                  />
                 </div>
-                <select value={jobType} onChange={(e) => setJobType(e.target.value)}
+                <select
+                  value={jobType}
+                  onChange={(e) => setJobType(e.target.value)}
                   className="w-full border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 text-xs bg-white">
                   {JOB_TYPES.map(t => <option key={t}>{t}</option>)}
                 </select>
@@ -337,6 +435,7 @@ export default function JobPortal() {
                 </button>
               </div>
 
+              {/* Category Filter */}
               <div className="flex flex-wrap gap-1.5">
                 {CATEGORIES.map(cat => (
                   <button key={cat} onClick={() => setCategory(cat)}
@@ -355,7 +454,9 @@ export default function JobPortal() {
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm text-gray-500">
               {loading ? 'Loading...' : `${displayJobs.length} job${displayJobs.length !== 1 ? 's' : ''} found`}
-              {quizResult && <span className="ml-2 text-teal-600 font-medium">· Ranked by quiz results 🎯</span>}
+              {quizResult && (
+                <span className="ml-2 text-teal-600 font-medium">· Ranked by quiz results 🎯</span>
+              )}
             </p>
           </div>
 
@@ -385,7 +486,11 @@ export default function JobPortal() {
                       </div>
                       {quizResult && index < 3 && (
                         <div className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white"
-                          style={{background: index === 0 ? '#f59e0b' : index === 1 ? '#9ca3af' : '#b45309'}}>
+                          style={{
+                            background: index === 0 ? '#f59e0b'
+                              : index === 1 ? '#9ca3af'
+                              : '#b45309'
+                          }}>
                           {index + 1}
                         </div>
                       )}
@@ -446,6 +551,9 @@ export default function JobPortal() {
                         <div className="flex gap-4 text-xs text-gray-400">
                           <span>📝 {job.applications_count} applications</span>
                           <span>📅 {new Date(job.created_at).toLocaleDateString()}</span>
+                          {job.deadline && (
+                            <span>⏰ Deadline: {new Date(job.deadline).toLocaleDateString()}</span>
+                          )}
                         </div>
                         <button
                           onClick={(e) => { e.stopPropagation(); setSelectedJob(job) }}
@@ -463,15 +571,16 @@ export default function JobPortal() {
         </div>
       )}
 
-      {/* MY APPLICATIONS */}
+      {/* ── MY APPLICATIONS ── */}
       {activeSection === 'applications' && (
         <div>
           {myApplications.length === 0 ? (
             <div className="text-center py-20 bg-white rounded-2xl border border-gray-100">
               <div className="text-6xl mb-4">📝</div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">No applications yet</h3>
+              <p className="text-gray-500 text-sm mb-4">Browse jobs and start applying!</p>
               <button onClick={() => setActiveSection('browse')}
-                className="mt-4 px-5 py-2 rounded-xl text-sm font-semibold text-white"
+                className="px-5 py-2 rounded-xl text-sm font-semibold text-white"
                 style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
                 Browse Jobs
               </button>
@@ -479,7 +588,8 @@ export default function JobPortal() {
           ) : (
             <div className="space-y-4">
               {myApplications.map(app => (
-                <div key={app.id} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <div key={app.id}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
                   <div className="flex items-start gap-4">
                     <div className="w-11 h-11 rounded-xl flex items-center justify-center text-xl font-bold text-white flex-shrink-0"
                       style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
@@ -505,6 +615,11 @@ export default function JobPortal() {
                       <p className="text-xs text-gray-400 mt-2">
                         Applied on {new Date(app.applied_at).toLocaleDateString()}
                       </p>
+                      {app.cover_letter && (
+                        <p className="text-xs text-gray-500 mt-1 italic">
+                          "{app.cover_letter.substring(0, 100)}..."
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>

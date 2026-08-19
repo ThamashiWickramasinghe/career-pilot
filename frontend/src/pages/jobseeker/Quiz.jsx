@@ -597,11 +597,16 @@ export default function Quiz({ onComplete }) {
             </div>
 
             <button
-              onClick={() => onComplete && onComplete({ categoryScores, skippedCategories, totalScore })}
-              className="w-full py-3 rounded-xl font-bold text-white"
-              style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
-              View Job Recommendations →
-            </button>
+  onClick={() => onComplete && onComplete({
+    categoryScores,
+    skippedCategories,
+    totalScore,
+    attemptId
+  })}
+  className="w-full py-3 rounded-xl font-bold text-white"
+  style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
+  🤖 Get AI Career Analysis →
+</button>
           </div>
         </div>
       </div>
