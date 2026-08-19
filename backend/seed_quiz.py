@@ -1,5 +1,7 @@
 from app import create_app, db
 from app.models.quiz import QuizCategory, QuizQuestion
+from app.models.learning import LearningContent
+from app.models.user import User
 
 app = create_app()
 
@@ -191,13 +193,33 @@ QUESTIONS = {
     ],
 }
 
+SAMPLE_COURSES = [
+    {'title': 'Python for Data Science', 'category': 'Data Science & AI', 'description': 'Learn Python programming for data science, machine learning and AI applications including NumPy, Pandas and Scikit-learn', 'content_type': 'video_link', 'drive_link': 'https://drive.google.com'},
+    {'title': 'Web Development with React', 'category': 'Web Development', 'description': 'Complete guide to building modern web applications using React.js JavaScript HTML CSS and REST APIs', 'content_type': 'video_link', 'drive_link': 'https://drive.google.com'},
+    {'title': 'SQL and Database Design', 'category': 'Database & SQL', 'description': 'Master SQL queries database design normalization and working with MySQL PostgreSQL and MongoDB', 'content_type': 'pdf', 'drive_link': None},
+    {'title': 'Cybersecurity Fundamentals', 'category': 'Cybersecurity', 'description': 'Network security ethical hacking encryption firewall VPN and cybersecurity best practices', 'content_type': 'video_link', 'drive_link': 'https://drive.google.com'},
+    {'title': 'Cloud Computing with AWS', 'category': 'Cloud Computing', 'description': 'Learn AWS services cloud deployment auto-scaling serverless computing and cloud architecture', 'content_type': 'video_link', 'drive_link': 'https://drive.google.com'},
+    {'title': 'Mobile App Development with Flutter', 'category': 'Mobile Development', 'description': 'Build cross-platform mobile apps using Flutter Dart for Android and iOS development', 'content_type': 'video_link', 'drive_link': 'https://drive.google.com'},
+    {'title': 'DevOps and CI/CD Pipeline', 'category': 'DevOps & SRE', 'description': 'Docker Kubernetes Jenkins Git CI/CD pipeline setup and complete DevOps practices', 'content_type': 'video_link', 'drive_link': 'https://drive.google.com'},
+    {'title': 'UI/UX Design with Figma', 'category': 'UI/UX Design', 'description': 'User interface design prototyping wireframing and user experience research using Figma', 'content_type': 'video_link', 'drive_link': 'https://drive.google.com'},
+    {'title': 'Machine Learning Fundamentals', 'category': 'Data Science & AI', 'description': 'Supervised unsupervised learning neural networks Random Forest XGBoost model evaluation', 'content_type': 'video_link', 'drive_link': 'https://drive.google.com'},
+    {'title': 'Networking and System Administration', 'category': 'Networking & System Admin', 'description': 'TCP/IP DNS DHCP network protocols Linux system administration and server management', 'content_type': 'pdf', 'drive_link': None},
+    {'title': 'Software Testing and QA', 'category': 'Testing & QA', 'description': 'Unit testing integration testing Selenium automation regression testing and QA methodologies', 'content_type': 'video_link', 'drive_link': 'https://drive.google.com'},
+    {'title': 'Java Programming Complete Course', 'category': 'Programming Languages', 'description': 'Object oriented programming design patterns Java enterprise development Spring Boot', 'content_type': 'video_link', 'drive_link': 'https://drive.google.com'},
+    {'title': 'Data Analytics with Power BI', 'category': 'Data Analytics & BI', 'description': 'Business intelligence data visualization dashboard creation ETL and analytics using Power BI Tableau', 'content_type': 'video_link', 'drive_link': 'https://drive.google.com'},
+    {'title': 'IoT and Embedded Systems', 'category': 'Embedded Systems & IoT', 'description': 'Arduino Raspberry Pi IoT protocols MQTT embedded systems programming sensors microcontrollers', 'content_type': 'video_link', 'drive_link': 'https://drive.google.com'},
+    {'title': 'Full Stack Web Development', 'category': 'Web Development', 'description': 'Complete full stack development with React Node.js Express MongoDB REST API design', 'content_type': 'video_link', 'drive_link': 'https://drive.google.com'},
+    {'title': 'Cybersecurity and Ethical Hacking', 'category': 'Cybersecurity', 'description': 'Penetration testing vulnerability assessment network security SSL encryption and ethical hacking', 'content_type': 'video_link', 'drive_link': 'https://drive.google.com'},
+    {'title': 'General ICT Fundamentals', 'category': 'General ICT', 'description': 'Computer hardware software networks operating systems internet and basic ICT concepts', 'content_type': 'pdf', 'drive_link': None},
+]
+
 with app.app_context():
-    # Clear existing data
+    # ── Clear existing quiz data ──
     QuizQuestion.query.delete()
     QuizCategory.query.delete()
     db.session.commit()
 
-    # Add categories
+    # ── Add categories ──
     cat_map = {}
     for cat_data in CATEGORIES:
         cat = QuizCategory(
@@ -213,8 +235,8 @@ with app.app_context():
 
     db.session.commit()
 
-    # Add questions
-    total = 0
+    # ── Add questions ──
+    total_q = 0
     for cat_code, questions in QUESTIONS.items():
         cat_id = cat_map.get(cat_code)
         if not cat_id:
@@ -232,7 +254,34 @@ with app.app_context():
                 marks=10
             )
             db.session.add(question)
-            total += 1
+            total_q += 1
 
     db.session.commit()
-    print(f'✅ Seeded {len(CATEGORIES)} categories and {total} questions!')
+    print(f'✅ Seeded {len(CATEGORIES)} categories and {total_q} questions!')
+
+    # ── Add sample approved courses ──
+    instructor = User.query.filter(User.role.in_(['instructor', 'admin'])).first()
+
+    if instructor:
+        existing_titles = [c.title for c in LearningContent.query.all()]
+        added = 0
+        for course_data in SAMPLE_COURSES:
+            if course_data['title'] not in existing_titles:
+                content = LearningContent(
+                    title=course_data['title'],
+                    description=course_data['description'],
+                    category=course_data['category'],
+                    content_type=course_data['content_type'],
+                    drive_link=course_data.get('drive_link'),
+                    instructor_id=instructor.id,
+                    is_approved=True
+                )
+                db.session.add(content)
+                added += 1
+
+        db.session.commit()
+        print(f'✅ Added {added} sample approved courses!')
+    else:
+        print('⚠️ No instructor/admin found. Run seed.py first to create admin user.')
+
+    print('🎉 Seed complete!')
