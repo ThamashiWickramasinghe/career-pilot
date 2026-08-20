@@ -572,9 +572,7 @@ export default function JobVacancy() {
         {/* Header */}
         <div className="mb-7">
           <h1 className="text-2xl font-bold mb-0.5" style={{color: theme.mainText}}>Job Vacancies</h1>
-          <p className="text-sm" style={{color: theme.secondaryText}}>
-            Explore available IT positions and track your applications
-          </p>
+          
         </div>
 
         {/* Alerts */}

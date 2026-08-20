@@ -610,6 +610,8 @@ export default function AIResults({ quizData, onBack }) {
 }
 
 
+
+
 // ==================================================================
 // STAT PILL (new — used in the prediction summary card)
 // ==================================================================

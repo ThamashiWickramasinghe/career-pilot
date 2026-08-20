@@ -104,6 +104,10 @@ export default function Profile() {
     setError('')
   }
 
+  const handleBack = () => {
+    window.history.back()
+  }
+
   const skills = form.skills
     ? form.skills
         .split(',')
@@ -136,6 +140,20 @@ export default function Profile() {
   return (
     <div>
       <div className="w-full max-w-4xl h-full mx-auto px-4 sm:px-5 py-3">
+
+        {/* =====================================================
+            PAGE HEADER (Back button + Title)
+        ====================================================== */}
+        <div className="flex items-center gap-3 mb-3">
+          
+
+          <h1
+            className="text-2xl font-bold"
+            style={{ color: '#25243a' }}
+          >
+            My Profile
+          </h1>
+        </div>
 
         {/* =====================================================
             SUCCESS MESSAGE

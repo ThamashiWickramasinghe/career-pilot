@@ -56,6 +56,10 @@ export default function JobPortal() {
     setShowAIResults(true)
   }
 
+  const handleBack = () => {
+    window.history.back()
+  }
+
   // ── AI RESULTS VIEW ──
   if (showAIResults && quizResult) {
     return (
@@ -70,14 +74,7 @@ export default function JobPortal() {
   if (showQuiz) {
     return (
       <div className="min-h-screen" style={{ background: COLORS.bg }}>
-        <div className="max-w-2xl mx-auto pt-6 px-4">
-          <button onClick={() => setShowQuiz(false)}
-            className="flex items-center gap-2 font-medium text-sm mb-2"
-            style={{ color: COLORS.primary }}>
-            <Icon name="arrowLeft" className="w-4 h-4" strokeWidth={2.2} />
-            Back
-          </button>
-        </div>
+        
         <Quiz onComplete={handleQuizComplete} />
       </div>
     )
@@ -85,8 +82,22 @@ export default function JobPortal() {
 
   // ── MAIN VIEW — quiz entry point only ──
   return (
-    <div className="min-h-screen flex items-center justify-center py-10 px-4" style={{ background: COLORS.bg }}>
-      <div className="max-w-xl w-full">
+    <div className="h-screen overflow-hidden flex items-center justify-center px-4 py-4" style={{ background: COLORS.bg }}>
+      <div className="max-w-2xl w-full">
+
+        {/* =====================================================
+            PAGE HEADER (Title + Back button on right)
+        ====================================================== */}
+        <div className="flex items-center justify-between mb-4">
+          <h1
+            className="text-2xl font-bold"
+            style={{ color: COLORS.text }}
+          >
+            Career Assessment
+          </h1>
+
+          
+        </div>
 
         <div className="rounded-3xl overflow-hidden shadow-sm" style={{ background: COLORS.panel, border: `1px solid ${COLORS.border}` }}>
 
