@@ -1021,13 +1021,7 @@ export default function JobSeekerDashboard() {
           {/* LEARNING */}
           {activeTab === 'learning' && (
             <div>
-              <p
-                className="mb-4"
-                style={{ color: C.sub }}
-              >
-                Browse and access learning materials from
-                instructors
-              </p>
+              
 
               <LearningHub />
             </div>
