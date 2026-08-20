@@ -18,8 +18,8 @@ def create_app():
     jwt.init_app(app)
     mail.init_app(app)
 
-    # Fix CORS
-    CORS(app)
+    # Fix CORS - allow all origins
+    CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
 
     # Create upload folder
     import os

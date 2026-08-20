@@ -1,14 +1,68 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import LearningHub from './LearningHub'
 import JobPortal from './JobPortal'
+import Profile from './Profile'
+
+/* ── Palette (rebalanced — deeper background & richer accents so the
+   page doesn't read as washed out) ── */
+const C = {
+  bg: '#fceeff',
+  sidebar: '#feffff',
+  panel: '#feffff',
+  border: '#e3e6ee',
+  ink: '#171b26',
+  sub: '#767d8c',
+  accent: '#7f3e8b',
+  accentSoft: '#e7e2fb',
+  green: '#0fa877',
+  greenSoft: '#cff7e8',
+  orange: '#ed8831',
+  orangeSoft: '#ffdebd',
+  purple: '#6e4fe0',
+  purpleSoft: '#d9caff',
+  pink: '#e5488c',
+  pinkSoft: '#fbdde9',
+  blue: '#2f75ee',
+  blueSoft: '#d2e1fb',
+}
+const cardShadow = '0 1px 2px rgba(23,27,38,0.04), 0 1px 10px rgba(23,27,38,0.04)'
+
+/* ── Inline SVG icons ── */
+const Icon = ({ path, size = 18, color = 'currentColor', strokeWidth = 2 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color}
+    strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
+    {path}
+  </svg>
+)
+
+const IconHome = (p) => <Icon {...p} path={<><path d="M3 9l9-7 9 7"/><path d="M9 22V12h6v10"/><path d="M5 10v10a1 1 0 001 1h3M19 10v10a1 1 0 01-1 1h-3"/></>} />
+const IconUser = (p) => <Icon {...p} path={<><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></>} />
+const IconBot = (p) => <Icon {...p} path={<><rect x="4" y="9" width="16" height="10" rx="2"/><path d="M12 9V5M9 5h6"/><circle cx="9" cy="14" r="1"/><circle cx="15" cy="14" r="1"/></>} />
+const IconMap = (p) => <Icon {...p} path={<><path d="M9 3l6 2 6-2v16l-6 2-6-2-6 2V5z"/><path d="M9 3v16M15 5v16"/></>} />
+const IconBook = (p) => <Icon {...p} path={<><path d="M4 4.5A2.5 2.5 0 016.5 2H20v16H6.5A2.5 2.5 0 004 20.5v-16z"/><path d="M4 20.5A2.5 2.5 0 016.5 18H20"/></>} />
+const IconBriefcase = (p) => <Icon {...p} path={<><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></>} />
+const IconTrophy = (p) => <Icon {...p} path={<><path d="M8 21h8M12 17v4"/><path d="M7 4h10v5a5 5 0 01-10 0V4z"/><path d="M7 5H4a2 2 0 002 4M17 5h3a2 2 0 01-2 4"/></>} />
+const IconLogout = (p) => <Icon {...p} path={<><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></>} />
+const IconSearch = (p) => <Icon {...p} path={<><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></>} />
+const IconBell = (p) => <Icon {...p} path={<><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></>} />
+const IconCalendar = (p) => <Icon {...p} path={<><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></>} />
+const IconChevronLeft = (p) => <Icon {...p} path={<path d="M15 18l-6-6 6-6"/>} />
+const IconChevronRight = (p) => <Icon {...p} path={<path d="M9 18l6-6-6-6"/>} />
+const IconSparkle = (p) => <Icon {...p} path={<><path d="M12 3l1.8 4.9L19 9.7l-4.9 1.8L12 16.4l-1.8-4.9L5.3 9.7l4.9-1.8L12 3z"/></>} />
+const IconMedal = (p) => <Icon {...p} path={<><circle cx="12" cy="15" r="6"/><path d="M9 9.5L7 3h2l2 5M15 9.5L17 3h-2l-2 5"/><path d="M12 12v6"/></>} />
+const IconShieldCheck = (p) => <Icon {...p} path={<><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></>} />
+const IconCertificate = (p) => <Icon {...p} path={<><rect x="3" y="4" width="18" height="12" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M13 8h5M13 12h5"/><path d="M8 20l2-4M13 20l-2-4"/></>} />
+const IconClock = (p) => <Icon {...p} path={<><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></>} />
 
 export default function JobSeekerDashboard() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('home')
   const [notifOpen, setNotifOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [courseFilter, setCourseFilter] = useState('all')
 
   const handleLogout = () => {
     logout()
@@ -16,456 +70,413 @@ export default function JobSeekerDashboard() {
   }
 
   const navItems = [
-    { id: 'home', icon: '🏠', label: 'Home' },
-    { id: 'profile', icon: '👤', label: 'Profile' },
-    { id: 'ai-jobs', icon: '🤖', label: 'AI Job Match' },
-    { id: 'roadmap', icon: '🗺️', label: 'Career Roadmap' },
-    { id: 'learning', icon: '📚', label: 'Learning Hub' },
-    { id: 'jobs', icon: '💼', label: 'Job Vacancy' },
-    { id: 'challenges', icon: '🏆', label: 'Skill Challenges' },
-    
+    { id: 'home', icon: IconHome, label: 'Dashboard' },
+    { id: 'profile', icon: IconUser, label: 'Profile' },
+    { id: 'ai-jobs', icon: IconBot, label: 'AI Job Match' },
+    { id: 'jobs', icon: IconBriefcase, label: 'Job Vacancy' },
+    { id: 'roadmap', icon: IconMap, label: 'Career Roadmap' },
+    { id: 'learning', icon: IconBook, label: 'Learning Hub' },
+    { id: 'challenges', icon: IconTrophy, label: 'Skill Challenges' },
   ]
+
+  const filteredNavItems = useMemo(() => {
+    if (!searchQuery.trim()) return []
+    return navItems.filter(n => n.label.toLowerCase().includes(searchQuery.toLowerCase()))
+  }, [searchQuery])
 
   const notifications = [
-    { id: 1, icon: '🤖', text: 'New job matches found for you!', time: '2 min ago', unread: true },
-    { id: 2, icon: '📚', text: 'Your learning access expires in 3 days', time: '1 hr ago', unread: true },
-    { id: 3, icon: '🏆', text: 'You earned a Python badge!', time: '2 hrs ago', unread: false },
-    { id: 4, icon: '💼', text: 'Application status updated', time: '1 day ago', unread: false },
+    { id: 1, text: 'New job matches found for you!', time: '2 min ago', unread: true },
+    { id: 2, text: 'Your learning access expires in 3 days', time: '1 hr ago', unread: true },
+    { id: 3, text: 'You earned a Python badge!', time: '2 hrs ago', unread: false },
+    { id: 4, text: 'Application status updated', time: '1 day ago', unread: false },
   ]
-
   const unreadCount = notifications.filter(n => n.unread).length
 
+  const jobVacancies = [
+    { title: 'Frontend Developer', company: 'TechCorp Lanka', tag: 'New' },
+    { title: 'UI/UX Designer', company: 'Creative Studio', tag: 'New' },
+    { title: 'Full Stack Developer', company: 'StartupX', tag: 'Closing soon' },
+  ]
+
+  const myCourses = [
+    { id: 1, type: 'active', title: 'Advanced React Patterns', instructor: 'Dr. Silva', status: 'In progress · 60%', icon: IconBook, color: C.green, soft: C.greenSoft },
+    { id: 2, type: 'active', title: 'SQL for Data Analysis', instructor: 'Prof. Perera', status: 'In progress · 30%', icon: IconBook, color: C.blue, soft: C.blueSoft },
+    { id: 3, type: 'requested', title: 'System Design Basics', instructor: 'Mr. Fernando', status: 'Awaiting approval', icon: IconClock, color: C.orange, soft: C.orangeSoft },
+    { id: 4, type: 'requested', title: 'Python Data Science', instructor: 'Prof. Perera', status: 'Awaiting approval', icon: IconClock, color: C.purple, soft: C.purpleSoft },
+  ]
+
+  const courseTabs = [
+    { id: 'all', label: 'All' },
+    { id: 'active', label: 'Active Courses' },
+    { id: 'requested', label: 'Requested Courses' },
+  ]
+  const visibleCourses = courseFilter === 'all' ? myCourses : myCourses.filter(c => c.type === courseFilter)
+
+  const badges = [
+    { name: 'Python Pro', icon: IconMedal, color: C.green, soft: C.greenSoft },
+    { name: 'React Basics', icon: IconShieldCheck, color: C.blue, soft: C.blueSoft },
+    { name: 'SQL Master', icon: IconCertificate, color: C.purple, soft: C.purpleSoft },
+  ]
+
+  const jobStatusNotifications = [
+    { company: 'TechCorp Lanka', role: 'Frontend Developer', status: 'Interview Scheduled', color: C.pink },
+    { company: 'Creative Studio', role: 'UI/UX Designer', status: 'Shortlisted', color: C.blue },
+    { company: 'StartupX', role: 'Full Stack Developer', status: 'Under Review', color: C.orange },
+  ]
+
+  const stats = [
+    { label: 'Available Jobs', value: jobVacancies.length + 9, icon: IconBriefcase, color: C.blue, soft: C.blueSoft },
+    { label: 'My Courses', value: myCourses.length, icon: IconBook, color: C.green, soft: C.greenSoft },
+    { label: 'Badges Earned', value: badges.length, icon: IconMedal, color: C.purple, soft: C.purpleSoft },
+  ]
+
+  const today = new Date()
+  const [calMonth, setCalMonth] = useState(today.getMonth())
+  const [calYear, setCalYear] = useState(today.getFullYear())
+
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December']
+  const eventDays = [18, 19, 20, 21]
+
+  const calendarDays = useMemo(() => {
+    const firstDay = new Date(calYear, calMonth, 1).getDay()
+    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate()
+    const cells = []
+    for (let i = 0; i < firstDay; i++) cells.push(null)
+    for (let d = 1; d <= daysInMonth; d++) cells.push(d)
+    return cells
+  }, [calMonth, calYear])
+
+  const goPrevMonth = () => {
+    if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1) } else setCalMonth(m => m - 1)
+  }
+  const goNextMonth = () => {
+    if (calMonth === 11) { setCalMonth(0); setCalYear(y => y + 1) } else setCalMonth(m => m + 1)
+  }
+  const isToday = (d) => d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear()
+
+  const navBtnClass = (id) =>
+    `w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-left transition-colors ${
+      activeTab === id ? 'font-semibold' : 'hover:bg-gray-50'
+    }`
+
+  /* Reusable search + notification row, rendered after the Welcome
+     heading on the dashboard only. Search is fully rounded (pill/circle). */
+  const SearchAndBell = () => (
+    <div className="flex items-center justify-center gap-3 mb-8 relative">
+      <div className="w-full max-w-sm relative">
+        <div className="absolute left-5 top-1/2 -translate-y-1/2" style={{ color: C.sub }}>
+          <IconSearch size={16} />
+        </div>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search for anything..."
+          className="w-full pl-12 pr-5 py-3 rounded-full border text-sm focus:outline-none focus:ring-2"
+          style={{ borderColor: C.border, background: '#fff', color: C.ink, boxShadow: cardShadow, '--tw-ring-color': C.accent }}
+        />
+        {filteredNavItems.length > 0 && (
+          <div className="absolute left-0 right-0 top-14 rounded-2xl shadow-lg border z-50 overflow-hidden"
+            style={{ background: '#fff', borderColor: C.border }}>
+            {filteredNavItems.map(item => {
+              const IconComp = item.icon
+              return (
+                <button key={item.id}
+                  onClick={() => { setActiveTab(item.id); setSearchQuery('') }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left hover:bg-gray-50"
+                  style={{ color: C.ink }}>
+                  <IconComp size={16} color={C.accent} />
+                  {item.label}
+                </button>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      <div className="relative flex-shrink-0">
+        <button onClick={() => setNotifOpen(!notifOpen)}
+          className="relative w-12 h-12 rounded-full border flex items-center justify-center"
+          style={{ background: '#fff', borderColor: C.border, boxShadow: cardShadow }}>
+          <IconBell size={18} color="#5b6172" />
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full text-white text-xs flex items-center justify-center font-bold"
+              style={{ background: C.pink }}>
+              {unreadCount}
+            </span>
+          )}
+        </button>
+        {notifOpen && (
+          <div className="absolute right-0 top-14 w-80 rounded-2xl shadow-xl border z-50" style={{ background: '#fff', borderColor: C.border }}>
+            <div className="p-4 border-b flex justify-between items-center" style={{ borderColor: C.border }}>
+              <h3 className="font-semibold" style={{ color: C.ink }}>Notifications</h3>
+              <span className="text-xs font-medium cursor-pointer" style={{ color: C.accent }}>Mark all read</span>
+            </div>
+            {notifications.map(n => (
+              <div key={n.id} className="px-4 py-3 flex gap-3 items-start" style={{ background: n.unread ? C.accentSoft : 'transparent' }}>
+                <div className="flex-1">
+                  <p className="text-sm" style={{ color: C.ink }}>{n.text}</p>
+                  <p className="text-xs mt-0.5" style={{ color: C.sub }}>{n.time}</p>
+                </div>
+                {n.unread && <div className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style={{ background: C.accent }}></div>}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+
   return (
-    <div className="min-h-screen flex" style={{background: '#f0fdf4'}}>
+    <div className="min-h-screen flex" style={{ background: C.bg }}>
 
-      {/* ── LEFT SIDEBAR ── */}
-<div className="hidden lg:flex flex-col w-64 h-screen fixed left-0 top-0 z-40 overflow-y-auto"        style={{background: 'linear-gradient(180deg, #0f4c35 0%, #1a7a5e 50%, #0f766e 100%)'}}>
-
-        {/* Logo */}
-        <div className="px-6 py-6 border-b border-white border-opacity-10">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white bg-opacity-20 flex items-center justify-center text-2xl flex-shrink-0">
-              🚀
-            </div>
-            <span className="text-white font-bold text-lg leading-tight">Career Pilot</span>
+      {/* ── LEFT SIDEBAR (unchanged) ── */}
+      <div className="hidden lg:flex flex-col w-64 h-screen fixed left-0 top-0 z-40 border-r"
+        style={{ background: C.sidebar, borderColor: C.border }}>
+        <div className="px-6 py-6 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: C.accent }}>
+            <IconSparkle size={17} color="white" />
           </div>
+          <p className="font-bold text-[15px]" style={{ color: C.ink }}>Career Pilot</p>
         </div>
 
-        {/* User info */}
-        <div className="px-6 py-4 border-b border-white border-opacity-10">
-          <div className="flex items-center gap-3">
-  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0 border-2 border-white border-opacity-30"
-    style={{background: 'linear-gradient(135deg, #10b981, #06b6d4)'}}>
-    {user?.full_name?.charAt(0).toUpperCase()}
-  </div>
-            <div className="overflow-hidden">
-              <p className="text-white font-semibold text-sm truncate">{user?.full_name}</p>
-              <p className="text-green-300 text-xs truncate">{user?.current_post || 'Job Seeker'}</p>
+        <nav className="flex-1 px-4 py-2 space-y-1">
+          {navItems.map(item => {
+            const IconComp = item.icon
+            const active = activeTab === item.id
+            return (
+              <button key={item.id} onClick={() => setActiveTab(item.id)}
+                className={navBtnClass(item.id)}
+                style={active ? { background: C.accentSoft, color: C.accent } : { color: '#5b6172' }}>
+                <IconComp size={18} color={active ? C.accent : '#9aa1b1'} strokeWidth={2} />
+                <span>{item.label}</span>
+              </button>
+            )
+          })}
+        </nav>
+
+        <div className="px-4 py-4 border-t" style={{ borderColor: C.border }}>
+          <div className="flex items-center gap-3 px-2 py-2">
+            <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0" style={{ background: C.accent }}>
+              {user?.full_name?.charAt(0).toUpperCase()}
             </div>
+            <div className="flex-1 overflow-hidden">
+              <p className="text-xs font-semibold truncate" style={{ color: C.ink }}>{user?.full_name}</p>
+              <p className="text-[11px]" style={{ color: C.green }}>● Active</p>
+            </div>
+            <button onClick={handleLogout} className="p-1.5 rounded-lg hover:bg-gray-50" title="Log out">
+              <IconLogout size={16} color="#9aa1b1" />
+            </button>
           </div>
-        </div>
-
-        {/* Nav Items */}
-<nav className="flex-1 px-4 py-4 space-y-1">
-  {navItems.map(item => (
-    <button key={item.id}
-      onClick={() => setActiveTab(item.id)}
-      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition text-left ${
-        activeTab === item.id
-          ? 'text-teal-800 font-semibold'
-          : 'text-green-200 hover:bg-white hover:bg-opacity-90 hover:text-teal-800'
-      }`}
-      style={activeTab === item.id ? {background: 'white'} : {}}>
-      <span className="text-lg flex-shrink-0">{item.icon}</span>
-      <span className="flex-shrink-0">{item.label}</span>
-      {activeTab === item.id && (
-        <div className="ml-auto w-1.5 h-1.5 rounded-full flex-shrink-0"
-          style={{background: '#0f4c35'}}></div>
-      )}
-    </button>
-  ))}
-</nav>
-
-        {/* Logout at bottom */}
-        <div className="px-4 py-4 border-t border-white border-opacity-10">
-          <button onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-300 hover:bg-red-500 hover:bg-opacity-20 hover:text-red-200 transition">
-            <span className="text-lg">🚪</span>
-            <span>Logout</span>
-          </button>
         </div>
       </div>
 
       {/* ── MAIN CONTENT ── */}
-      <div className="flex-1 lg:ml-64">
+      <div className="flex-1 lg:ml-64 xl:mr-80">
+        <div className="p-6">
 
-        {/* Top Header */}
-        <div className="bg-white border-b border-gray-100 sticky top-0 z-30 px-6 py-3 flex items-center justify-between shadow-sm">
-          <div>
-            <h1 className="text-lg font-bold text-gray-800">
-              {navItems.find(n => n.id === activeTab)?.icon}{' '}
-              {navItems.find(n => n.id === activeTab)?.label}
-            </h1>
-            <p className="text-xs text-gray-400">Career Pilot Dashboard</p>
-          </div>
+          {activeTab === 'home' && (
+            <div>
+              {/* Welcome */}
+              <div className="mb-6 text-center">
+                <h1 className="text-2xl font-bold" style={{ color: C.ink }}>Welcome, {user?.username} 👋</h1>
+                
+              </div>
 
-          <div className="flex items-center gap-3">
-            {/* Notification Bell */}
-            <div className="relative">
-              <button onClick={() => setNotifOpen(!notifOpen)}
-                className="relative w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition text-lg">
-                🔔
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full text-white text-xs flex items-center justify-center font-bold"
-                    style={{background: '#10b981'}}>
-                    {unreadCount}
-                  </span>
-                )}
-              </button>
+              {/* Search + notification, placed right after the welcome */}
+              <SearchAndBell />
 
-              {notifOpen && (
-                <div className="absolute right-0 top-12 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 z-50">
-                  <div className="p-4 border-b border-gray-100 flex justify-between items-center">
-                    <h3 className="font-semibold text-gray-800">Notifications</h3>
-                    <span className="text-xs text-teal-600 font-medium cursor-pointer">Mark all read</span>
-                  </div>
-                  {notifications.map(n => (
-                    <div key={n.id}
-                      className={`px-4 py-3 flex gap-3 items-start hover:bg-gray-50 cursor-pointer ${n.unread ? 'bg-teal-50' : ''}`}>
-                      <span className="text-xl flex-shrink-0">{n.icon}</span>
-                      <div className="flex-1">
-                        <p className="text-sm text-gray-700">{n.text}</p>
-                        <p className="text-xs text-gray-400 mt-0.5">{n.time}</p>
+              {/* Stat cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                {stats.map(s => {
+                  const IconComp = s.icon
+                  return (
+                    <div key={s.label} className="rounded-2xl p-5 flex items-center gap-4" style={{ background: '#fff', boxShadow: cardShadow }}>
+                      <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: s.soft }}>
+                        <IconComp size={20} color={s.color} />
                       </div>
-                      {n.unread && (
-                        <div className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0"
-                          style={{background: '#10b981'}}></div>
-                      )}
+                      <div>
+                        <p className="text-xl font-bold leading-none" style={{ color: C.ink }}>{s.value}</p>
+                        <p className="text-xs mt-1" style={{ color: C.sub }}>{s.label}</p>
+                      </div>
                     </div>
+                  )
+                })}
+              </div>
+
+              {/* My Courses */}
+              <div className="rounded-2xl p-6" style={{ background: '#fff', boxShadow: cardShadow }}>
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="font-bold text-lg" style={{ color: C.ink }}>My Courses</h2>
+                  <button onClick={() => setActiveTab('learning')} className="text-sm font-medium hover:underline" style={{ color: C.accent }}>
+                    View all
+                  </button>
+                </div>
+                <div className="flex items-center gap-2 mb-5 border-b" style={{ borderColor: C.border }}>
+                  {courseTabs.map(t => (
+                    <button key={t.id} onClick={() => setCourseFilter(t.id)}
+                      className="text-sm font-medium px-3 py-2 -mb-px border-b-2"
+                      style={{
+                        color: courseFilter === t.id ? C.accent : C.sub,
+                        borderColor: courseFilter === t.id ? C.accent : 'transparent',
+                      }}>
+                      {t.label}
+                    </button>
                   ))}
                 </div>
-              )}
+                <div className="space-y-2">
+                  {visibleCourses.map(c => {
+                    const IconComp = c.icon
+                    return (
+                      <div key={c.id} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: C.bg }}>
+                        <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: c.soft }}>
+                          <IconComp size={16} color={c.color} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate" style={{ color: C.ink }}>{c.title}</p>
+                          <p className="text-xs truncate" style={{ color: C.sub }}>{c.instructor}</p>
+                        </div>
+                        <span className="flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-full"
+                          style={{ background: c.soft, color: c.color }}>
+                          {c.status}
+                        </span>
+                      </div>
+                    )
+                  })}
+                  {visibleCourses.length === 0 && (
+                    <p className="text-sm text-center py-8" style={{ color: C.sub }}>No courses here yet.</p>
+                  )}
+                </div>
+              </div>
             </div>
+          )}
 
-           
+          {activeTab === 'ai-jobs' && (
+            <div>
+              <p className="mb-4" style={{ color: C.sub }}>Browse and apply for IT job vacancies</p>
+              <JobPortal />
+            </div>
+          )}
+
+          {activeTab === 'roadmap' && (
+            <div className="rounded-2xl p-10 text-center" style={{ background: '#fff', boxShadow: cardShadow }}>
+              <div className="text-7xl mb-5">🗺️</div>
+              <h3 className="text-2xl font-bold mb-3" style={{ color: C.ink }}>Career Roadmap</h3>
+              <p className="max-w-md mx-auto" style={{ color: C.sub }}>Get a personalized step-by-step career path powered by Google Gemini AI</p>
+              <div className="inline-block mt-5 px-5 py-2.5 rounded-full text-sm font-semibold text-white" style={{ background: C.accent }}>
+                Coming Soon 🔧
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'learning' && (
+            <div>
+              <p className="mb-4" style={{ color: C.sub }}>Browse and access learning materials from instructors</p>
+              <LearningHub />
+            </div>
+          )}
+
+          {activeTab === 'challenges' && (
+            <div className="rounded-2xl p-10 text-center" style={{ background: '#fff', boxShadow: cardShadow }}>
+              <div className="text-7xl mb-5">🏆</div>
+              <h3 className="text-2xl font-bold mb-3" style={{ color: C.ink }}>Skill Challenges</h3>
+              <p className="max-w-md mx-auto" style={{ color: C.sub }}>Take AI-generated challenges powered by Gemini, earn badges and track your scores</p>
+              <div className="inline-block mt-5 px-5 py-2.5 rounded-full text-sm font-semibold text-white" style={{ background: C.accent }}>
+                Coming Soon 🔧
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'profile' && <Profile />}
+        </div>
+      </div>
+
+      {/* ── RIGHT PANEL ── fixed height, no scroll, light blue background ── */}
+      <div className="hidden xl:flex flex-col w-80 h-screen fixed right-0 top-0 z-30 border-l overflow-hidden p-5"
+        style={{ background: C.panel, borderColor: C.border }}>
+
+        {/* Calendar */}
+        <div className="mb-5">
+          <div className="flex justify-between items-center mb-3">
+            <h2 className="text-sm font-bold flex items-center gap-2" style={{ color: C.ink }}>
+              <IconCalendar size={15} color={C.accent} /> {monthNames[calMonth]} {calYear}
+            </h2>
+            <div className="flex items-center gap-1">
+              <button onClick={goPrevMonth} className="w-6 h-6 rounded-lg flex items-center justify-center hover:bg-white/60">
+                <IconChevronLeft size={14} color={C.sub} />
+              </button>
+              <button onClick={goNextMonth} className="w-6 h-6 rounded-lg flex items-center justify-center hover:bg-white/60">
+                <IconChevronRight size={14} color={C.sub} />
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-7 gap-1 mb-1">
+            {['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => (
+              <div key={d} className="text-center text-[10px] font-semibold py-0.5" style={{ color: C.sub }}>{d}</div>
+            ))}
+          </div>
+          <div className="grid grid-cols-7 gap-1">
+            {calendarDays.map((d, i) => (
+              <div key={i} className="aspect-square flex flex-col items-center justify-center rounded-full relative text-[11px]"
+                style={{
+                  background: d && isToday(d) ? C.accent : 'transparent',
+                  color: d && isToday(d) ? '#ffffff' : d ? C.ink : 'transparent',
+                  fontWeight: d && isToday(d) ? 700 : 500,
+                }}>
+                {d || ''}
+                {d && eventDays.includes(d) && !isToday(d) && (
+                  <span className="absolute bottom-0.5 w-1 h-1 rounded-full" style={{ background: C.orange }}></span>
+                )}
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Page Body */}
-        <div className="p-6">
-
-          {/* ── HOME ── */}
-          {activeTab === 'home' && (
-            <div>
-              {/* Welcome Banner */}
-              <div className="rounded-2xl p-8 mb-6 text-white relative overflow-hidden"
-                style={{background: 'linear-gradient(135deg, #0f4c35 0%, #1a7a5e 40%, #10b981 80%, #06b6d4 100%)'}}>
-                <div className="absolute top-[-40px] right-[-40px] w-64 h-64 rounded-full opacity-10"
-                  style={{background: 'radial-gradient(circle, #ffffff, transparent)'}}></div>
-                <div className="absolute bottom-[-30px] left-1/3 w-48 h-48 rounded-full opacity-10"
-                  style={{background: 'radial-gradient(circle, #06b6d4, transparent)'}}></div>
-                <div className="relative z-10">
-                  <p className="text-green-200 text-sm font-medium mb-1">Welcome back 👋</p>
-                  <h1 className="text-3xl font-bold mb-2">{user?.full_name}</h1>
-                  <p className="text-green-100 text-sm">{user?.current_post || 'Job Seeker'} · Building your career journey</p>
-                  <div className="flex gap-4 mt-6">
-                    <button onClick={() => setActiveTab('ai-jobs')}
-                      className="bg-white text-teal-700 px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-green-50 transition">
-                      🤖 Find Jobs
-                    </button>
-                    <button onClick={() => setActiveTab('roadmap')}
-                      className="bg-white text-teal-700 px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-green-50 transition">
-                      🗺️ My Roadmap
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                {[
-                  { icon: '🎯', label: 'Job Matches', value: '12', bg: '#d1fae5', color: '#065f46' },
-                  { icon: '📊', label: 'Skills Gap', value: '5', bg: '#cffafe', color: '#164e63' },
-                  { icon: '🏆', label: 'Badges Earned', value: '3', bg: '#fef3c7', color: '#92400e' },
-                  { icon: '📚', label: 'Courses Active', value: '2', bg: '#ede9fe', color: '#4c1d95' },
-                ].map(stat => (
-                  <div key={stat.label} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                    <div className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl mb-3"
-                      style={{background: stat.bg}}>
-                      {stat.icon}
-                    </div>
-                    <p className="text-3xl font-bold" style={{color: stat.color}}>{stat.value}</p>
-                    <p className="text-sm text-gray-500 mt-1">{stat.label}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-                {/* AI Job Matches */}
-                <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                  <div className="flex justify-between items-center mb-5">
-                    <h2 className="font-bold text-gray-800 text-lg">🤖 AI Job Matches</h2>
-                    <button onClick={() => setActiveTab('ai-jobs')}
-                      className="text-sm text-teal-600 font-medium hover:underline">See all</button>
-                  </div>
-                  <div className="space-y-3">
-                    {[
-                      { title: 'Frontend Developer', company: 'TechCorp Lanka', match: 92, skills: ['React', 'JavaScript'], color: '#d1fae5' },
-                      { title: 'UI/UX Designer', company: 'Creative Studio', match: 85, skills: ['Figma', 'CSS'], color: '#cffafe' },
-                      { title: 'Full Stack Developer', company: 'StartupX', match: 78, skills: ['Node.js', 'Python'], color: '#fef3c7' },
-                    ].map((job, i) => (
-                      <div key={i}
-                        className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition cursor-pointer border border-gray-100">
-                        <div className="w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-                          style={{background: job.color}}>
-                          💼
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-semibold text-gray-800 text-sm">{job.title}</p>
-                          <p className="text-xs text-gray-500 mb-1">{job.company}</p>
-                          <div className="flex gap-1">
-                            {job.skills.map(s => (
-                              <span key={s}
-                                className="text-xs bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full border border-teal-100">
-                                {s}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="text-right flex-shrink-0">
-                          <div className="text-sm font-bold"
-                            style={{color: job.match >= 90 ? '#10b981' : job.match >= 80 ? '#f59e0b' : '#6b7280'}}>
-                            {job.match}%
-                          </div>
-                          <div className="text-xs text-gray-400">match</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Challenge Score */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                  <div className="flex justify-between items-center mb-5">
-                    <h2 className="font-bold text-gray-800 text-lg">🏆 Challenge Score</h2>
-                    <button onClick={() => setActiveTab('challenges')}
-                      className="text-sm text-teal-600 font-medium hover:underline">View all</button>
-                  </div>
-                  <div className="flex flex-col items-center mb-5">
-                    <div className="w-24 h-24 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-3 shadow-lg"
-                      style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
-                      780
-                    </div>
-                    <p className="text-sm font-semibold text-gray-700">Total Score</p>
-                    <p className="text-xs text-gray-400">Top 15% of users</p>
-                  </div>
-                  <div className="space-y-2">
-                    {[
-                      { badge: '🐍', name: 'Python Pro', level: 'Intermediate', bg: '#fef3c7' },
-                      { badge: '⚛️', name: 'React Basics', level: 'Beginner', bg: '#cffafe' },
-                      { badge: '🗄️', name: 'SQL Master', level: 'Advanced', bg: '#d1fae5' },
-                    ].map((b, i) => (
-                      <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl"
-                        style={{background: b.bg}}>
-                        <span className="text-xl">{b.badge}</span>
-                        <div>
-                          <p className="text-xs font-semibold text-gray-700">{b.name}</p>
-                          <p className="text-xs text-gray-500">{b.level}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Continue Learning */}
-                <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                  <div className="flex justify-between items-center mb-5">
-                    <h2 className="font-bold text-gray-800 text-lg">📚 Continue Learning</h2>
-                    <button onClick={() => setActiveTab('learning')}
-                      className="text-sm text-teal-600 font-medium hover:underline">Learning hub</button>
-                  </div>
-                  <div className="space-y-3">
-                    {[
-                      { title: 'React.js for Beginners', instructor: 'Dr. Silva', progress: 65, thumb: '⚛️', bg: '#cffafe' },
-                      { title: 'Python Data Science', instructor: 'Prof. Perera', progress: 40, thumb: '🐍', bg: '#d1fae5' },
-                    ].map((course, i) => (
-                      <div key={i}
-                        className="p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition cursor-pointer">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
-                            style={{background: course.bg}}>
-                            {course.thumb}
-                          </div>
-                          <div className="flex-1">
-                            <p className="font-semibold text-gray-800 text-sm">{course.title}</p>
-                            <p className="text-xs text-gray-500 mb-2">{course.instructor}</p>
-                            <div className="w-full bg-gray-100 rounded-full h-1.5">
-                              <div className="h-1.5 rounded-full"
-                                style={{width: `${course.progress}%`, background: 'linear-gradient(90deg, #0f4c35, #10b981)'}}>
-                              </div>
-                            </div>
-                            <p className="text-xs text-gray-400 mt-1">{course.progress}% complete</p>
-                          </div>
-                          <button className="text-xs font-semibold text-white px-3 py-1.5 rounded-lg flex-shrink-0"
-                            style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
-                            Continue
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Career Roadmap Preview */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                  <div className="flex justify-between items-center mb-5">
-                    <h2 className="font-bold text-gray-800 text-lg">🗺️ Career Roadmap</h2>
-                    <button onClick={() => setActiveTab('roadmap')}
-                      className="text-sm text-teal-600 font-medium hover:underline">Full map</button>
-                  </div>
-                  <div className="space-y-3">
-                    {[
-                      { step: 'Learn React.js', status: 'done' },
-                      { step: 'Master Node.js', status: 'active' },
-                      { step: 'Build Portfolio', status: 'upcoming' },
-                      { step: 'Apply for Jobs', status: 'upcoming' },
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-3">
-                        <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0`}
-                          style={{
-                            background: item.status === 'done' ? '#10b981' :
-                                        item.status === 'active' ? '#0f4c35' : '#e5e7eb',
-                            color: item.status === 'upcoming' ? '#9ca3af' : 'white'
-                          }}>
-                          {item.status === 'done' ? '✓' : i + 1}
-                        </div>
-                        <p className={`text-sm flex-1 ${
-                          item.status === 'done' ? 'text-gray-400 line-through' :
-                          item.status === 'active' ? 'font-semibold text-gray-800' :
-                          'text-gray-500'
-                        }`}>{item.step}</p>
-                        {item.status === 'active' && (
-                          <span className="text-xs px-2 py-0.5 rounded-full text-white"
-                            style={{background: '#10b981'}}>Active</span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                  <button onClick={() => setActiveTab('roadmap')}
-                    className="w-full mt-5 py-2.5 rounded-xl text-sm font-semibold text-white"
-                    style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
-                    Generate My Roadmap 🗺️
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ── JOBS ── */}
-          {activeTab === 'jobs' && (
-          <div>
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">💼 Job Portal</h2>
-              <p className="text-gray-500 mt-1">Browse and apply for IT job vacancies</p>
-            </div>
-            <JobPortal />
+        {/* Job Status Notifications */}
+        <div className="mb-5 flex flex-col">
+          <div className="flex justify-between items-center mb-2.5 flex-shrink-0">
+            <p className="text-xs font-semibold flex items-center gap-2" style={{ color: C.ink }}>
+              <IconBriefcase size={14} color={C.accent} /> Job Status Notifications
+            </p>
+            <button onClick={() => setActiveTab('jobs')} className="text-[11px] font-medium" style={{ color: C.accent }}>View all</button>
           </div>
-        )}
-
-          {/* ── ROADMAP ── */}
-          {activeTab === 'roadmap' && (
-            <div className="bg-white rounded-2xl p-10 shadow-sm border border-gray-100 text-center">
-              <div className="text-7xl mb-5">🗺️</div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3">Career Roadmap</h3>
-              <p className="text-gray-500 max-w-md mx-auto">Get a personalized step-by-step career path powered by Google Gemini AI</p>
-              <div className="inline-block mt-5 px-5 py-2.5 rounded-full text-sm font-semibold text-white"
-                style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
-                Coming Soon 🔧
-              </div>
-            </div>
-          )}
-
-          {/* ── LEARNING ── */}
-{activeTab === 'learning' && (
-  <div>
-    <div className="mb-6">
-      <h2 className="text-2xl font-bold text-gray-800">📚 Learning Hub</h2>
-      <p className="text-gray-500 mt-1">Browse and access learning materials from instructors</p>
-    </div>
-    <LearningHub />
-  </div>
-)}
-
-          
-          {/* ── CHALLENGES ── */}
-          {activeTab === 'challenges' && (
-            <div className="bg-white rounded-2xl p-10 shadow-sm border border-gray-100 text-center">
-              <div className="text-7xl mb-5">🏆</div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3">Skill Challenges</h3>
-              <p className="text-gray-500 max-w-md mx-auto">Take AI-generated challenges powered by Gemini, earn badges and track your scores</p>
-              <div className="inline-block mt-5 px-5 py-2.5 rounded-full text-sm font-semibold text-white"
-                style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
-                Coming Soon 🔧
-              </div>
-            </div>
-          )}
-
-          {/* ── PROFILE ── */}
-          {activeTab === 'profile' && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
-                <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-3xl font-bold text-white mx-auto mb-4"
-                  style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
-                  {user?.full_name?.charAt(0).toUpperCase()}
-                </div>
-                <h3 className="font-bold text-gray-800 text-lg">{user?.full_name}</h3>
-                <p className="text-gray-500 text-sm">@{user?.username}</p>
-                <p className="text-sm font-medium mt-1" style={{color: '#10b981'}}>{user?.current_post || 'Job Seeker'}</p>
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <p className="text-xs text-gray-500">{user?.email}</p>
-                </div>
-                <button className="mt-4 w-full py-2.5 rounded-xl text-sm font-semibold text-white"
-                  style={{background: 'linear-gradient(135deg, #0f4c35, #10b981)'}}>
-                  Edit Profile
-                </button>
-              </div>
-
-              <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <h3 className="font-bold text-gray-800 mb-5">Profile Information</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { label: 'Full Name', value: user?.full_name },
-                    { label: 'Username', value: `@${user?.username}` },
-                    { label: 'Email', value: user?.email },
-                    { label: 'Current Post', value: user?.current_post || 'Not set' },
-                    { label: 'Experience', value: `${user?.experience_years || 0} years` },
-                    { label: 'Role', value: 'Job Seeker' },
-                  ].map((item) => (
-                    <div key={item.label} className="p-3 rounded-xl" style={{background: '#f0fdf4'}}>
-                      <p className="text-xs text-gray-500 mb-1">{item.label}</p>
-                      <p className="text-sm font-semibold text-gray-800">{item.value}</p>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-5">
-                  <p className="text-sm font-semibold text-gray-700 mb-2">Skills</p>
-                  <div className="flex flex-wrap gap-2">
-                    {user?.skills
-                      ? user.skills.split(',').map(s => (
-                          <span key={s} className="text-xs text-teal-700 px-3 py-1 rounded-full border border-teal-200"
-                            style={{background: '#d1fae5'}}>
-                            {s.trim()}
-                          </span>
-                        ))
-                      : <p className="text-sm text-gray-400">No skills added yet.</p>
-                    }
+          <div className="space-y-2 overflow-hidden">
+            {jobStatusNotifications.map((j, i) => (
+              <div key={i} className="rounded-xl p-2.5 pl-3 border-l-4" style={{ background: '#fceeff', borderColor: j.color }}>
+                <div className="flex justify-between items-start gap-2">
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-semibold truncate" style={{ color: C.ink }}>{j.role}</p>
+                    <p className="text-[10px] mt-0.5 truncate" style={{ color: C.sub }}>{j.company}</p>
                   </div>
+                  <span className="text-[9px] font-semibold whitespace-nowrap flex-shrink-0" style={{ color: j.color }}>{j.status}</span>
                 </div>
               </div>
-            </div>
-          )}
+            ))}
+          </div>
+        </div>
 
+        {/* Achievement Badges */}
+        <div className="flex-shrink-0">
+          <div className="flex justify-between items-center mb-2.5">
+            <p className="text-xs font-semibold flex items-center gap-2" style={{ color: C.ink }}>
+              <IconMedal size={14} color={C.accent} /> Achievement Badges
+            </p>
+            <button onClick={() => setActiveTab('challenges')} className="text-[11px] font-medium" style={{ color: C.accent }}>View all</button>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {badges.map((b, i) => {
+              const IconComp = b.icon
+              return (
+                <div key={i} className="rounded-xl p-2.5 flex flex-col items-center text-center" style={{ background: '#fceeff' }}>
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center mb-1" style={{ background: b.soft }}>
+                    <IconComp size={14} color={b.color} />
+                  </div>
+                  <p className="text-[10px] font-semibold leading-tight" style={{ color: C.ink }}>{b.name}</p>
+                </div>
+              )
+            })}
+          </div>
         </div>
       </div>
     </div>
