@@ -16,6 +16,7 @@ if __name__ == '__main__':
         from app.models.learning import LearningContent, ContentAccess, ReAccessRequest, ContentComment
         from app.models.job import Job, JobApplication
         from app.models.quiz import QuizCategory, QuizQuestion, QuizAttempt
+        from app.models.challenge import ChallengeSession, UserBadge
         db.create_all()
         print("✅ Database tables created!")
     app.run(debug=True, port=5000)

@@ -1,11 +1,13 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
+import API from '../../utils/api'
 import LearningHub from './LearningHub'
 import JobPortal from './JobPortal'
 import Profile from './Profile'
 import JobVacancy from './JobVacancy'
 import CareerRoadmap from './CareerRoadmap'
+import SkillChallenge from './SkillChallenge'
 
 /* ── Colour Theme ──
    Updated only to match the purple/lavender theme
@@ -277,6 +279,16 @@ const IconClock = (p) => (
   />
 )
 
+// Colour palette cycled across earned badges so each one gets a distinct
+// accent without needing the backend to store colour info.
+const BADGE_PALETTE = [
+  { color: C.green, soft: C.greenSoft },
+  { color: C.blue, soft: C.blueSoft },
+  { color: C.purple, soft: C.purpleSoft },
+  { color: C.orange, soft: C.orangeSoft },
+  { color: C.pink, soft: C.pinkSoft }
+]
+
 export default function JobSeekerDashboard() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
@@ -285,6 +297,26 @@ export default function JobSeekerDashboard() {
   const [notifOpen, setNotifOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [courseFilter, setCourseFilter] = useState('all')
+
+  // ── Real earned badges, fetched from the Skill Challenge backend ──
+  const [earnedBadges, setEarnedBadges] = useState([])
+  const [badgesLoading, setBadgesLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+    const fetchEarnedBadges = async () => {
+      try {
+        const res = await API.get('/challenge/badges')
+        if (!cancelled) setEarnedBadges(res.data.badges || [])
+      } catch (err) {
+        console.error('Failed to load badges:', err)
+      } finally {
+        if (!cancelled) setBadgesLoading(false)
+      }
+    }
+    fetchEarnedBadges()
+    return () => { cancelled = true }
+  }, [])
 
   const handleLogout = () => {
     logout()
@@ -410,27 +442,6 @@ export default function JobSeekerDashboard() {
       ? myCourses
       : myCourses.filter((c) => c.type === courseFilter)
 
-  const badges = [
-    {
-      name: 'Python Pro',
-      icon: IconMedal,
-      color: C.green,
-      soft: C.greenSoft
-    },
-    {
-      name: 'React Basics',
-      icon: IconShieldCheck,
-      color: C.blue,
-      soft: C.blueSoft
-    },
-    {
-      name: 'SQL Master',
-      icon: IconCertificate,
-      color: C.purple,
-      soft: C.purpleSoft
-    }
-  ]
-
   const jobStatusNotifications = [
     {
       company: 'TechCorp Lanka',
@@ -469,7 +480,7 @@ export default function JobSeekerDashboard() {
     },
     {
       label: 'Badges Earned',
-      value: badges.length,
+      value: earnedBadges.length,
       icon: IconMedal,
       color: C.purple,
       soft: C.purpleSoft
@@ -1030,43 +1041,7 @@ export default function JobSeekerDashboard() {
           {activeTab === 'jobs' && <JobVacancy />}
 
           {/* CHALLENGES */}
-          {activeTab === 'challenges' && (
-            <div
-              className="rounded-2xl p-10 text-center"
-              style={{
-                background: C.card,
-                boxShadow: cardShadow
-              }}
-            >
-              <div className="text-7xl mb-5">
-                🏆
-              </div>
-
-              <h3
-                className="text-2xl font-bold mb-3"
-                style={{ color: C.ink }}
-              >
-                Skill Challenges
-              </h3>
-
-              <p
-                className="max-w-md mx-auto"
-                style={{ color: C.sub }}
-              >
-                Take AI-generated challenges powered by
-                Gemini, earn badges and track your scores
-              </p>
-
-              <div
-                className="inline-block mt-5 px-5 py-2.5 rounded-full text-sm font-semibold text-white"
-                style={{
-                  background: C.accent
-                }}
-              >
-                Coming Soon 🔧
-              </div>
-            </div>
-          )}
+          {activeTab === 'challenges' && <SkillChallenge />}
 
           {/* PROFILE */}
           {activeTab === 'profile' && <Profile />}
@@ -1244,7 +1219,7 @@ export default function JobSeekerDashboard() {
           </div>
         </div>
 
-        {/* Achievement Badges */}
+        {/* Achievement Badges — now sourced live from /challenge/badges */}
         <div className="flex-shrink-0">
           <div className="flex justify-between items-center mb-2.5">
             <p
@@ -1270,40 +1245,67 @@ export default function JobSeekerDashboard() {
             </button>
           </div>
 
-          <div className="grid grid-cols-3 gap-2">
-            {badges.map((b, i) => {
-              const IconComp = b.icon
-
-              return (
+          {badgesLoading ? (
+            <div className="grid grid-cols-3 gap-2">
+              {[0, 1, 2].map((i) => (
                 <div
                   key={i}
-                  className="rounded-xl p-2.5 flex flex-col items-center text-center"
-                  style={{
-                    background: C.softPanel
-                  }}
+                  className="rounded-xl p-2.5 flex flex-col items-center text-center animate-pulse"
+                  style={{ background: C.softPanel }}
                 >
                   <div
-                    className="w-7 h-7 rounded-full flex items-center justify-center mb-1"
+                    className="w-7 h-7 rounded-full mb-1"
+                    style={{ background: C.border }}
+                  />
+                  <div
+                    className="h-2 w-10 rounded"
+                    style={{ background: C.border }}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : earnedBadges.length === 0 ? (
+            <div
+              className="rounded-xl p-4 text-center"
+              style={{ background: C.softPanel }}
+            >
+              <p className="text-[11px]" style={{ color: C.sub }}>
+                No badges earned yet — complete a Skill Challenge to earn your first one.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-3 gap-2">
+              {earnedBadges.slice(0, 3).map((b, i) => {
+                const palette = BADGE_PALETTE[i % BADGE_PALETTE.length]
+
+                return (
+                  <div
+                    key={b.id || i}
+                    className="rounded-xl p-2.5 flex flex-col items-center text-center"
                     style={{
-                      background: b.soft
+                      background: C.softPanel
                     }}
                   >
-                    <IconComp
-                      size={14}
-                      color={b.color}
-                    />
-                  </div>
+                    <div
+                      className="w-7 h-7 rounded-full flex items-center justify-center mb-1 text-sm"
+                      style={{
+                        background: palette.soft
+                      }}
+                    >
+                      {b.badge_icon}
+                    </div>
 
-                  <p
-                    className="text-[10px] font-semibold leading-tight"
-                    style={{ color: C.ink }}
-                  >
-                    {b.name}
-                  </p>
-                </div>
-              )
-            })}
-          </div>
+                    <p
+                      className="text-[10px] font-semibold leading-tight"
+                      style={{ color: C.ink }}
+                    >
+                      {b.badge_name}
+                    </p>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>

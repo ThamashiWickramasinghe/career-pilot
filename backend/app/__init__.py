@@ -41,6 +41,9 @@ def create_app():
     from app.routes.ai_core import ai_bp, load_models
     app.register_blueprint(ai_bp, url_prefix='/api/ai')
 
+    from app.routes.challenge import challenge_bp
+    app.register_blueprint(challenge_bp, url_prefix='/api/challenge')
+
     # Load AI models after app context is ready
     with app.app_context():
         load_models()

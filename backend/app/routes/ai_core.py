@@ -16,6 +16,39 @@ ai_bp = Blueprint('ai', __name__)
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
 GEMINI_URL = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_API_KEY}'
 
+
+def _call_gemini(prompt, temperature=0.7, max_tokens=2048):
+    """
+    Shared helper: sends a prompt to Gemini and returns the text response.
+    Raises RuntimeError with a human-readable message on any failure so
+    callers can turn it into a proper JSON error instead of failing silently.
+    """
+    if not GEMINI_API_KEY:
+        raise RuntimeError('Server is missing GEMINI_API_KEY configuration')
+
+    response = requests.post(
+        GEMINI_URL,
+        json={
+            'contents': [{'parts': [{'text': prompt}]}],
+            'generationConfig': {'temperature': temperature, 'maxOutputTokens': max_tokens}
+        },
+        headers={'Content-Type': 'application/json'}
+    )
+    result = response.json()
+
+    if not response.ok:
+        error_message = result.get('error', {}).get('message', 'Gemini API error')
+        print(f"Gemini API error: {error_message}")
+        raise RuntimeError(error_message)
+
+    text = result.get('candidates', [{}])[0].get('content', {}).get('parts', [{}])[0].get('text')
+    if not text:
+        print(f"Gemini returned no usable text: {result}")
+        raise RuntimeError('Gemini returned an empty response')
+
+    return text
+
+
 # ── Load Models ───────────────────────────────────────
 MODEL_PATH = os.path.join(os.path.dirname(__file__), '../../ai_models/career_pilot_final_tuned_model.pkl')
 ENCODER_PATH = os.path.join(os.path.dirname(__file__), '../../ai_models/label_encoder.pkl')
@@ -46,7 +79,7 @@ def get_user_from_token():
         return None, None
 
 
-# ── NEW: Minimum-effort guard ─────────────────────────
+# ── Minimum-effort guard ─────────────────────────
 # A quiz that was skipped entirely (or answered with nothing correct in
 # every single category) should NEVER be handed to the model as if it were
 # a legitimate, analyzable result. We block prediction in that case instead
@@ -560,32 +593,40 @@ def career_roadmap():
     if not prompt:
         return jsonify({'error': 'Prompt is required'}), 400
 
-    if not GEMINI_API_KEY:
-        return jsonify({'error': 'Server is missing GEMINI_API_KEY configuration'}), 500
-
     try:
-        response = requests.post(
-            GEMINI_URL,
-            json={
-                'contents': [{'parts': [{'text': prompt}]}],
-                'generationConfig': {'temperature': 0.7, 'maxOutputTokens': 2048}
-            },
-            headers={'Content-Type': 'application/json'}
-        )
-        result = response.json()
-
-        if not response.ok:
-            error_message = result.get('error', {}).get('message', 'Gemini API error')
-            print(f"Gemini API error: {error_message}")
-            return jsonify({'error': error_message}), response.status_code
-
-        text = result.get('candidates', [{}])[0].get('content', {}).get('parts', [{}])[0].get('text')
-        if not text:
-            print(f"Gemini returned no usable text: {result}")
-            return jsonify({'error': 'Gemini returned an empty response'}), 502
-
+        text = _call_gemini(prompt, temperature=0.7, max_tokens=2048)
         return jsonify({'text': text}), 200
-
+    except RuntimeError as e:
+        return jsonify({'error': str(e)}), 502
     except Exception as e:
         print(f"career_roadmap error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+# ── GENERIC GENERATE-CONTENT (used by Skill Challenge) ────────
+# One shared, generic prompt-in/text-out endpoint so any feature that needs
+# a raw Gemini completion (challenge generation, answer evaluation, etc.)
+# can reuse it instead of hardcoding a key/URL in the frontend.
+@ai_bp.route('/generate-content', methods=['POST'])
+@jwt_required()
+def generate_content():
+    user_id, _ = get_user_from_token()
+    if not user_id:
+        return jsonify({'message': 'Invalid token'}), 422
+
+    data = request.get_json()
+    prompt = data.get('prompt')
+    temperature = data.get('temperature', 0.7)
+    max_tokens = data.get('max_tokens', 1500)
+
+    if not prompt:
+        return jsonify({'error': 'Prompt is required'}), 400
+
+    try:
+        text = _call_gemini(prompt, temperature=temperature, max_tokens=max_tokens)
+        return jsonify({'text': text}), 200
+    except RuntimeError as e:
+        return jsonify({'error': str(e)}), 502
+    except Exception as e:
+        print(f"generate_content error: {e}")
         return jsonify({'error': str(e)}), 500
