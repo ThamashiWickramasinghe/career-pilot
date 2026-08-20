@@ -5,6 +5,7 @@ import LearningHub from './LearningHub'
 import JobPortal from './JobPortal'
 import Profile from './Profile'
 import JobVacancy from './JobVacancy'
+import CareerRoadmap from './CareerRoadmap'
 
 /* ── Colour Theme ──
    Updated only to match the purple/lavender theme
@@ -694,6 +695,19 @@ export default function JobSeekerDashboard() {
       className="min-h-screen flex"
       style={{ background: C.bg }}
     >
+      <style>{`
+        /* Hide scrollbars while keeping scrolling enabled */
+        * {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+
+        *::-webkit-scrollbar {
+          width: 0;
+          height: 0;
+          display: none;
+        }
+      `}</style>
 
       {/* ── LEFT SIDEBAR ── */}
       <div
@@ -1002,43 +1016,7 @@ export default function JobSeekerDashboard() {
           )}
 
           {/* ROADMAP */}
-          {activeTab === 'roadmap' && (
-            <div
-              className="rounded-2xl p-10 text-center"
-              style={{
-                background: C.card,
-                boxShadow: cardShadow
-              }}
-            >
-              <div className="text-7xl mb-5">
-                🗺️
-              </div>
-
-              <h3
-                className="text-2xl font-bold mb-3"
-                style={{ color: C.ink }}
-              >
-                Career Roadmap
-              </h3>
-
-              <p
-                className="max-w-md mx-auto"
-                style={{ color: C.sub }}
-              >
-                Get a personalized step-by-step career
-                path powered by Google Gemini AI
-              </p>
-
-              <div
-                className="inline-block mt-5 px-5 py-2.5 rounded-full text-sm font-semibold text-white"
-                style={{
-                  background: C.accent
-                }}
-              >
-                Coming Soon 🔧
-              </div>
-            </div>
-          )}
+          {activeTab === 'roadmap' && <CareerRoadmap />}
 
           {/* LEARNING */}
           {activeTab === 'learning' && (

@@ -8,8 +8,13 @@ import numpy as np
 import json
 import os
 import pickle
+import requests
 
 ai_bp = Blueprint('ai', __name__)
+
+# ── Gemini config (key stays server-side, loaded from .env) ─────
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
+GEMINI_URL = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_API_KEY}'
 
 # ── Load Models ───────────────────────────────────────
 MODEL_PATH = os.path.join(os.path.dirname(__file__), '../../ai_models/career_pilot_final_tuned_model.pkl')
@@ -455,3 +460,48 @@ def full_analysis():
         'recommended_courses': courses,
         'recommended_jobs': jobs
     }), 200
+
+
+# ── CAREER ROADMAP (Gemini proxy — key stays server-side) ────
+@ai_bp.route('/career-roadmap', methods=['POST'])
+@jwt_required()
+def career_roadmap():
+    user_id, _ = get_user_from_token()
+    if not user_id:
+        return jsonify({'message': 'Invalid token'}), 422
+
+    data = request.get_json()
+    prompt = data.get('prompt')
+
+    if not prompt:
+        return jsonify({'error': 'Prompt is required'}), 400
+
+    if not GEMINI_API_KEY:
+        return jsonify({'error': 'Server is missing GEMINI_API_KEY configuration'}), 500
+
+    try:
+        response = requests.post(
+            GEMINI_URL,
+            json={
+                'contents': [{'parts': [{'text': prompt}]}],
+                'generationConfig': {'temperature': 0.7, 'maxOutputTokens': 2048}
+            },
+            headers={'Content-Type': 'application/json'}
+        )
+        result = response.json()
+
+        if not response.ok:
+            error_message = result.get('error', {}).get('message', 'Gemini API error')
+            print(f"Gemini API error: {error_message}")
+            return jsonify({'error': error_message}), response.status_code
+
+        text = result.get('candidates', [{}])[0].get('content', {}).get('parts', [{}])[0].get('text')
+        if not text:
+            print(f"Gemini returned no usable text: {result}")
+            return jsonify({'error': 'Gemini returned an empty response'}), 502
+
+        return jsonify({'text': text}), 200
+
+    except Exception as e:
+        print(f"career_roadmap error: {e}")
+        return jsonify({'error': str(e)}), 500
