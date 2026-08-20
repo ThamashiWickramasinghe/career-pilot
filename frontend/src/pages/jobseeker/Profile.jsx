@@ -115,14 +115,17 @@ export default function Profile() {
     return (
       <div
         className="h-screen flex items-center justify-center overflow-hidden"
-        style={{ background: '#fdf4ff' }}
+        style={{ background: '#f6f3ff' }}
       >
         <div className="text-center">
           <div className="text-4xl mb-3 animate-pulse">
             👤
           </div>
 
-          <p className="text-sm text-gray-500">
+          <p
+            className="text-sm"
+            style={{ color: '#85839a' }}
+          >
             Loading profile...
           </p>
         </div>
@@ -131,9 +134,7 @@ export default function Profile() {
   }
 
   return (
-    <div
-     
-    >
+    <div>
       <div className="w-full max-w-4xl h-full mx-auto px-4 sm:px-5 py-3">
 
         {/* =====================================================
@@ -143,8 +144,8 @@ export default function Profile() {
           <div
             className="mb-3 p-3 rounded-xl text-xs font-medium flex items-center gap-2"
             style={{
-              background: '#D0F4E0',
-              color: '#065f46',
+              background: '#dffff0',
+              color: '#3f8069',
             }}
           >
             <span>✅</span>
@@ -159,8 +160,8 @@ export default function Profile() {
           <div
             className="mb-3 p-3 rounded-xl text-xs font-medium flex items-center gap-2"
             style={{
-              background: '#fee2e2',
-              color: '#dc2626',
+              background: '#ffefe0',
+              color: '#b66b35',
             }}
           >
             <span>⚠️</span>
@@ -169,7 +170,8 @@ export default function Profile() {
 
             <button
               onClick={() => setError('')}
-              className="ml-auto text-red-400 hover:text-red-600"
+              className="ml-auto"
+              style={{ color: '#b66b35' }}
             >
               ✕
             </button>
@@ -180,29 +182,35 @@ export default function Profile() {
             PERSONAL INFORMATION CARD
         ====================================================== */}
         {!editing && (
-          <div className="h-full bg-white rounded-2xl shadow-sm overflow-y-auto">
+          <div
+            className="h-full rounded-2xl overflow-y-auto"
+            style={{
+              background: '#ffffff',
+              boxShadow:
+                '0 2px 8px rgba(74, 69, 130, 0.06), 0 1px 3px rgba(74, 69, 130, 0.04)',
+            }}
+          >
 
             {/* Card Header */}
             <div
               className="relative overflow-hidden"
               style={{
                 minHeight: '10px',
+                background: '#ffffff',
               }}
             >
 
               {/* Decorative circles */}
-              <div
-               
-              />
+              <div />
 
-              <div
-                
-              />
+              <div />
 
               <div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start gap-4">
+
                 {/* Profile Avatar */}
 
                 {/* Edit Button */}
+
               </div>
             </div>
 
@@ -214,7 +222,10 @@ export default function Profile() {
               <div className="flex items-center justify-between mb-3">
 
                 <div>
-                  <h3 className="text-base font-bold text-gray-800 flex items-center gap-2">
+                  <h3
+                    className="text-base font-bold flex items-center gap-2"
+                    style={{ color: '#25243a' }}
+                  >
                     Personal Information
                   </h3>
                 </div>
@@ -223,7 +234,7 @@ export default function Profile() {
                   onClick={() => setEditing(true)}
                   className="text-xs px-3 py-1.5 rounded-lg text-white font-medium hover:shadow-md transition"
                   style={{
-                    background: '#7f3e8b',
+                    background: '#5b56b5',
                   }}
                 >
                   Edit
@@ -235,32 +246,46 @@ export default function Profile() {
 
                 {/* Full Name */}
                 <div
-                  className="p-3 rounded-xl border border-gray-100"
+                  className="p-3 rounded-xl border"
                   style={{
-                    background: '#fdf4ff',
+                    background: '#f3f0fa',
+                    borderColor: '#e6e3f2',
                   }}
                 >
-                  <p className="text-[11px] text-gray-400 mb-0.5">
+                  <p
+                    className="text-[11px] mb-0.5"
+                    style={{ color: '#85839a' }}
+                  >
                     Full Name
                   </p>
 
-                  <p className="text-xs font-semibold text-gray-800">
+                  <p
+                    className="text-xs font-semibold"
+                    style={{ color: '#25243a' }}
+                  >
                     {form.full_name || 'Not set'}
                   </p>
                 </div>
 
                 {/* Username */}
                 <div
-                  className="p-3 rounded-xl border border-gray-100"
+                  className="p-3 rounded-xl border"
                   style={{
-                    background: '#fdf4ff',
+                    background: '#f3f0fa',
+                    borderColor: '#e6e3f2',
                   }}
                 >
-                  <p className="text-[11px] text-gray-400 mb-0.5">
+                  <p
+                    className="text-[11px] mb-0.5"
+                    style={{ color: '#85839a' }}
+                  >
                     Username
                   </p>
 
-                  <p className="text-xs font-semibold text-gray-800">
+                  <p
+                    className="text-xs font-semibold"
+                    style={{ color: '#25243a' }}
+                  >
                     {form.username
                       ? `@${form.username}`
                       : 'Not set'}
@@ -269,48 +294,69 @@ export default function Profile() {
 
                 {/* Email */}
                 <div
-                  className="p-3 rounded-xl border border-gray-100"
+                  className="p-3 rounded-xl border"
                   style={{
-                    background: '#fdf4ff',
+                    background: '#f3f0fa',
+                    borderColor: '#e6e3f2',
                   }}
                 >
-                  <p className="text-[11px] text-gray-400 mb-0.5">
+                  <p
+                    className="text-[11px] mb-0.5"
+                    style={{ color: '#85839a' }}
+                  >
                     Email Address
                   </p>
 
-                  <p className="text-xs font-semibold text-gray-800 break-all">
+                  <p
+                    className="text-xs font-semibold break-all"
+                    style={{ color: '#25243a' }}
+                  >
                     {form.email || 'Not set'}
                   </p>
                 </div>
 
                 {/* Current Role */}
                 <div
-                  className="p-3 rounded-xl border border-gray-100"
+                  className="p-3 rounded-xl border"
                   style={{
-                    background: '#fdf4ff',
+                    background: '#f3f0fa',
+                    borderColor: '#e6e3f2',
                   }}
                 >
-                  <p className="text-[11px] text-gray-400 mb-0.5">
+                  <p
+                    className="text-[11px] mb-0.5"
+                    style={{ color: '#85839a' }}
+                  >
                     Current Role / Post
                   </p>
 
-                  <p className="text-xs font-semibold text-gray-800">
+                  <p
+                    className="text-xs font-semibold"
+                    style={{ color: '#25243a' }}
+                  >
                     {form.current_post || 'Not set'}
                   </p>
                 </div>
 
                 {/* Experience */}
                 <div
-                  className="p-3 rounded-xl border border-gray-100"
+                  className="p-3 rounded-xl border"
                   style={{
-                    background: '#fdf4ff',
+                    background: '#f3f0fa',
+                    borderColor: '#e6e3f2',
                   }}
                 >
-                  <p className="text-[11px] text-gray-400 mb-0.5">
+                  <p
+                    className="text-[11px] mb-0.5"
+                    style={{ color: '#85839a' }}
+                  >
                     Years of Experience
                   </p>
 
-                  <p className="text-xs font-semibold text-gray-800">
+                  <p
+                    className="text-xs font-semibold"
+                    style={{ color: '#25243a' }}
+                  >
                     {form.experience_years || 0}{' '}
                     {Number(form.experience_years) === 1
                       ? 'year'
@@ -320,35 +366,50 @@ export default function Profile() {
 
                 {/* Account Type */}
                 <div
-                  className="p-3 rounded-xl border border-gray-100"
+                  className="p-3 rounded-xl border"
                   style={{
-                    background: '#fdf4ff',
+                    background: '#f3f0fa',
+                    borderColor: '#e6e3f2',
                   }}
                 >
-                  <p className="text-[11px] text-gray-400 mb-0.5">
+                  <p
+                    className="text-[11px] mb-0.5"
+                    style={{ color: '#85839a' }}
+                  >
                     Account Type
                   </p>
 
-                  <p className="text-xs font-semibold text-gray-800">
+                  <p
+                    className="text-xs font-semibold"
+                    style={{ color: '#25243a' }}
+                  >
                     Job Seeker
                   </p>
                 </div>
+
               </div>
 
               {/* =================================================
                   BIO
               ================================================== */}
               <div
-                className="mt-3 p-3 rounded-xl border border-gray-100"
+                className="mt-3 p-3 rounded-xl border"
                 style={{
-                  background: '#fdf4ff',
+                  background: '#f3f0fa',
+                  borderColor: '#e6e3f2',
                 }}
               >
-                <p className="text-[11px] text-gray-400 mb-1">
+                <p
+                  className="text-[11px] mb-1"
+                  style={{ color: '#85839a' }}
+                >
                   About Me
                 </p>
 
-                <p className="text-xs text-gray-700 leading-5">
+                <p
+                  className="text-xs leading-5"
+                  style={{ color: '#3f3d52' }}
+                >
                   {form.bio ||
                     'No biography has been added yet.'}
                 </p>
@@ -358,17 +419,22 @@ export default function Profile() {
                   SKILLS
               ================================================== */}
               <div
-                className="mt-3 p-3 rounded-xl border border-gray-100"
+                className="mt-3 p-3 rounded-xl border"
                 style={{
-                  background: '#fdf4ff',
+                  background: '#f3f0fa',
+                  borderColor: '#e6e3f2',
                 }}
               >
-                <p className="text-[11px] text-gray-400 mb-2">
+                <p
+                  className="text-[11px] mb-2"
+                  style={{ color: '#85839a' }}
+                >
                   Skills
                 </p>
 
                 {skills.length > 0 ? (
                   <div className="flex flex-wrap gap-1.5">
+
                     {skills.map((skill, index) => (
                       <span
                         key={index}
@@ -376,25 +442,29 @@ export default function Profile() {
                         style={{
                           background:
                             index % 3 === 0
-                              ? '#E8C0FC'
+                              ? '#e9e7f8'
                               : index % 3 === 1
-                              ? '#A8DEFA'
-                              : '#D0F4E0',
+                              ? '#e3eafb'
+                              : '#dffff0',
 
                           color:
                             index % 3 === 0
-                              ? '#6b21a8'
+                              ? '#4d48a3'
                               : index % 3 === 1
-                              ? '#1e40af'
-                              : '#065f46',
+                              ? '#4f6fb4'
+                              : '#3f8069',
                         }}
                       >
                         {skill}
                       </span>
                     ))}
+
                   </div>
                 ) : (
-                  <p className="text-xs text-gray-400">
+                  <p
+                    className="text-xs"
+                    style={{ color: '#85839a' }}
+                  >
                     No skills added yet.
                   </p>
                 )}
@@ -405,47 +475,71 @@ export default function Profile() {
               ================================================== */}
               <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-2.5">
 
+                {/* GitHub */}
                 <div
-                  className="p-3 rounded-xl border border-gray-100"
+                  className="p-3 rounded-xl border"
                   style={{
-                    background: '#fdf4ff',
+                    background: '#f3f0fa',
+                    borderColor: '#e6e3f2',
                   }}
                 >
-                  <p className="text-[11px] text-gray-400 mb-0.5">
+                  <p
+                    className="text-[11px] mb-0.5"
+                    style={{ color: '#85839a' }}
+                  >
                     GitHub
                   </p>
 
-                  <p className="text-xs font-medium text-gray-700 break-all">
+                  <p
+                    className="text-xs font-medium break-all"
+                    style={{ color: '#3f3d52' }}
+                  >
                     {form.github || 'Not added'}
                   </p>
                 </div>
 
+                {/* LinkedIn */}
                 <div
-                  className="p-3 rounded-xl border border-gray-100"
+                  className="p-3 rounded-xl border"
                   style={{
-                    background: '#fdf4ff',
+                    background: '#f3f0fa',
+                    borderColor: '#e6e3f2',
                   }}
                 >
-                  <p className="text-[11px] text-gray-400 mb-0.5">
+                  <p
+                    className="text-[11px] mb-0.5"
+                    style={{ color: '#85839a' }}
+                  >
                     LinkedIn
                   </p>
 
-                  <p className="text-xs font-medium text-gray-700 break-all">
+                  <p
+                    className="text-xs font-medium break-all"
+                    style={{ color: '#3f3d52' }}
+                  >
                     {form.linkedin || 'Not added'}
                   </p>
                 </div>
 
+                {/* Portfolio */}
                 <div
-                  className="p-3 rounded-xl border border-gray-100"
+                  className="p-3 rounded-xl border"
                   style={{
-                    background: '#fdf4ff',
+                    background: '#f3f0fa',
+                    borderColor: '#e6e3f2',
                   }}
                 >
-                  <p className="text-[11px] text-gray-400 mb-0.5">
+                  <p
+                    className="text-[11px] mb-0.5"
+                    style={{ color: '#85839a' }}
+                  >
                     Portfolio
                   </p>
 
-                  <p className="text-xs font-medium text-gray-700 break-all">
+                  <p
+                    className="text-xs font-medium break-all"
+                    style={{ color: '#3f3d52' }}
+                  >
                     {form.portfolio || 'Not added'}
                   </p>
                 </div>
@@ -460,13 +554,23 @@ export default function Profile() {
             EDIT PROFILE SECTION
         ====================================================== */}
         {editing && (
-          <div className="h-full bg-white rounded-2xl p-5 shadow-sm overflow-y-auto">
+          <div
+            className="h-full rounded-2xl p-5 shadow-sm overflow-y-auto"
+            style={{
+              background: '#ffffff',
+              boxShadow:
+                '0 2px 8px rgba(74, 69, 130, 0.06), 0 1px 3px rgba(74, 69, 130, 0.04)',
+            }}
+          >
 
             {/* Edit Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
 
               <div>
-                <h2 className="text-lg font-bold text-gray-800">
+                <h2
+                  className="text-lg font-bold"
+                  style={{ color: '#25243a' }}
+                >
                   Edit Profile
                 </h2>
               </div>
@@ -481,7 +585,10 @@ export default function Profile() {
 
               {/* Full Name */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+                <label
+                  className="block text-xs font-medium mb-1"
+                  style={{ color: '#3f3d52' }}
+                >
                   Full Name
                 </label>
 
@@ -494,9 +601,12 @@ export default function Profile() {
                       e.target.value
                     )
                   }
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  className="w-full rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2"
                   style={{
-                    background: '#fdf4ff',
+                    background: '#f3f0fa',
+                    border: '1px solid #e6e3f2',
+                    color: '#25243a',
+                    '--tw-ring-color': '#5b56b5',
                   }}
                   placeholder="Enter your full name"
                 />
@@ -504,7 +614,10 @@ export default function Profile() {
 
               {/* Username */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+                <label
+                  className="block text-xs font-medium mb-1"
+                  style={{ color: '#3f3d52' }}
+                >
                   Username
                 </label>
 
@@ -517,9 +630,12 @@ export default function Profile() {
                       e.target.value
                     )
                   }
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  className="w-full rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2"
                   style={{
-                    background: '#fdf4ff',
+                    background: '#f3f0fa',
+                    border: '1px solid #e6e3f2',
+                    color: '#25243a',
+                    '--tw-ring-color': '#5b56b5',
                   }}
                   placeholder="Enter username"
                 />
@@ -527,7 +643,10 @@ export default function Profile() {
 
               {/* Email */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+                <label
+                  className="block text-xs font-medium mb-1"
+                  style={{ color: '#3f3d52' }}
+                >
                   Email Address
                 </label>
 
@@ -540,9 +659,12 @@ export default function Profile() {
                       e.target.value
                     )
                   }
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  className="w-full rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2"
                   style={{
-                    background: '#fdf4ff',
+                    background: '#f3f0fa',
+                    border: '1px solid #e6e3f2',
+                    color: '#25243a',
+                    '--tw-ring-color': '#5b56b5',
                   }}
                   placeholder="Enter email address"
                 />
@@ -550,7 +672,10 @@ export default function Profile() {
 
               {/* Current Role */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+                <label
+                  className="block text-xs font-medium mb-1"
+                  style={{ color: '#3f3d52' }}
+                >
                   Current Role / Post
                 </label>
 
@@ -563,9 +688,12 @@ export default function Profile() {
                       e.target.value
                     )
                   }
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  className="w-full rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2"
                   style={{
-                    background: '#fdf4ff',
+                    background: '#f3f0fa',
+                    border: '1px solid #e6e3f2',
+                    color: '#25243a',
+                    '--tw-ring-color': '#5b56b5',
                   }}
                   placeholder="e.g. Frontend Developer"
                 />
@@ -573,7 +701,10 @@ export default function Profile() {
 
               {/* Experience */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+                <label
+                  className="block text-xs font-medium mb-1"
+                  style={{ color: '#3f3d52' }}
+                >
                   Years of Experience
                 </label>
 
@@ -585,9 +716,12 @@ export default function Profile() {
                       e.target.value
                     )
                   }
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  className="w-full rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2"
                   style={{
-                    background: '#fdf4ff',
+                    background: '#f3f0fa',
+                    border: '1px solid #e6e3f2',
+                    color: '#25243a',
+                    '--tw-ring-color': '#5b56b5',
                   }}
                 >
                   {[0,1,2,3,4,5,6,7,8,9,10].map(n => (
@@ -609,7 +743,10 @@ export default function Profile() {
 
               {/* Skills */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+                <label
+                  className="block text-xs font-medium mb-1"
+                  style={{ color: '#3f3d52' }}
+                >
                   Skills
                 </label>
 
@@ -622,21 +759,30 @@ export default function Profile() {
                       e.target.value
                     )
                   }
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  className="w-full rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2"
                   style={{
-                    background: '#fdf4ff',
+                    background: '#f3f0fa',
+                    border: '1px solid #e6e3f2',
+                    color: '#25243a',
+                    '--tw-ring-color': '#5b56b5',
                   }}
                   placeholder="Python, React, SQL, JavaScript"
                 />
 
-                <p className="text-[10px] text-gray-400 mt-1">
+                <p
+                  className="text-[10px] mt-1"
+                  style={{ color: '#85839a' }}
+                >
                   Separate skills using commas
                 </p>
               </div>
 
               {/* GitHub */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+                <label
+                  className="block text-xs font-medium mb-1"
+                  style={{ color: '#3f3d52' }}
+                >
                   GitHub URL
                 </label>
 
@@ -649,9 +795,12 @@ export default function Profile() {
                       e.target.value
                     )
                   }
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  className="w-full rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2"
                   style={{
-                    background: '#fdf4ff',
+                    background: '#f3f0fa',
+                    border: '1px solid #e6e3f2',
+                    color: '#25243a',
+                    '--tw-ring-color': '#5b56b5',
                   }}
                   placeholder="github.com/yourusername"
                 />
@@ -659,7 +808,10 @@ export default function Profile() {
 
               {/* LinkedIn */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+                <label
+                  className="block text-xs font-medium mb-1"
+                  style={{ color: '#3f3d52' }}
+                >
                   LinkedIn URL
                 </label>
 
@@ -672,9 +824,12 @@ export default function Profile() {
                       e.target.value
                     )
                   }
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  className="w-full rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2"
                   style={{
-                    background: '#fdf4ff',
+                    background: '#f3f0fa',
+                    border: '1px solid #e6e3f2',
+                    color: '#25243a',
+                    '--tw-ring-color': '#5b56b5',
                   }}
                   placeholder="linkedin.com/in/yourusername"
                 />
@@ -682,7 +837,10 @@ export default function Profile() {
 
               {/* Portfolio */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+                <label
+                  className="block text-xs font-medium mb-1"
+                  style={{ color: '#3f3d52' }}
+                >
                   Portfolio URL
                 </label>
 
@@ -695,9 +853,12 @@ export default function Profile() {
                       e.target.value
                     )
                   }
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  className="w-full rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2"
                   style={{
-                    background: '#fdf4ff',
+                    background: '#f3f0fa',
+                    border: '1px solid #e6e3f2',
+                    color: '#25243a',
+                    '--tw-ring-color': '#5b56b5',
                   }}
                   placeholder="yourportfolio.com"
                 />
@@ -705,7 +866,10 @@ export default function Profile() {
 
               {/* Bio */}
               <div className="md:col-span-2">
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+                <label
+                  className="block text-xs font-medium mb-1"
+                  style={{ color: '#3f3d52' }}
+                >
                   About Me / Bio
                 </label>
 
@@ -718,9 +882,12 @@ export default function Profile() {
                       e.target.value
                     )
                   }
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
+                  className="w-full rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 resize-none"
                   style={{
-                    background: '#fdf4ff',
+                    background: '#f3f0fa',
+                    border: '1px solid #e6e3f2',
+                    color: '#25243a',
+                    '--tw-ring-color': '#5b56b5',
                   }}
                   placeholder="Tell us a little about yourself..."
                 />
@@ -729,11 +896,21 @@ export default function Profile() {
             </div>
 
             {/* Bottom Buttons */}
-            <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-gray-100">
+            <div
+              className="flex justify-end gap-2 mt-4 pt-4"
+              style={{
+                borderTop: '1px solid #e6e3f2',
+              }}
+            >
 
               <button
                 onClick={handleCancel}
-                className="px-4 py-2 rounded-lg text-xs font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition"
+                className="px-4 py-2 rounded-lg text-xs font-medium transition"
+                style={{
+                  border: '1px solid #e6e3f2',
+                  color: '#85839a',
+                  background: '#ffffff',
+                }}
               >
                 Cancel
               </button>
@@ -743,8 +920,7 @@ export default function Profile() {
                 disabled={loading}
                 className="px-6 py-2 rounded-lg text-xs font-bold text-white disabled:opacity-50 transition hover:shadow-lg"
                 style={{
-                  background:
-                    'linear-gradient(#7f3e8b)',
+                  background: '#5b56b5',
                 }}
               >
                 {loading
