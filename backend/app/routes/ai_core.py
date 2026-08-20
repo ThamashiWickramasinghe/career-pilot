@@ -46,6 +46,53 @@ def get_user_from_token():
         return None, None
 
 
+# ── NEW: Minimum-effort guard ─────────────────────────
+# A quiz that was skipped entirely (or answered with nothing correct in
+# every single category) should NEVER be handed to the model as if it were
+# a legitimate, analyzable result. We block prediction in that case instead
+# of letting XGBoost/rule-based fallback pick an arbitrary "best" class.
+#
+# MIN_NONZERO_CATEGORIES: at least this many categories must have a score
+# above 0 for the attempt to be considered "real".
+# MIN_TOTAL_SCORE: the sum of all category scores must exceed this.
+MIN_NONZERO_CATEGORIES = 1
+MIN_TOTAL_SCORE = 0  # sum of all category_scores.values() must be > this
+
+
+def _quiz_is_valid(category_scores):
+    """
+    Returns (is_valid: bool, reason: str|None)
+    is_valid=False means we should NOT run any prediction/recommendation.
+    """
+    if not category_scores or not isinstance(category_scores, dict):
+        return False, "No quiz scores were submitted."
+
+    values = list(category_scores.values())
+    total_score = sum(v for v in values if isinstance(v, (int, float)))
+    nonzero_categories = sum(1 for v in values if isinstance(v, (int, float)) and v > 0)
+
+    if total_score <= MIN_TOTAL_SCORE:
+        return False, "You scored 0 across every category — it looks like the quiz was skipped or left unanswered. Please complete the quiz to get an accurate career prediction."
+
+    if nonzero_categories < MIN_NONZERO_CATEGORIES:
+        return False, "Not enough quiz data was recorded to generate a reliable prediction. Please complete the quiz."
+
+    return True, None
+
+
+def _insufficient_data_response(reason):
+    """Consistent response shape returned whenever we block a prediction."""
+    return {
+        'quiz_incomplete': True,
+        'message': reason,
+        'predictions': [],
+        'top_career': None,
+        'skill_gap': None,
+        'recommended_courses': [],
+        'recommended_jobs': []
+    }
+
+
 # ── Feature column order (must match training data) ──
 FEATURE_COLUMNS = [
     'GI1','GI2','GI3','GI4','GI5','GI6','GI7','GI8','GI9','GI10',
@@ -339,6 +386,16 @@ def predict_career():
     if not category_scores:
         return jsonify({'message': 'No quiz scores provided'}), 400
 
+    # ── Guard: block prediction for skipped/all-zero quizzes ──
+    is_valid, reason = _quiz_is_valid(category_scores)
+    if not is_valid:
+        return jsonify({
+            'quiz_incomplete': True,
+            'message': reason,
+            'predictions': [],
+            'top_career': None
+        }), 200
+
     predictions = _get_predictions(category_scores)
 
     if attempt_id:
@@ -371,6 +428,19 @@ def skill_gap_analysis():
     if not career or not category_scores:
         return jsonify({'message': 'Career and scores required'}), 400
 
+    is_valid, reason = _quiz_is_valid(category_scores)
+    if not is_valid:
+        return jsonify({
+            'quiz_incomplete': True,
+            'message': reason,
+            'career': career,
+            'overall_readiness': 0,
+            'strengths': [],
+            'weaknesses': [],
+            'missing_skills': [],
+            'total_gaps': 0
+        }), 200
+
     gap = _skill_gap(career, category_scores)
     return jsonify({
         'career': career,
@@ -392,6 +462,10 @@ def recommend_courses():
     career = data.get('career', '')
     category_scores = data.get('category_scores', {})
 
+    is_valid, reason = _quiz_is_valid(category_scores)
+    if not is_valid:
+        return jsonify({'quiz_incomplete': True, 'message': reason, 'courses': []}), 200
+
     courses = _recommend_courses(career, skill_gaps, category_scores)
     return jsonify({'courses': courses}), 200
 
@@ -407,6 +481,10 @@ def recommend_jobs():
     data = request.get_json()
     predicted_careers = data.get('predicted_careers', [])
     category_scores = data.get('category_scores', {})
+
+    is_valid, reason = _quiz_is_valid(category_scores)
+    if not is_valid:
+        return jsonify({'quiz_incomplete': True, 'message': reason, 'jobs': [], 'top_career': ''}), 200
 
     jobs = _recommend_jobs(predicted_careers, category_scores)
     top_career = predicted_careers[0]['career'] if predicted_careers else ''
@@ -428,6 +506,11 @@ def full_analysis():
 
     if not category_scores:
         return jsonify({'message': 'No scores provided'}), 400
+
+    # ── Guard: block the entire pipeline for skipped/all-zero quizzes ──
+    is_valid, reason = _quiz_is_valid(category_scores)
+    if not is_valid:
+        return jsonify(_insufficient_data_response(reason)), 200
 
     # Step 1: Career prediction
     predictions = _get_predictions(category_scores)
@@ -454,6 +537,7 @@ def full_analysis():
             print(f"Save attempt error: {e}")
 
     return jsonify({
+        'quiz_incomplete': False,
         'predictions': predictions,
         'top_career': top_career,
         'skill_gap': skill_gap,

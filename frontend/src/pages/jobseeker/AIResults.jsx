@@ -377,14 +377,7 @@ export default function AIResults({ quizData, onBack }) {
                     {top_career}
                   </h1>
 
-                  <p
-                    className="text-xs md:text-sm mt-1.5"
-                    style={{
-                      color: '#85839a'
-                    }}
-                  >
-                    Based on your performance across {categoriesAnalyzed || 'all'} quiz categories
-                  </p>
+                  
 
                 </div>
 
@@ -392,74 +385,9 @@ export default function AIResults({ quizData, onBack }) {
 
 
               {/* Right: confidence gauge */}
-              <div
-                className="flex items-center gap-4 rounded-2xl px-5 py-4 flex-shrink-0"
-                style={{
-                  background: '#f3f0fa',
-                  border: '1px solid #e6e3f2'
-                }}
-              >
+              
 
-                <div className="relative w-16 h-16 flex-shrink-0">
-
-                  <svg
-                    className="w-16 h-16 -rotate-90"
-                    viewBox="0 0 36 36"
-                  >
-                    <circle
-                      cx="18"
-                      cy="18"
-                      r="15.5"
-                      fill="none"
-                      stroke="#e9e7f8"
-                      strokeWidth="3.5"
-                    />
-                    <circle
-                      cx="18"
-                      cy="18"
-                      r="15.5"
-                      fill="none"
-                      stroke="#5b56b5"
-                      strokeWidth="3.5"
-                      strokeDasharray={`${(topConfidence / 100) * 97} 97`}
-                      strokeLinecap="round"
-                    />
-                  </svg>
-
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span
-                      className="text-sm font-bold"
-                      style={{ color: '#25243a' }}
-                    >
-                      {topConfidence}%
-                    </span>
-                  </div>
-
-                </div>
-
-                <div>
-
-                  <p
-                    className="text-[10px] uppercase tracking-wide font-semibold"
-                    style={{
-                      color: '#85839a'
-                    }}
-                  >
-                    Match Confidence
-                  </p>
-
-                  <p
-                    className="text-xs font-bold mt-0.5"
-                    style={{
-                      color: '#25243a'
-                    }}
-                  >
-                    Strong Alignment
-                  </p>
-
-                </div>
-
-              </div>
+              
 
             </div>
 
