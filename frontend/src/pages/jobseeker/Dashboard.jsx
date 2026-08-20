@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import LearningHub from './LearningHub'
 import JobPortal from './JobPortal'
 import Profile from './Profile'
+import JobVacancy from './JobVacancy'
 
 /* ── Colour Theme ──
    Updated only to match the purple/lavender theme
@@ -1053,6 +1054,8 @@ export default function JobSeekerDashboard() {
               <LearningHub />
             </div>
           )}
+
+          {activeTab === 'jobs' && <JobVacancy />}
 
           {/* CHALLENGES */}
           {activeTab === 'challenges' && (
