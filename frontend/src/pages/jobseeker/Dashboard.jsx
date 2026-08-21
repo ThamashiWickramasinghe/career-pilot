@@ -8,6 +8,7 @@ import Profile from './Profile'
 import JobVacancy from './JobVacancy'
 import CareerRoadmap from './CareerRoadmap'
 import SkillChallenge from './SkillChallenge'
+import Help from './Help'
 
 /* ── Colour Theme ──
    Updated only to match the purple/lavender theme
@@ -279,6 +280,19 @@ const IconClock = (p) => (
   />
 )
 
+const IconHelp = (p) => (
+  <Icon
+    {...p}
+    path={
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M9.5 9a2.5 2.5 0 015 0c0 1.5-2.5 1.8-2.5 3.5" />
+        <path d="M12 17h.01" />
+      </>
+    }
+  />
+)
+
 // Colour palette cycled across earned badges so each one gets a distinct
 // accent without needing the backend to store colour info.
 const BADGE_PALETTE = [
@@ -287,6 +301,50 @@ const BADGE_PALETTE = [
   { color: C.purple, soft: C.purpleSoft },
   { color: C.orange, soft: C.orangeSoft },
   { color: C.pink, soft: C.pinkSoft }
+]
+
+// Colour palettes for real "My Courses" rows (active / requested)
+const ACTIVE_COURSE_PALETTE = [
+  { color: C.green, soft: C.greenSoft },
+  { color: C.blue, soft: C.blueSoft }
+]
+
+const REQUESTED_COURSE_PALETTE = [
+  { color: C.orange, soft: C.orangeSoft },
+  { color: C.purple, soft: C.purpleSoft }
+]
+
+// Real application status → display colour, used by the
+// "Job Status Notifications" widget in the right panel.
+const JOB_STATUS_STYLE = {
+  Pending: { color: C.orange },
+  Shortlisted: { color: C.blue },
+  Hired: { color: C.green },
+  Rejected: { color: '#dc2626' }
+}
+
+// Static base notifications kept as before (demo items).
+// Real re-access + job-application notifications from the backend
+// get merged in on top of these.
+const BASE_NOTIFICATIONS = [
+  {
+    id: 1,
+    text: 'New job matches found for you!',
+    time: '2 min ago',
+    unread: true
+  },
+  {
+    id: 2,
+    text: 'Your learning access expires in 3 days',
+    time: '1 hr ago',
+    unread: true
+  },
+  {
+    id: 3,
+    text: 'You earned a Python badge!',
+    time: '2 hrs ago',
+    unread: false
+  }
 ]
 
 export default function JobSeekerDashboard() {
@@ -318,11 +376,198 @@ export default function JobSeekerDashboard() {
     return () => { cancelled = true }
   }, [])
 
+  // ── Real "My Courses" data, fetched from /learning/my-courses ──
+  const [courses, setCourses] = useState({ active: [], requested: [] })
+  const [coursesLoading, setCoursesLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+    const fetchMyCourses = async () => {
+      try {
+        const res = await API.get('/learning/my-courses')
+        if (!cancelled) {
+          setCourses({
+            active: res.data.active_courses || [],
+            requested: res.data.requested_courses || []
+          })
+        }
+      } catch (err) {
+        console.error('Failed to load my courses:', err)
+      } finally {
+        if (!cancelled) setCoursesLoading(false)
+      }
+    }
+    fetchMyCourses()
+    return () => { cancelled = true }
+  }, [])
+
+  // ── Real "Available Jobs" count, fetched from /jobs/all ──
+  const [availableJobsCount, setAvailableJobsCount] = useState(0)
+  const [jobsCountLoading, setJobsCountLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+    const fetchJobsCount = async () => {
+      try {
+        const res = await API.get('/jobs/all')
+        if (!cancelled) setAvailableJobsCount((res.data.jobs || []).length)
+      } catch (err) {
+        console.error('Failed to load available jobs count:', err)
+      } finally {
+        if (!cancelled) setJobsCountLoading(false)
+      }
+    }
+    fetchJobsCount()
+    return () => { cancelled = true }
+  }, [])
+
+  // ── Real "Job Status Notifications" data, fetched from
+  //    /jobs/my-applications. Powers the right-panel widget that
+  //    shows Pending / Shortlisted / Hired / Rejected per application.
+  const [myApplications, setMyApplications] = useState([])
+  const [applicationsLoading, setApplicationsLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+    const fetchMyApplications = async () => {
+      try {
+        const res = await API.get('/jobs/my-applications')
+        if (!cancelled) setMyApplications(res.data.applications || [])
+      } catch (err) {
+        console.error('Failed to load my applications:', err)
+      } finally {
+        if (!cancelled) setApplicationsLoading(false)
+      }
+    }
+    fetchMyApplications()
+    return () => { cancelled = true }
+  }, [])
+
+  // ── Notifications: static demo items + real re-access decisions +
+  //    real job-application status updates ──
+  const [notifications, setNotifications] = useState(BASE_NOTIFICATIONS)
+
+  useEffect(() => {
+    let cancelled = false
+    const fetchLearningNotifications = async () => {
+      try {
+        const res = await API.get('/learning/notifications')
+        const reaccessNotifs = res.data.notifications || []
+
+        if (!cancelled && reaccessNotifs.length > 0) {
+          setNotifications((prev) => {
+            const existingIds = new Set(prev.map((n) => n.id))
+            const fresh = reaccessNotifs.filter(
+              (n) => !existingIds.has(n.id)
+            )
+            return [...fresh, ...prev]
+          })
+        }
+      } catch (err) {
+        console.error('Failed to load learning notifications:', err)
+      }
+    }
+    fetchLearningNotifications()
+    return () => { cancelled = true }
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    const fetchJobNotifications = async () => {
+      try {
+        const res = await API.get('/jobs/notifications')
+        const jobNotifs = res.data.notifications || []
+
+        if (!cancelled && jobNotifs.length > 0) {
+          setNotifications((prev) => {
+            const existingIds = new Set(prev.map((n) => n.id))
+            const fresh = jobNotifs.filter((n) => !existingIds.has(n.id))
+            return [...fresh, ...prev]
+          })
+        }
+      } catch (err) {
+        console.error('Failed to load job notifications:', err)
+      }
+    }
+    fetchJobNotifications()
+    return () => { cancelled = true }
+  }, [])
+
+  const getDaysRemaining = (expiresAt) => {
+    if (!expiresAt) return null
+    const diff = new Date(expiresAt).getTime() - new Date().getTime()
+    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
+  }
+
+  // Real course rows, shaped the same way the old static array was,
+  // so the render logic below stays untouched.
+  const myCourses = useMemo(() => {
+    const active = courses.active.map((c, i) => {
+      const palette =
+        ACTIVE_COURSE_PALETTE[i % ACTIVE_COURSE_PALETTE.length]
+      const daysLeft = c.access
+        ? getDaysRemaining(c.access.expires_at)
+        : null
+
+      return {
+        id: `active-${c.id}`,
+        content_id: c.id,
+        type: 'active',
+        title: c.title,
+        instructor: c.instructor_name,
+        status:
+          daysLeft !== null
+            ? `In progress · ${daysLeft} days left`
+            : 'Active',
+        icon: IconBook,
+        color: palette.color,
+        soft: palette.soft
+      }
+    })
+
+    const requested = courses.requested.map((c, i) => {
+      const palette =
+        REQUESTED_COURSE_PALETTE[i % REQUESTED_COURSE_PALETTE.length]
+
+      return {
+        id: `requested-${c.id}`,
+        content_id: c.id,
+        type: 'requested',
+        title: c.title,
+        instructor: c.instructor_name,
+        status: 'Awaiting approval',
+        icon: IconClock,
+        color: palette.color,
+        soft: palette.soft
+      }
+    })
+
+    return [...active, ...requested]
+  }, [courses])
+
+  // Real job status rows for the right-panel widget — most recent
+  // applications first, each coloured by its actual status.
+  const jobStatusNotifications = useMemo(() => {
+    return myApplications.slice(0, 4).map((a) => {
+      const style = JOB_STATUS_STYLE[a.status] || JOB_STATUS_STYLE.Pending
+
+      return {
+        id: a.id,
+        company: a.company_name,
+        role: a.job_title,
+        status: a.status,
+        color: style.color
+      }
+    })
+  }, [myApplications])
+
   const handleLogout = () => {
     logout()
     navigate('/login')
   }
 
+  // ── Sidebar nav items — grouped into two sections so we can add
+  //    visual gaps between them, and Help added at the end. ──
   const navItems = [
     { id: 'home', icon: IconHome, label: 'Dashboard' },
     { id: 'profile', icon: IconUser, label: 'Profile' },
@@ -333,103 +578,21 @@ export default function JobSeekerDashboard() {
     { id: 'challenges', icon: IconTrophy, label: 'Skill Challenges' }
   ]
 
+  const secondaryNavItems = [
+    { id: 'help', icon: IconHelp, label: 'Help' }
+  ]
+
+  const allNavItems = [...navItems, ...secondaryNavItems]
+
   const filteredNavItems = useMemo(() => {
     if (!searchQuery.trim()) return []
 
-    return navItems.filter((n) =>
+    return allNavItems.filter((n) =>
       n.label.toLowerCase().includes(searchQuery.toLowerCase())
     )
   }, [searchQuery])
 
-  const notifications = [
-    {
-      id: 1,
-      text: 'New job matches found for you!',
-      time: '2 min ago',
-      unread: true
-    },
-    {
-      id: 2,
-      text: 'Your learning access expires in 3 days',
-      time: '1 hr ago',
-      unread: true
-    },
-    {
-      id: 3,
-      text: 'You earned a Python badge!',
-      time: '2 hrs ago',
-      unread: false
-    },
-    {
-      id: 4,
-      text: 'Application status updated',
-      time: '1 day ago',
-      unread: false
-    }
-  ]
-
   const unreadCount = notifications.filter((n) => n.unread).length
-
-  const jobVacancies = [
-    {
-      title: 'Frontend Developer',
-      company: 'TechCorp Lanka',
-      tag: 'New'
-    },
-    {
-      title: 'UI/UX Designer',
-      company: 'Creative Studio',
-      tag: 'New'
-    },
-    {
-      title: 'Full Stack Developer',
-      company: 'StartupX',
-      tag: 'Closing soon'
-    }
-  ]
-
-  const myCourses = [
-    {
-      id: 1,
-      type: 'active',
-      title: 'Advanced React Patterns',
-      instructor: 'Dr. Silva',
-      status: 'In progress · 60%',
-      icon: IconBook,
-      color: C.green,
-      soft: C.greenSoft
-    },
-    {
-      id: 2,
-      type: 'active',
-      title: 'SQL for Data Analysis',
-      instructor: 'Prof. Perera',
-      status: 'In progress · 30%',
-      icon: IconBook,
-      color: C.blue,
-      soft: C.blueSoft
-    },
-    {
-      id: 3,
-      type: 'requested',
-      title: 'System Design Basics',
-      instructor: 'Mr. Fernando',
-      status: 'Awaiting approval',
-      icon: IconClock,
-      color: C.orange,
-      soft: C.orangeSoft
-    },
-    {
-      id: 4,
-      type: 'requested',
-      title: 'Python Data Science',
-      instructor: 'Prof. Perera',
-      status: 'Awaiting approval',
-      icon: IconClock,
-      color: C.purple,
-      soft: C.purpleSoft
-    }
-  ]
 
   const courseTabs = [
     { id: 'all', label: 'All' },
@@ -442,48 +605,33 @@ export default function JobSeekerDashboard() {
       ? myCourses
       : myCourses.filter((c) => c.type === courseFilter)
 
-  const jobStatusNotifications = [
-    {
-      company: 'TechCorp Lanka',
-      role: 'Frontend Developer',
-      status: 'Interview Scheduled',
-      color: C.pink
-    },
-    {
-      company: 'Creative Studio',
-      role: 'UI/UX Designer',
-      status: 'Shortlisted',
-      color: C.blue
-    },
-    {
-      company: 'StartupX',
-      role: 'Full Stack Developer',
-      status: 'Under Review',
-      color: C.orange
-    }
-  ]
-
   const stats = [
     {
+      id: 'jobs',
       label: 'Available Jobs',
-      value: jobVacancies.length + 9,
+      value: jobsCountLoading ? '—' : availableJobsCount,
       icon: IconBriefcase,
       color: C.blue,
-      soft: C.blueSoft
+      soft: C.blueSoft,
+      onClick: () => setActiveTab('jobs')
     },
     {
+      id: 'learning',
       label: 'My Courses',
       value: myCourses.length,
       icon: IconBook,
       color: C.green,
-      soft: C.greenSoft
+      soft: C.greenSoft,
+      onClick: () => setActiveTab('learning')
     },
     {
+      id: 'challenges',
       label: 'Badges Earned',
       value: earnedBadges.length,
       icon: IconMedal,
       color: C.purple,
-      soft: C.purpleSoft
+      soft: C.purpleSoft,
+      onClick: () => setActiveTab('challenges')
     }
   ]
 
@@ -656,45 +804,65 @@ export default function JobSeekerDashboard() {
               <span
                 className="text-xs font-medium cursor-pointer"
                 style={{ color: C.accent }}
+                onClick={() =>
+                  setNotifications((prev) =>
+                    prev.map((n) => ({ ...n, unread: false }))
+                  )
+                }
               >
                 Mark all read
               </span>
             </div>
 
-            {notifications.map((n) => (
-              <div
-                key={n.id}
-                className="px-4 py-3 flex gap-3 items-start"
-                style={{
-                  background: n.unread
-                    ? C.accentSoft
-                    : 'transparent'
-                }}
-              >
-                <div className="flex-1">
-                  <p
-                    className="text-sm"
-                    style={{ color: C.ink }}
-                  >
-                    {n.text}
-                  </p>
-
-                  <p
-                    className="text-xs mt-0.5"
-                    style={{ color: C.sub }}
-                  >
-                    {n.time}
-                  </p>
-                </div>
-
-                {n.unread && (
+            <div style={{ maxHeight: '360px', overflowY: 'auto' }}>
+              {notifications.length === 0 ? (
+                <p
+                  className="text-sm text-center py-6"
+                  style={{ color: C.sub }}
+                >
+                  No notifications yet.
+                </p>
+              ) : (
+                notifications.map((n) => (
                   <div
-                    className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0"
-                    style={{ background: C.accent }}
-                  />
-                )}
-              </div>
-            ))}
+                    key={n.id}
+                    onClick={() => {
+                      if (n.type === 'reaccess') setActiveTab('learning')
+                      if (n.type === 'job_application') setActiveTab('jobs')
+                    }}
+                    className="px-4 py-3 flex gap-3 items-start cursor-pointer"
+                    style={{
+                      background: n.unread
+                        ? C.accentSoft
+                        : 'transparent'
+                    }}
+                  >
+                    <div className="flex-1">
+                      <p
+                        className="text-sm"
+                        style={{ color: C.ink }}
+                      >
+                        {n.text}
+                      </p>
+
+                      <p
+                        className="text-xs mt-0.5"
+                        style={{ color: C.sub }}
+                      >
+                        {n.time}
+                      </p>
+                    </div>
+
+                    {n.unread && (
+                      <div
+                        className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0"
+                        style={{ background: C.accent }}
+                      />
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         )}
       </div>
@@ -727,28 +895,70 @@ export default function JobSeekerDashboard() {
           background: C.sidebar
         }}
       >
-        {/* Logo */}
-        <div className="px-6 py-6 flex items-center gap-3">
+        {/* Logo — bigger icon box + icon + text, extra bottom padding
+            kept for the gap before "Dashboard" below it */}
+        <div className="px-6 pt-6 pb-10 flex items-center gap-3">
           <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+            className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
             style={{
               background: 'rgba(255,255,255,0.18)'
             }}
           >
-            <IconSparkle size={17} color="#ffffff" />
+            <IconSparkle size={24} color="#ffffff" />
           </div>
 
           <p
-            className="font-bold text-[15px]"
+            className="font-bold text-xl"
             style={{ color: '#ffffff' }}
           >
             Career Pilot
           </p>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 px-4 py-2 space-y-1">
+        {/* Navigation — primary items, with breathing room between rows */}
+        <nav className="flex-1 px-4 py-2 space-y-2.5 overflow-y-auto">
           {navItems.map((item) => {
+            const IconComp = item.icon
+            const active = activeTab === item.id
+
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={navBtnClass(item.id)}
+                style={
+                  active
+                    ? {
+                        background: 'rgba(255,255,255,0.18)',
+                        color: '#ffffff'
+                      }
+                    : {
+                        color: C.sidebarText
+                      }
+                }
+              >
+                <IconComp
+                  size={18}
+                  color={
+                    active
+                      ? '#ffffff'
+                      : C.sidebarMuted
+                  }
+                  strokeWidth={2}
+                />
+
+                <span>{item.label}</span>
+              </button>
+            )
+          })}
+
+          {/* Divider before secondary items (Help) for clear separation */}
+          <div
+            className="mx-1 my-4 border-t"
+            style={{ borderColor: 'rgba(255,255,255,0.14)' }}
+          />
+
+          {secondaryNavItems.map((item) => {
             const IconComp = item.icon
             const active = activeTab === item.id
 
@@ -852,15 +1062,16 @@ export default function JobSeekerDashboard() {
               {/* Search + Notification */}
               <SearchAndBell />
 
-              {/* Stat Cards */}
+              {/* Stat Cards — each now links to its own tab */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                 {stats.map((s) => {
                   const IconComp = s.icon
 
                   return (
-                    <div
-                      key={s.label}
-                      className="rounded-2xl p-5 flex items-center gap-4"
+                    <button
+                      key={s.id}
+                      onClick={s.onClick}
+                      className="text-left rounded-2xl p-5 flex items-center gap-4 transition hover:-translate-y-0.5 hover:shadow-md"
                       style={{
                         background: C.card,
                         boxShadow: cardShadow
@@ -893,12 +1104,13 @@ export default function JobSeekerDashboard() {
                           {s.label}
                         </p>
                       </div>
-                    </div>
+                    </button>
                   )
                 })}
               </div>
 
-              {/* My Courses */}
+              {/* My Courses — backed by /learning/my-courses,
+                  each row links into the real Learning Hub */}
               <div
                 className="rounded-2xl p-6"
                 style={{
@@ -952,65 +1164,95 @@ export default function JobSeekerDashboard() {
                 </div>
 
                 <div className="space-y-2">
-                  {visibleCourses.map((c) => {
-                    const IconComp = c.icon
-
-                    return (
-                      <div
-                        key={c.id}
-                        className="flex items-center gap-3 p-3 rounded-xl"
-                        style={{
-                          background: C.softPanel
-                        }}
-                      >
+                  {coursesLoading ? (
+                    <div className="space-y-2">
+                      {[0, 1, 2].map((i) => (
                         <div
-                          className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-                          style={{
-                            background: c.soft
-                          }}
+                          key={i}
+                          className="flex items-center gap-3 p-3 rounded-xl animate-pulse"
+                          style={{ background: C.softPanel }}
                         >
-                          <IconComp
-                            size={16}
-                            color={c.color}
+                          <div
+                            className="w-9 h-9 rounded-lg flex-shrink-0"
+                            style={{ background: C.border }}
                           />
+                          <div className="flex-1 space-y-1.5">
+                            <div
+                              className="h-3 w-1/3 rounded"
+                              style={{ background: C.border }}
+                            />
+                            <div
+                              className="h-2.5 w-1/4 rounded"
+                              style={{ background: C.border }}
+                            />
+                          </div>
                         </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <>
+                      {visibleCourses.map((c) => {
+                        const IconComp = c.icon
 
-                        <div className="flex-1 min-w-0">
-                          <p
-                            className="text-sm font-medium truncate"
-                            style={{ color: C.ink }}
+                        return (
+                          <div
+                            key={c.id}
+                            onClick={() => setActiveTab('learning')}
+                            className="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition hover:opacity-80"
+                            style={{
+                              background: C.softPanel
+                            }}
                           >
-                            {c.title}
-                          </p>
+                            <div
+                              className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                              style={{
+                                background: c.soft
+                              }}
+                            >
+                              <IconComp
+                                size={16}
+                                color={c.color}
+                              />
+                            </div>
 
-                          <p
-                            className="text-xs truncate"
-                            style={{ color: C.sub }}
-                          >
-                            {c.instructor}
-                          </p>
-                        </div>
+                            <div className="flex-1 min-w-0">
+                              <p
+                                className="text-sm font-medium truncate"
+                                style={{ color: C.ink }}
+                              >
+                                {c.title}
+                              </p>
 
-                        <span
-                          className="flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-full"
-                          style={{
-                            background: c.soft,
-                            color: c.color
-                          }}
+                              <p
+                                className="text-xs truncate"
+                                style={{ color: C.sub }}
+                              >
+                                {c.instructor}
+                              </p>
+                            </div>
+
+                            <span
+                              className="flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-full"
+                              style={{
+                                background: c.soft,
+                                color: c.color
+                              }}
+                            >
+                              {c.status}
+                            </span>
+                          </div>
+                        )
+                      })}
+
+                      {visibleCourses.length === 0 && (
+                        <p
+                          className="text-sm text-center py-8"
+                          style={{ color: C.sub }}
                         >
-                          {c.status}
-                        </span>
-                      </div>
-                    )
-                  })}
-
-                  {visibleCourses.length === 0 && (
-                    <p
-                      className="text-sm text-center py-8"
-                      style={{ color: C.sub }}
-                    >
-                      No courses here yet.
-                    </p>
+                          No courses here yet.
+                        </p>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -1045,6 +1287,9 @@ export default function JobSeekerDashboard() {
 
           {/* PROFILE */}
           {activeTab === 'profile' && <Profile />}
+
+          {/* HELP */}
+          {activeTab === 'help' && <Help />}
         </div>
       </div>
 
@@ -1156,7 +1401,7 @@ export default function JobSeekerDashboard() {
           </div>
         </div>
 
-        {/* Job Status Notifications */}
+        {/* Job Status Notifications — backed by /jobs/my-applications */}
         <div className="mb-5 flex flex-col">
           <div className="flex justify-between items-center mb-2.5 flex-shrink-0">
             <p
@@ -1181,45 +1426,74 @@ export default function JobSeekerDashboard() {
           </div>
 
           <div className="space-y-2 overflow-hidden">
-            {jobStatusNotifications.map((j, i) => (
-              <div
-                key={i}
-                className="rounded-xl p-2.5 pl-3 border-l-4"
-                style={{
-                  background: C.softPanel,
-                  borderColor: j.color
-                }}
-              >
-                <div className="flex justify-between items-start gap-2">
-                  <div className="min-w-0">
-                    <p
-                      className="text-[11px] font-semibold truncate"
-                      style={{ color: C.ink }}
-                    >
-                      {j.role}
-                    </p>
-
-                    <p
-                      className="text-[10px] mt-0.5 truncate"
-                      style={{ color: C.sub }}
-                    >
-                      {j.company}
-                    </p>
-                  </div>
-
-                  <span
-                    className="text-[9px] font-semibold whitespace-nowrap flex-shrink-0"
-                    style={{ color: j.color }}
-                  >
-                    {j.status}
-                  </span>
+            {applicationsLoading ? (
+              [0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="rounded-xl p-2.5 pl-3 animate-pulse"
+                  style={{ background: C.softPanel }}
+                >
+                  <div
+                    className="h-2.5 w-2/3 rounded mb-1.5"
+                    style={{ background: C.border }}
+                  />
+                  <div
+                    className="h-2 w-1/3 rounded"
+                    style={{ background: C.border }}
+                  />
                 </div>
+              ))
+            ) : jobStatusNotifications.length === 0 ? (
+              <div
+                className="rounded-xl p-3 text-center"
+                style={{ background: C.softPanel }}
+              >
+                <p className="text-[11px]" style={{ color: C.sub }}>
+                  No applications yet — send a CV from Job Vacancy to see status here.
+                </p>
               </div>
-            ))}
+            ) : (
+              jobStatusNotifications.map((j) => (
+                <div
+                  key={j.id}
+                  onClick={() => setActiveTab('jobs')}
+                  className="rounded-xl p-2.5 pl-3 border-l-4 cursor-pointer transition hover:opacity-80"
+                  style={{
+                    background: C.softPanel,
+                    borderColor: j.color
+                  }}
+                >
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="min-w-0">
+                      <p
+                        className="text-[11px] font-semibold truncate"
+                        style={{ color: C.ink }}
+                      >
+                        {j.role}
+                      </p>
+
+                      <p
+                        className="text-[10px] mt-0.5 truncate"
+                        style={{ color: C.sub }}
+                      >
+                        {j.company}
+                      </p>
+                    </div>
+
+                    <span
+                      className="text-[9px] font-semibold whitespace-nowrap flex-shrink-0"
+                      style={{ color: j.color }}
+                    >
+                      {j.status}
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
-        {/* Achievement Badges — now sourced live from /challenge/badges */}
+        {/* Achievement Badges — live from /challenge/badges */}
         <div className="flex-shrink-0">
           <div className="flex justify-between items-center mb-2.5">
             <p

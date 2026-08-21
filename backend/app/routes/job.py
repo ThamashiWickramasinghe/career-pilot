@@ -299,3 +299,50 @@ def admin_get_all_jobs():
 
     jobs = Job.query.order_by(Job.created_at.desc()).all()
     return jsonify({'jobs': [j.to_dict() for j in jobs]}), 200
+
+
+# ── JOB SEEKER: GET APPLICATION-STATUS NOTIFICATIONS ─────────
+# Turns the job seeker's own applications into notification-style
+# entries so the bell can show "shortlisted / hired / rejected"
+# updates. Pending is included (for the status widget) but marked
+# read since it's just the default post-apply state, not a change.
+@job_bp.route('/notifications', methods=['GET'])
+@jwt_required()
+def get_job_notifications():
+    user_id, user_role = get_user_from_token()
+    if not user_id:
+        return jsonify({'message': 'Invalid token'}), 422
+    if user_role != 'job_seeker':
+        return jsonify({'message': 'Job seekers only'}), 403
+
+    applications = JobApplication.query.filter_by(
+        applicant_id=user_id
+    ).order_by(JobApplication.applied_at.desc()).limit(10).all()
+
+    notifications = []
+    for a in applications:
+        d = a.to_dict()
+        status = d.get('status')
+        title = d.get('job_title') or 'a position'
+        company = d.get('company_name') or 'the company'
+
+        if status == 'Shortlisted':
+            text = f'Good news — you were shortlisted for "{title}" at {company}'
+        elif status == 'Hired':
+            text = f'Congratulations! You were hired for "{title}" at {company}'
+        elif status == 'Rejected':
+            text = f'Your application for "{title}" at {company} was not selected'
+        else:
+            text = f'Your application for "{title}" at {company} is pending review'
+
+        notifications.append({
+            'id': f'job-app-{d.get("id")}',
+            'text': text,
+            'time': d.get('applied_at'),
+            'unread': status != 'Pending',
+            'type': 'job_application',
+            'status': status,
+            'job_id': d.get('job_id')
+        })
+
+    return jsonify({'notifications': notifications}), 200

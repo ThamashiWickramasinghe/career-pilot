@@ -407,3 +407,79 @@ def delete_content(content_id):
     db.session.delete(content)
     db.session.commit()
     return jsonify({'message': 'Content deleted successfully'}), 200
+
+
+# ── JOB SEEKER: GET MY COURSES (active + requested) ──────────
+# Powers the Dashboard "My Courses" card with real data instead
+# of a hardcoded list. Active = live ContentAccess rows.
+# Requested = pending ReAccessRequest rows.
+@learning_bp.route('/my-courses', methods=['GET'])
+@jwt_required()
+def get_my_courses():
+    user_id, user_role = get_user_from_token()
+    if not user_id:
+        return jsonify({'message': 'Invalid token'}), 422
+
+    active_access = ContentAccess.query.filter_by(
+        user_id=user_id, is_active=True
+    ).order_by(ContentAccess.granted_at.desc()).all()
+
+    active_courses = []
+    for a in active_access:
+        if a.content:
+            item = a.content.to_dict()
+            item['access'] = a.to_dict()
+            active_courses.append(item)
+
+    pending_requests = ReAccessRequest.query.filter_by(
+        user_id=user_id, status='pending'
+    ).order_by(ReAccessRequest.requested_at.desc()).all()
+
+    requested_courses = []
+    for r in pending_requests:
+        if r.content:
+            item = r.content.to_dict()
+            item['request'] = r.to_dict()
+            requested_courses.append(item)
+
+    return jsonify({
+        'active_courses': active_courses,
+        'requested_courses': requested_courses
+    }), 200
+
+
+# ── JOB SEEKER: GET NOTIFICATIONS (re-access decisions) ──────
+# When an instructor approves/denies a re-access request, this
+# shows up here so it can be surfaced in the notification bell.
+@learning_bp.route('/notifications', methods=['GET'])
+@jwt_required()
+def get_learning_notifications():
+    user_id, user_role = get_user_from_token()
+    if not user_id:
+        return jsonify({'message': 'Invalid token'}), 422
+
+    responded = ReAccessRequest.query.filter(
+        ReAccessRequest.user_id == user_id,
+        ReAccessRequest.status != 'pending'
+    ).order_by(ReAccessRequest.responded_at.desc()).limit(10).all()
+
+    notifications = []
+    for r in responded:
+        title = r.content.title if r.content else 'your course'
+
+        if r.status == 'approved':
+            text = f'Your re-access request for "{title}" was approved'
+        else:
+            text = f'Your re-access request for "{title}" was denied'
+
+        notifications.append({
+            'id': f'reaccess-{r.id}',
+            'text': text,
+            'time': str(r.responded_at) if r.responded_at else str(r.requested_at),
+            'unread': True,
+            'type': 'reaccess',
+            'status': r.status,
+            'content_id': r.content_id
+        })
+
+    return jsonify({'notifications': notifications}), 200
