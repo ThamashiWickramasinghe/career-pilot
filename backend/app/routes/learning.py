@@ -483,3 +483,140 @@ def get_learning_notifications():
         })
 
     return jsonify({'notifications': notifications}), 200
+
+
+# ── INSTRUCTOR: ANALYTICS ─────────────────────────────
+# Powers the Analytics page: content mix, category spread,
+# a 6-month upload trend, students reached, comment volume,
+# top-performing content, and re-access response stats — all
+# computed live from this instructor's own content.
+@learning_bp.route('/analytics', methods=['GET'])
+@jwt_required()
+def get_instructor_analytics():
+    user_id, user_role = get_user_from_token()
+    if not user_id:
+        return jsonify({'message': 'Invalid token'}), 422
+    if user_role != 'instructor':
+        return jsonify({'message': 'Instructors only'}), 403
+
+    contents = LearningContent.query.filter_by(instructor_id=user_id).all()
+    content_ids = [c.id for c in contents]
+
+    total_content = len(contents)
+    approved_count = sum(1 for c in contents if c.is_approved)
+    rejected_count = sum(1 for c in contents if c.is_rejected)
+    pending_count = total_content - approved_count - rejected_count
+
+    # Content type breakdown (video_link / pdf / note)
+    type_counts = {}
+    for c in contents:
+        type_counts[c.content_type] = type_counts.get(c.content_type, 0) + 1
+    content_type_breakdown = [
+        {'type': k, 'count': v} for k, v in type_counts.items()
+    ]
+
+    # Category breakdown, sorted highest first
+    category_counts = {}
+    for c in contents:
+        cat = c.category or 'Uncategorized'
+        category_counts[cat] = category_counts.get(cat, 0) + 1
+    category_breakdown = sorted(
+        [{'category': k, 'count': v} for k, v in category_counts.items()],
+        key=lambda x: -x['count']
+    )
+
+    # Uploads over the last 6 months (including current month)
+    now = datetime.utcnow()
+    month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    month_buckets = []
+    y, m = now.year, now.month
+    for i in range(5, -1, -1):
+        mm, yy = m - i, y
+        while mm <= 0:
+            mm += 12
+            yy -= 1
+        month_buckets.append((yy, mm))
+
+    monthly_counts = {f'{yy}-{mm:02d}': 0 for yy, mm in month_buckets}
+    for c in contents:
+        if c.created_at:
+            key = c.created_at.strftime('%Y-%m')
+            if key in monthly_counts:
+                monthly_counts[key] += 1
+
+    monthly_uploads = [
+        {'month': month_names[mm - 1], 'count': monthly_counts[f'{yy}-{mm:02d}']}
+        for yy, mm in month_buckets
+    ]
+
+    # Distinct students who have ever had access to this instructor's content
+    students_reached = 0
+    if content_ids:
+        students_reached = db.session.query(ContentAccess.user_id).filter(
+            ContentAccess.content_id.in_(content_ids)
+        ).distinct().count()
+
+    # Total comments received across all of this instructor's content
+    total_comments = 0
+    if content_ids:
+        total_comments = ContentComment.query.filter(
+            ContentComment.content_id.in_(content_ids)
+        ).count()
+
+    # Top 5 content items by number of students with access
+    top_content = []
+    if content_ids:
+        access_counts = db.session.query(
+            ContentAccess.content_id, db.func.count(ContentAccess.id)
+        ).filter(
+            ContentAccess.content_id.in_(content_ids)
+        ).group_by(ContentAccess.content_id).all()
+        access_map = {cid: cnt for cid, cnt in access_counts}
+
+        for c in contents:
+            top_content.append({
+                'id': c.id,
+                'title': c.title,
+                'content_type': c.content_type,
+                'category': c.category,
+                'students': access_map.get(c.id, 0),
+                'is_approved': c.is_approved,
+                'is_rejected': c.is_rejected
+            })
+        top_content.sort(key=lambda x: -x['students'])
+        top_content = top_content[:5]
+
+    # Re-access request outcomes for this instructor's content
+    reaccess_approved = reaccess_denied = reaccess_pending = 0
+    if content_ids:
+        reaccess_approved = ReAccessRequest.query.filter(
+            ReAccessRequest.content_id.in_(content_ids),
+            ReAccessRequest.status == 'approved'
+        ).count()
+        reaccess_denied = ReAccessRequest.query.filter(
+            ReAccessRequest.content_id.in_(content_ids),
+            ReAccessRequest.status == 'denied'
+        ).count()
+        reaccess_pending = ReAccessRequest.query.filter(
+            ReAccessRequest.content_id.in_(content_ids),
+            ReAccessRequest.status == 'pending'
+        ).count()
+
+    return jsonify({
+        'total_content': total_content,
+        'approved_count': approved_count,
+        'pending_count': pending_count,
+        'rejected_count': rejected_count,
+        'content_type_breakdown': content_type_breakdown,
+        'category_breakdown': category_breakdown,
+        'monthly_uploads': monthly_uploads,
+        'students_reached': students_reached,
+        'total_comments': total_comments,
+        'top_content': top_content,
+        'reaccess_stats': {
+            'approved': reaccess_approved,
+            'denied': reaccess_denied,
+            'pending': reaccess_pending
+        }
+    }), 200

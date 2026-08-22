@@ -10,13 +10,14 @@ import CareerRoadmap from './CareerRoadmap'
 import SkillChallenge from './SkillChallenge'
 import Help from './Help'
 
-/* ── Colour Theme ──
-   Updated only to match the purple/lavender theme
-   of the reference design.
-*/
+/* ============================================================
+   COLOUR THEME
+   ============================================================ */
 const C = {
   bg: '#f6f3ff',
+
   sidebar: '#5b56b5',
+
   panel: '#ffffff',
   card: '#ffffff',
   border: '#e6e3f2',
@@ -28,20 +29,26 @@ const C = {
   accentDark: '#4d48a3',
   accentSoft: '#e9e7f8',
 
+  /* Teal dashboard colours */
+  teal: '#a48dec',
+  tealDark: '#5b56b5',
+  tealSoft: '#e1f5f3',
+  tealLight: '#eefafa',
+
   green: '#5db192',
   greenSoft: '#dffff0',
 
   orange: '#e5a26d',
   orangeSoft: '#ffefe0',
 
-  purple: '#bf5bbd',
-  purpleSoft: '#ffdcfc',
+  purple: '#e5a26d',
+  purpleSoft: '#ffefe0',
 
-  pink: '#5b56b5',
-  pinkSoft: '#f6e5f0',
+  pink: '#171b8d',
+  pinkSoft: '#caceff',
 
-  blue: '#6f8fd4',
-  blueSoft: '#e3eafb',
+  blue: '#bf5bbd',
+  blueSoft: '#ffdcfc',
 
   sidebarText: '#dedcf5',
   sidebarMuted: '#bcb9df',
@@ -52,7 +59,10 @@ const C = {
 const cardShadow =
   '0 2px 8px rgba(74, 69, 130, 0.06), 0 1px 3px rgba(74, 69, 130, 0.04)'
 
-/* ── Inline SVG icons ── */
+/* ============================================================
+   INLINE SVG ICONS
+   ============================================================ */
+
 const Icon = ({
   path,
   size = 18,
@@ -211,11 +221,17 @@ const IconCalendar = (p) => (
 )
 
 const IconChevronLeft = (p) => (
-  <Icon {...p} path={<path d="M15 18l-6-6 6-6" />} />
+  <Icon
+    {...p}
+    path={<path d="M15 18l-6-6 6-6" />}
+  />
 )
 
 const IconChevronRight = (p) => (
-  <Icon {...p} path={<path d="M9 18l6-6-6-6" />} />
+  <Icon
+    {...p}
+    path={<path d="M9 18l6-6-6-6" />}
+  />
 )
 
 const IconSparkle = (p) => (
@@ -293,29 +309,28 @@ const IconHelp = (p) => (
   />
 )
 
-// Colour palette cycled across earned badges so each one gets a distinct
-// accent without needing the backend to store colour info.
+/* ============================================================
+   BADGE / COURSE COLOURS
+   ============================================================ */
+
 const BADGE_PALETTE = [
   { color: C.green, soft: C.greenSoft },
+  { color: C.pink, soft: C.pinkSoft },
   { color: C.blue, soft: C.blueSoft },
-  { color: C.purple, soft: C.purpleSoft },
   { color: C.orange, soft: C.orangeSoft },
-  { color: C.pink, soft: C.pinkSoft }
 ]
 
-// Colour palettes for real "My Courses" rows (active / requested)
 const ACTIVE_COURSE_PALETTE = [
   { color: C.green, soft: C.greenSoft },
   { color: C.blue, soft: C.blueSoft }
+  
 ]
 
 const REQUESTED_COURSE_PALETTE = [
   { color: C.orange, soft: C.orangeSoft },
-  { color: C.purple, soft: C.purpleSoft }
+  { color: C.pink, soft: C.pinkSoft },
 ]
 
-// Real application status → display colour, used by the
-// "Job Status Notifications" widget in the right panel.
 const JOB_STATUS_STYLE = {
   Pending: { color: C.orange },
   Shortlisted: { color: C.blue },
@@ -323,9 +338,10 @@ const JOB_STATUS_STYLE = {
   Rejected: { color: '#dc2626' }
 }
 
-// Static base notifications kept as before (demo items).
-// Real re-access + job-application notifications from the backend
-// get merged in on top of these.
+/* ============================================================
+   BASE NOTIFICATIONS
+   ============================================================ */
+
 const BASE_NOTIFICATIONS = [
   {
     id: 1,
@@ -347,6 +363,10 @@ const BASE_NOTIFICATIONS = [
   }
 ]
 
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
+
 export default function JobSeekerDashboard() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
@@ -356,264 +376,491 @@ export default function JobSeekerDashboard() {
   const [searchQuery, setSearchQuery] = useState('')
   const [courseFilter, setCourseFilter] = useState('all')
 
-  // ── Real earned badges, fetched from the Skill Challenge backend ──
+  /* ============================================================
+     EARNED BADGES
+     ============================================================ */
+
   const [earnedBadges, setEarnedBadges] = useState([])
   const [badgesLoading, setBadgesLoading] = useState(true)
 
   useEffect(() => {
     let cancelled = false
+
     const fetchEarnedBadges = async () => {
       try {
         const res = await API.get('/challenge/badges')
-        if (!cancelled) setEarnedBadges(res.data.badges || [])
+
+        if (!cancelled) {
+          setEarnedBadges(res.data.badges || [])
+        }
       } catch (err) {
         console.error('Failed to load badges:', err)
       } finally {
-        if (!cancelled) setBadgesLoading(false)
+        if (!cancelled) {
+          setBadgesLoading(false)
+        }
       }
     }
+
     fetchEarnedBadges()
-    return () => { cancelled = true }
+
+    return () => {
+      cancelled = true
+    }
   }, [])
 
-  // ── Real "My Courses" data, fetched from /learning/my-courses ──
-  const [courses, setCourses] = useState({ active: [], requested: [] })
-  const [coursesLoading, setCoursesLoading] = useState(true)
+  /* ============================================================
+     MY COURSES
+     ============================================================ */
+
+  const [courses, setCourses] = useState({
+    active: [],
+    requested: []
+  })
+
+  const [coursesLoading, setCoursesLoading] =
+    useState(true)
 
   useEffect(() => {
     let cancelled = false
+
     const fetchMyCourses = async () => {
       try {
         const res = await API.get('/learning/my-courses')
+
         if (!cancelled) {
           setCourses({
             active: res.data.active_courses || [],
-            requested: res.data.requested_courses || []
+            requested:
+              res.data.requested_courses || []
           })
         }
       } catch (err) {
-        console.error('Failed to load my courses:', err)
+        console.error(
+          'Failed to load my courses:',
+          err
+        )
       } finally {
-        if (!cancelled) setCoursesLoading(false)
+        if (!cancelled) {
+          setCoursesLoading(false)
+        }
       }
     }
+
     fetchMyCourses()
-    return () => { cancelled = true }
+
+    return () => {
+      cancelled = true
+    }
   }, [])
 
-  // ── Real "Available Jobs" count, fetched from /jobs/all ──
-  const [availableJobsCount, setAvailableJobsCount] = useState(0)
-  const [jobsCountLoading, setJobsCountLoading] = useState(true)
+  /* ============================================================
+     AVAILABLE JOBS
+     ============================================================ */
+
+  const [availableJobsCount, setAvailableJobsCount] =
+    useState(0)
+
+  const [jobsCountLoading, setJobsCountLoading] =
+    useState(true)
 
   useEffect(() => {
     let cancelled = false
+
     const fetchJobsCount = async () => {
       try {
         const res = await API.get('/jobs/all')
-        if (!cancelled) setAvailableJobsCount((res.data.jobs || []).length)
+
+        if (!cancelled) {
+          setAvailableJobsCount(
+            (res.data.jobs || []).length
+          )
+        }
       } catch (err) {
-        console.error('Failed to load available jobs count:', err)
+        console.error(
+          'Failed to load available jobs count:',
+          err
+        )
       } finally {
-        if (!cancelled) setJobsCountLoading(false)
+        if (!cancelled) {
+          setJobsCountLoading(false)
+        }
       }
     }
+
     fetchJobsCount()
-    return () => { cancelled = true }
+
+    return () => {
+      cancelled = true
+    }
   }, [])
 
-  // ── Real "Job Status Notifications" data, fetched from
-  //    /jobs/my-applications. Powers the right-panel widget that
-  //    shows Pending / Shortlisted / Hired / Rejected per application.
-  const [myApplications, setMyApplications] = useState([])
-  const [applicationsLoading, setApplicationsLoading] = useState(true)
+  /* ============================================================
+     APPLICATIONS
+     ============================================================ */
+
+  const [myApplications, setMyApplications] =
+    useState([])
+
+  const [applicationsLoading, setApplicationsLoading] =
+    useState(true)
 
   useEffect(() => {
     let cancelled = false
+
     const fetchMyApplications = async () => {
       try {
-        const res = await API.get('/jobs/my-applications')
-        if (!cancelled) setMyApplications(res.data.applications || [])
-      } catch (err) {
-        console.error('Failed to load my applications:', err)
-      } finally {
-        if (!cancelled) setApplicationsLoading(false)
-      }
-    }
-    fetchMyApplications()
-    return () => { cancelled = true }
-  }, [])
+        const res =
+          await API.get('/jobs/my-applications')
 
-  // ── Notifications: static demo items + real re-access decisions +
-  //    real job-application status updates ──
-  const [notifications, setNotifications] = useState(BASE_NOTIFICATIONS)
-
-  useEffect(() => {
-    let cancelled = false
-    const fetchLearningNotifications = async () => {
-      try {
-        const res = await API.get('/learning/notifications')
-        const reaccessNotifs = res.data.notifications || []
-
-        if (!cancelled && reaccessNotifs.length > 0) {
-          setNotifications((prev) => {
-            const existingIds = new Set(prev.map((n) => n.id))
-            const fresh = reaccessNotifs.filter(
-              (n) => !existingIds.has(n.id)
-            )
-            return [...fresh, ...prev]
-          })
+        if (!cancelled) {
+          setMyApplications(
+            res.data.applications || []
+          )
         }
       } catch (err) {
-        console.error('Failed to load learning notifications:', err)
+        console.error(
+          'Failed to load my applications:',
+          err
+        )
+      } finally {
+        if (!cancelled) {
+          setApplicationsLoading(false)
+        }
       }
     }
+
+    fetchMyApplications()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  /* ============================================================
+     NOTIFICATIONS
+     ============================================================ */
+
+  const [notifications, setNotifications] =
+    useState(BASE_NOTIFICATIONS)
+
+  useEffect(() => {
+    let cancelled = false
+
+    const fetchLearningNotifications =
+      async () => {
+        try {
+          const res = await API.get(
+            '/learning/notifications'
+          )
+
+          const reaccessNotifs =
+            res.data.notifications || []
+
+          if (
+            !cancelled &&
+            reaccessNotifs.length > 0
+          ) {
+            setNotifications((prev) => {
+              const existingIds = new Set(
+                prev.map((n) => n.id)
+              )
+
+              const fresh =
+                reaccessNotifs.filter(
+                  (n) =>
+                    !existingIds.has(n.id)
+                )
+
+              return [...fresh, ...prev]
+            })
+          }
+        } catch (err) {
+          console.error(
+            'Failed to load learning notifications:',
+            err
+          )
+        }
+      }
+
     fetchLearningNotifications()
-    return () => { cancelled = true }
+
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   useEffect(() => {
     let cancelled = false
+
     const fetchJobNotifications = async () => {
       try {
-        const res = await API.get('/jobs/notifications')
-        const jobNotifs = res.data.notifications || []
+        const res = await API.get(
+          '/jobs/notifications'
+        )
 
-        if (!cancelled && jobNotifs.length > 0) {
+        const jobNotifs =
+          res.data.notifications || []
+
+        if (
+          !cancelled &&
+          jobNotifs.length > 0
+        ) {
           setNotifications((prev) => {
-            const existingIds = new Set(prev.map((n) => n.id))
-            const fresh = jobNotifs.filter((n) => !existingIds.has(n.id))
+            const existingIds = new Set(
+              prev.map((n) => n.id)
+            )
+
+            const fresh = jobNotifs.filter(
+              (n) => !existingIds.has(n.id)
+            )
+
             return [...fresh, ...prev]
           })
         }
       } catch (err) {
-        console.error('Failed to load job notifications:', err)
+        console.error(
+          'Failed to load job notifications:',
+          err
+        )
       }
     }
+
     fetchJobNotifications()
-    return () => { cancelled = true }
+
+    return () => {
+      cancelled = true
+    }
   }, [])
+
+  /* ============================================================
+     HELPERS
+     ============================================================ */
 
   const getDaysRemaining = (expiresAt) => {
     if (!expiresAt) return null
-    const diff = new Date(expiresAt).getTime() - new Date().getTime()
-    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
+
+    const diff =
+      new Date(expiresAt).getTime() -
+      new Date().getTime()
+
+    return Math.max(
+      0,
+      Math.ceil(
+        diff / (1000 * 60 * 60 * 24)
+      )
+    )
   }
 
-  // Real course rows, shaped the same way the old static array was,
-  // so the render logic below stays untouched.
+  /* ============================================================
+     MY COURSES
+     ============================================================ */
+
   const myCourses = useMemo(() => {
-    const active = courses.active.map((c, i) => {
-      const palette =
-        ACTIVE_COURSE_PALETTE[i % ACTIVE_COURSE_PALETTE.length]
-      const daysLeft = c.access
-        ? getDaysRemaining(c.access.expires_at)
-        : null
+    const active = courses.active.map(
+      (c, i) => {
+        const palette =
+          ACTIVE_COURSE_PALETTE[
+            i % ACTIVE_COURSE_PALETTE.length
+          ]
 
-      return {
-        id: `active-${c.id}`,
-        content_id: c.id,
-        type: 'active',
-        title: c.title,
-        instructor: c.instructor_name,
-        status:
-          daysLeft !== null
-            ? `In progress · ${daysLeft} days left`
-            : 'Active',
-        icon: IconBook,
-        color: palette.color,
-        soft: palette.soft
+        const daysLeft = c.access
+          ? getDaysRemaining(
+              c.access.expires_at
+            )
+          : null
+
+        return {
+          id: `active-${c.id}`,
+          content_id: c.id,
+          type: 'active',
+          title: c.title,
+          instructor: c.instructor_name,
+          status:
+            daysLeft !== null
+              ? `In progress · ${daysLeft} days left`
+              : 'Active',
+          icon: IconBook,
+          color: palette.color,
+          soft: palette.soft
+        }
       }
-    })
+    )
 
-    const requested = courses.requested.map((c, i) => {
-      const palette =
-        REQUESTED_COURSE_PALETTE[i % REQUESTED_COURSE_PALETTE.length]
+    const requested =
+      courses.requested.map((c, i) => {
+        const palette =
+          REQUESTED_COURSE_PALETTE[
+            i %
+              REQUESTED_COURSE_PALETTE.length
+          ]
 
-      return {
-        id: `requested-${c.id}`,
-        content_id: c.id,
-        type: 'requested',
-        title: c.title,
-        instructor: c.instructor_name,
-        status: 'Awaiting approval',
-        icon: IconClock,
-        color: palette.color,
-        soft: palette.soft
-      }
-    })
+        return {
+          id: `requested-${c.id}`,
+          content_id: c.id,
+          type: 'requested',
+          title: c.title,
+          instructor: c.instructor_name,
+          status: 'Awaiting approval',
+          icon: IconClock,
+          color: palette.color,
+          soft: palette.soft
+        }
+      })
 
     return [...active, ...requested]
   }, [courses])
 
-  // Real job status rows for the right-panel widget — most recent
-  // applications first, each coloured by its actual status.
-  const jobStatusNotifications = useMemo(() => {
-    return myApplications.slice(0, 4).map((a) => {
-      const style = JOB_STATUS_STYLE[a.status] || JOB_STATUS_STYLE.Pending
+  /* ============================================================
+     JOB STATUS
+     ============================================================ */
 
-      return {
-        id: a.id,
-        company: a.company_name,
-        role: a.job_title,
-        status: a.status,
-        color: style.color
-      }
-    })
+  const jobStatusNotifications = useMemo(() => {
+    return myApplications
+      .slice(0, 4)
+      .map((a) => {
+        const style =
+          JOB_STATUS_STYLE[a.status] ||
+          JOB_STATUS_STYLE.Pending
+
+        return {
+          id: a.id,
+          company: a.company_name,
+          role: a.job_title,
+          status: a.status,
+          color: style.color
+        }
+      })
   }, [myApplications])
+
+  /* ============================================================
+     LOGOUT
+     ============================================================ */
 
   const handleLogout = () => {
     logout()
     navigate('/login')
   }
 
-  // ── Sidebar nav items — grouped into two sections so we can add
-  //    visual gaps between them, and Help added at the end. ──
+  /* ============================================================
+     NAVIGATION
+     ============================================================ */
+
   const navItems = [
-    { id: 'home', icon: IconHome, label: 'Dashboard' },
-    { id: 'profile', icon: IconUser, label: 'Profile' },
-    { id: 'ai-jobs', icon: IconBot, label: 'AI Job Match' },
-    { id: 'jobs', icon: IconBriefcase, label: 'Job Vacancy' },
-    { id: 'roadmap', icon: IconMap, label: 'Career Roadmap' },
-    { id: 'learning', icon: IconBook, label: 'Learning Hub' },
-    { id: 'challenges', icon: IconTrophy, label: 'Skill Challenges' }
+    {
+      id: 'home',
+      icon: IconHome,
+      label: 'Dashboard'
+    },
+    {
+      id: 'profile',
+      icon: IconUser,
+      label: 'Profile'
+    },
+    {
+      id: 'ai-jobs',
+      icon: IconBot,
+      label: 'AI Job Match'
+    },
+    {
+      id: 'jobs',
+      icon: IconBriefcase,
+      label: 'Job Vacancy'
+    },
+    {
+      id: 'roadmap',
+      icon: IconMap,
+      label: 'Career Roadmap'
+    },
+    {
+      id: 'learning',
+      icon: IconBook,
+      label: 'Learning Hub'
+    },
+    {
+      id: 'challenges',
+      icon: IconTrophy,
+      label: 'Skill Challenges'
+    }
   ]
 
   const secondaryNavItems = [
-    { id: 'help', icon: IconHelp, label: 'Help' }
+    {
+      id: 'help',
+      icon: IconHelp,
+      label: 'Help'
+    }
   ]
 
-  const allNavItems = [...navItems, ...secondaryNavItems]
+  const allNavItems = [
+    ...navItems,
+    ...secondaryNavItems
+  ]
+
+  /* ============================================================
+     SEARCH
+     ============================================================ */
 
   const filteredNavItems = useMemo(() => {
     if (!searchQuery.trim()) return []
 
     return allNavItems.filter((n) =>
-      n.label.toLowerCase().includes(searchQuery.toLowerCase())
+      n.label
+        .toLowerCase()
+        .includes(
+          searchQuery.toLowerCase()
+        )
     )
   }, [searchQuery])
 
-  const unreadCount = notifications.filter((n) => n.unread).length
+  const unreadCount =
+    notifications.filter(
+      (n) => n.unread
+    ).length
+
+  /* ============================================================
+     COURSE FILTER
+     ============================================================ */
 
   const courseTabs = [
-    { id: 'all', label: 'All' },
-    { id: 'active', label: 'Active Courses' },
-    { id: 'requested', label: 'Requested Courses' }
+    {
+      id: 'all',
+      label: 'All'
+    },
+    {
+      id: 'active',
+      label: 'Active Courses'
+    },
+    {
+      id: 'requested',
+      label: 'Requested Courses'
+    }
   ]
 
   const visibleCourses =
     courseFilter === 'all'
       ? myCourses
-      : myCourses.filter((c) => c.type === courseFilter)
+      : myCourses.filter(
+          (c) =>
+            c.type === courseFilter
+        )
+
+  /* ============================================================
+     DASHBOARD STATS
+     ============================================================ */
 
   const stats = [
     {
       id: 'jobs',
       label: 'Available Jobs',
-      value: jobsCountLoading ? '—' : availableJobsCount,
+      value: jobsCountLoading
+        ? '—'
+        : availableJobsCount,
       icon: IconBriefcase,
       color: C.blue,
       soft: C.blueSoft,
-      onClick: () => setActiveTab('jobs')
+      onClick: () =>
+        setActiveTab('jobs')
     },
     {
       id: 'learning',
@@ -622,7 +869,8 @@ export default function JobSeekerDashboard() {
       icon: IconBook,
       color: C.green,
       soft: C.greenSoft,
-      onClick: () => setActiveTab('learning')
+      onClick: () =>
+        setActiveTab('learning')
     },
     {
       id: 'challenges',
@@ -631,14 +879,22 @@ export default function JobSeekerDashboard() {
       icon: IconMedal,
       color: C.purple,
       soft: C.purpleSoft,
-      onClick: () => setActiveTab('challenges')
+      onClick: () =>
+        setActiveTab('challenges')
     }
   ]
 
+  /* ============================================================
+     CALENDAR
+     ============================================================ */
+
   const today = new Date()
 
-  const [calMonth, setCalMonth] = useState(today.getMonth())
-  const [calYear, setCalYear] = useState(today.getFullYear())
+  const [calMonth, setCalMonth] =
+    useState(today.getMonth())
+
+  const [calYear, setCalYear] =
+    useState(today.getFullYear())
 
   const monthNames = [
     'January',
@@ -655,19 +911,43 @@ export default function JobSeekerDashboard() {
     'December'
   ]
 
-  const eventDays = [18, 19, 20, 21]
+  const eventDays = [
+    18,
+    19,
+    20,
+    21
+  ]
 
   const calendarDays = useMemo(() => {
-    const firstDay = new Date(calYear, calMonth, 1).getDay()
-    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate()
+    const firstDay =
+      new Date(
+        calYear,
+        calMonth,
+        1
+      ).getDay()
+
+    const daysInMonth =
+      new Date(
+        calYear,
+        calMonth + 1,
+        0
+      ).getDate()
 
     const cells = []
 
-    for (let i = 0; i < firstDay; i++) {
+    for (
+      let i = 0;
+      i < firstDay;
+      i++
+    ) {
       cells.push(null)
     }
 
-    for (let d = 1; d <= daysInMonth; d++) {
+    for (
+      let d = 1;
+      d <= daysInMonth;
+      d++
+    ) {
       cells.push(d)
     }
 
@@ -677,18 +957,26 @@ export default function JobSeekerDashboard() {
   const goPrevMonth = () => {
     if (calMonth === 0) {
       setCalMonth(11)
-      setCalYear((y) => y - 1)
+      setCalYear(
+        (y) => y - 1
+      )
     } else {
-      setCalMonth((m) => m - 1)
+      setCalMonth(
+        (m) => m - 1
+      )
     }
   }
 
   const goNextMonth = () => {
     if (calMonth === 11) {
       setCalMonth(0)
-      setCalYear((y) => y + 1)
+      setCalYear(
+        (y) => y + 1
+      )
     } else {
-      setCalMonth((m) => m + 1)
+      setCalMonth(
+        (m) => m + 1
+      )
     }
   }
 
@@ -697,6 +985,10 @@ export default function JobSeekerDashboard() {
     calMonth === today.getMonth() &&
     calYear === today.getFullYear()
 
+  /* ============================================================
+     NAV BUTTON CLASS
+     ============================================================ */
+
   const navBtnClass = (id) =>
     `w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-left transition-colors ${
       activeTab === id
@@ -704,163 +996,293 @@ export default function JobSeekerDashboard() {
         : 'hover:bg-white/10'
     }`
 
-  /* ── Search + Notification Row ── */
-  const SearchAndBell = () => (
-    <div className="flex items-center justify-center gap-3 mb-8 relative">
-      <div className="w-full max-w-sm relative">
+  /* ============================================================
+     RIGHT SIDEBAR HEADER
+     
+     SEARCH + NOTIFICATION ARE ON ONE LINE
+     ============================================================ */
+
+  const RightSidebarHeader = () => (
+    <div
+      className="flex items-center gap-2 mb-5"
+      style={{
+        minHeight: '40px'
+      }}
+    >
+      {/* SEARCH BAR */}
+      <div className="relative flex-1 min-w-0">
         <div
-          className="absolute left-5 top-1/2 -translate-y-1/2"
-          style={{ color: C.sub }}
+          className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
         >
-          <IconSearch size={16} />
+          <IconSearch
+            size={15}
+            color={C.sub}
+          />
         </div>
 
         <input
           type="text"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search for anything..."
-          className="w-full pl-12 pr-5 py-3 rounded-full border text-sm focus:outline-none focus:ring-2"
+          onChange={(e) =>
+            setSearchQuery(
+              e.target.value
+            )
+          }
+          placeholder="Search..."
+          className="w-full pl-9 pr-3 py-2.5 rounded-xl border text-xs focus:outline-none focus:ring-2 transition"
           style={{
             borderColor: C.border,
-            background: C.card,
+            background: C.bg,
             color: C.ink,
-            boxShadow: cardShadow,
-            '--tw-ring-color': C.accent
+            '--tw-ring-color': C.teal
           }}
         />
 
+        {/* SEARCH RESULTS */}
         {filteredNavItems.length > 0 && (
           <div
-            className="absolute left-0 right-0 top-14 rounded-2xl shadow-lg border z-50 overflow-hidden"
+            className="absolute left-0 right-0 top-12 rounded-xl shadow-lg border z-50 overflow-hidden"
             style={{
               background: C.card,
               borderColor: C.border
             }}
           >
-            {filteredNavItems.map((item) => {
-              const IconComp = item.icon
+            {filteredNavItems.map(
+              (item) => {
+                const IconComp =
+                  item.icon
 
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    setActiveTab(item.id)
-                    setSearchQuery('')
-                  }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left hover:bg-purple-50"
-                  style={{ color: C.ink }}
-                >
-                  <IconComp size={16} color={C.accent} />
-                  {item.label}
-                </button>
-              )
-            })}
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setActiveTab(
+                        item.id
+                      )
+                      setSearchQuery('')
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-left hover:bg-teal-50 transition"
+                    style={{
+                      color: C.ink
+                    }}
+                  >
+                    <IconComp
+                      size={14}
+                      color={C.teal}
+                    />
+
+                    <span>
+                      {item.label}
+                    </span>
+                  </button>
+                )
+              }
+            )}
           </div>
         )}
       </div>
 
+      {/* NOTIFICATION BUTTON */}
       <div className="relative flex-shrink-0">
         <button
-          onClick={() => setNotifOpen(!notifOpen)}
-          className="relative w-12 h-12 rounded-full border flex items-center justify-center"
+          onClick={() =>
+            setNotifOpen(
+              !notifOpen
+            )
+          }
+          className="w-10 h-10 rounded-xl border flex items-center justify-center transition hover:shadow-sm"
           style={{
-            background: C.card,
-            borderColor: C.border,
-            boxShadow: cardShadow
+            background: C.bg,
+            borderColor: C.border
           }}
+          title="Notifications"
         >
-          <IconBell size={18} color={C.accent} />
+          <IconBell
+            size={17}
+            color={C.teal}
+          />
 
           {unreadCount > 0 && (
             <span
-              className="absolute -top-1 -right-1 w-5 h-5 rounded-full text-white text-xs flex items-center justify-center font-bold"
-              style={{ background: C.pink }}
+              className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full text-white text-[9px] flex items-center justify-center font-bold"
+              style={{
+                background: 'red'
+              }}
             >
               {unreadCount}
             </span>
           )}
         </button>
 
+        {/* NOTIFICATION DROPDOWN */}
         {notifOpen && (
           <div
-            className="absolute right-0 top-14 w-80 rounded-2xl shadow-xl border z-50"
+            className="absolute right-0 top-12 w-72 rounded-2xl shadow-xl border z-50 overflow-hidden"
             style={{
               background: C.card,
               borderColor: C.border
             }}
           >
+            {/* Notification Header */}
             <div
               className="p-4 border-b flex justify-between items-center"
-              style={{ borderColor: C.border }}
+              style={{
+                borderColor: C.border
+              }}
             >
-              <h3
-                className="font-semibold"
-                style={{ color: C.ink }}
-              >
-                Notifications
-              </h3>
+              <div>
+                <h3
+                  className="font-semibold text-sm"
+                  style={{
+                    color: C.ink
+                  }}
+                >
+                  Notifications
+                </h3>
 
-              <span
-                className="text-xs font-medium cursor-pointer"
-                style={{ color: C.accent }}
+                {unreadCount > 0 && (
+                  <p
+                    className="text-[10px] mt-0.5"
+                    style={{
+                      color: C.sub
+                    }}
+                  >
+                    {unreadCount}{' '}
+                    unread
+                    {unreadCount !==
+                    1
+                      ? ' notifications'
+                      : ' notification'}
+                  </p>
+                )}
+              </div>
+
+              <button
+                className="text-[10px] font-medium hover:underline"
+                style={{
+                  color: C.teal
+                }}
                 onClick={() =>
-                  setNotifications((prev) =>
-                    prev.map((n) => ({ ...n, unread: false }))
+                  setNotifications(
+                    (prev) =>
+                      prev.map(
+                        (n) => ({
+                          ...n,
+                          unread:
+                            false
+                        })
+                      )
                   )
                 }
               >
                 Mark all read
-              </span>
+              </button>
             </div>
 
-            <div style={{ maxHeight: '360px', overflowY: 'auto' }}>
-              {notifications.length === 0 ? (
+            {/* Notification List */}
+            <div
+              style={{
+                maxHeight:
+                  '320px',
+                overflowY:
+                  'auto'
+              }}
+            >
+              {notifications.length ===
+              0 ? (
                 <p
-                  className="text-sm text-center py-6"
-                  style={{ color: C.sub }}
+                  className="text-xs text-center py-8"
+                  style={{
+                    color: C.sub
+                  }}
                 >
-                  No notifications yet.
+                  No notifications
+                  yet.
                 </p>
               ) : (
-                notifications.map((n) => (
-                  <div
-                    key={n.id}
-                    onClick={() => {
-                      if (n.type === 'reaccess') setActiveTab('learning')
-                      if (n.type === 'job_application') setActiveTab('jobs')
-                    }}
-                    className="px-4 py-3 flex gap-3 items-start cursor-pointer"
-                    style={{
-                      background: n.unread
-                        ? C.accentSoft
-                        : 'transparent'
-                    }}
-                  >
-                    <div className="flex-1">
-                      <p
-                        className="text-sm"
-                        style={{ color: C.ink }}
-                      >
-                        {n.text}
-                      </p>
+                notifications.map(
+                  (n) => (
+                    <div
+                      key={n.id}
+                      onClick={() => {
+                        if (
+                          n.type ===
+                          'reaccess'
+                        ) {
+                          setActiveTab(
+                            'learning'
+                          )
+                        }
 
-                      <p
-                        className="text-xs mt-0.5"
-                        style={{ color: C.sub }}
-                      >
-                        {n.time}
-                      </p>
-                    </div>
-
-                    {n.unread && (
+                        if (
+                          n.type ===
+                          'job_application'
+                        ) {
+                          setActiveTab(
+                            'jobs'
+                          )
+                        }
+                      }}
+                      className="px-4 py-3 flex gap-3 items-start cursor-pointer transition hover:bg-gray-50"
+                      style={{
+                        background:
+                          n.unread
+                            ? C.tealSoft
+                            : 'transparent'
+                      }}
+                    >
+                      {/* Notification Dot */}
                       <div
-                        className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0"
-                        style={{ background: C.accent }}
-                      />
-                    )}
-                  </div>
-                ))
+                        className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                        style={{
+                          background:
+                            n.unread
+                              ? '#ccefeb'
+                              : C.softPanel
+                        }}
+                      >
+                        <IconBell
+                          size={13}
+                          color={
+                            n.unread
+                              ? C.teal
+                              : C.sub
+                          }
+                        />
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <p
+                          className="text-xs leading-relaxed"
+                          style={{
+                            color: C.ink
+                          }}
+                        >
+                          {n.text}
+                        </p>
+
+                        <p
+                          className="text-[10px] mt-1"
+                          style={{
+                            color: C.sub
+                          }}
+                        >
+                          {n.time}
+                        </p>
+                      </div>
+
+                      {n.unread && (
+                        <div
+                          className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0"
+                          style={{
+                            background:
+                              C.teal
+                          }}
+                        />
+                      )}
+                    </div>
+                  )
+                )
               )}
             </div>
           </div>
@@ -869,10 +1291,16 @@ export default function JobSeekerDashboard() {
     </div>
   )
 
+  /* ============================================================
+     MAIN RETURN
+     ============================================================ */
+
   return (
     <div
       className="min-h-screen flex"
-      style={{ background: C.bg }}
+      style={{
+        background: C.bg
+      }}
     >
       <style>{`
         /* Hide scrollbars while keeping scrolling enabled */
@@ -888,140 +1316,193 @@ export default function JobSeekerDashboard() {
         }
       `}</style>
 
-      {/* ── LEFT SIDEBAR ── */}
+      {/* ========================================================
+          LEFT SIDEBAR
+          ======================================================== */}
+
       <div
         className="hidden lg:flex flex-col w-64 h-screen fixed left-0 top-0 z-40"
         style={{
           background: C.sidebar
         }}
       >
-        {/* Logo — bigger icon box + icon + text, extra bottom padding
-            kept for the gap before "Dashboard" below it */}
+        {/* LOGO */}
         <div className="px-6 pt-6 pb-10 flex items-center gap-3">
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
             style={{
-              background: 'rgba(255,255,255,0.18)'
+              background:
+                'rgba(255,255,255,0.18)'
             }}
           >
-            <IconSparkle size={24} color="#ffffff" />
+            <IconSparkle
+              size={24}
+              color="#ffffff"
+            />
           </div>
 
           <p
             className="font-bold text-xl"
-            style={{ color: '#ffffff' }}
+            style={{
+              color: '#ffffff'
+            }}
           >
             Career Pilot
           </p>
         </div>
 
-        {/* Navigation — primary items, with breathing room between rows */}
+        {/* NAVIGATION */}
         <nav className="flex-1 px-4 py-2 space-y-2.5 overflow-y-auto">
-          {navItems.map((item) => {
-            const IconComp = item.icon
-            const active = activeTab === item.id
+          {navItems.map(
+            (item) => {
+              const IconComp =
+                item.icon
 
-            return (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={navBtnClass(item.id)}
-                style={
-                  active
-                    ? {
-                        background: 'rgba(255,255,255,0.18)',
-                        color: '#ffffff'
-                      }
-                    : {
-                        color: C.sidebarText
-                      }
-                }
-              >
-                <IconComp
-                  size={18}
-                  color={
-                    active
-                      ? '#ffffff'
-                      : C.sidebarMuted
+              const active =
+                activeTab ===
+                item.id
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() =>
+                    setActiveTab(
+                      item.id
+                    )
                   }
-                  strokeWidth={2}
-                />
+                  className={navBtnClass(
+                    item.id
+                  )}
+                  style={
+                    active
+                      ? {
+                          background:
+                            'rgba(255,255,255,0.18)',
+                          color:
+                            '#ffffff'
+                        }
+                      : {
+                          color:
+                            C.sidebarText
+                        }
+                  }
+                >
+                  <IconComp
+                    size={18}
+                    color={
+                      active
+                        ? '#ffffff'
+                        : C.sidebarMuted
+                    }
+                    strokeWidth={2}
+                  />
 
-                <span>{item.label}</span>
-              </button>
-            )
-          })}
+                  <span>
+                    {item.label}
+                  </span>
+                </button>
+              )
+            }
+          )}
 
-          {/* Divider before secondary items (Help) for clear separation */}
+          {/* DIVIDER */}
           <div
             className="mx-1 my-4 border-t"
-            style={{ borderColor: 'rgba(255,255,255,0.14)' }}
+            style={{
+              borderColor:
+                'rgba(255,255,255,0.14)'
+            }}
           />
 
-          {secondaryNavItems.map((item) => {
-            const IconComp = item.icon
-            const active = activeTab === item.id
+          {secondaryNavItems.map(
+            (item) => {
+              const IconComp =
+                item.icon
 
-            return (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={navBtnClass(item.id)}
-                style={
-                  active
-                    ? {
-                        background: 'rgba(255,255,255,0.18)',
-                        color: '#ffffff'
-                      }
-                    : {
-                        color: C.sidebarText
-                      }
-                }
-              >
-                <IconComp
-                  size={18}
-                  color={
-                    active
-                      ? '#ffffff'
-                      : C.sidebarMuted
+              const active =
+                activeTab ===
+                item.id
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() =>
+                    setActiveTab(
+                      item.id
+                    )
                   }
-                  strokeWidth={2}
-                />
+                  className={navBtnClass(
+                    item.id
+                  )}
+                  style={
+                    active
+                      ? {
+                          background:
+                            'rgba(255,255,255,0.18)',
+                          color:
+                            '#ffffff'
+                        }
+                      : {
+                          color:
+                            C.sidebarText
+                        }
+                  }
+                >
+                  <IconComp
+                    size={18}
+                    color={
+                      active
+                        ? '#ffffff'
+                        : C.sidebarMuted
+                    }
+                    strokeWidth={2}
+                  />
 
-                <span>{item.label}</span>
-              </button>
-            )
-          })}
+                  <span>
+                    {item.label}
+                  </span>
+                </button>
+              )
+            }
+          )}
         </nav>
 
-        {/* User section */}
+        {/* USER SECTION */}
         <div
           className="px-4 py-4 border-t"
           style={{
-            borderColor: 'rgba(255,255,255,0.16)'
+            borderColor:
+              'rgba(255,255,255,0.16)'
           }}
         >
           <div className="flex items-center gap-3 px-2 py-2">
             <div
               className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
               style={{
-                background: 'rgba(255,255,255,0.20)'
+                background:
+                  'rgba(255,255,255,0.20)'
               }}
             >
-              {user?.full_name?.charAt(0).toUpperCase()}
+              {user?.full_name
+                ?.charAt(0)
+                .toUpperCase()}
             </div>
 
             <div className="flex-1 overflow-hidden">
               <p
                 className="text-xs font-semibold truncate"
-                style={{ color: '#ffffff' }}
+                style={{
+                  color: '#ffffff'
+                }}
               >
                 {user?.full_name}
               </p>
 
               <p
                 className="text-[11px]"
-                style={{ color: '#43ba84' }}
+                style={{
+                  color: '#43ba84'
+                }}
               >
                 ● Active
               </p>
@@ -1034,222 +1515,400 @@ export default function JobSeekerDashboard() {
             >
               <IconLogout
                 size={16}
-                color={C.sidebarMuted}
+                color={
+                  C.sidebarMuted
+                }
               />
             </button>
           </div>
         </div>
       </div>
 
-      {/* ── MAIN CONTENT ── */}
+      {/* ========================================================
+          MAIN CONTENT
+          ======================================================== */}
+
       <div className="flex-1 lg:ml-64 xl:mr-80">
         <div className="p-6">
 
-          {/* HOME */}
-          {activeTab === 'home' && (
+          {/* ====================================================
+              HOME
+              ==================================================== */}
+
+          {activeTab ===
+            'home' && (
             <div>
 
-              {/* Welcome */}
-              <div className="mb-6 text-center">
-                <h1
-                  className="text-2xl font-bold"
-                  style={{ color: C.ink }}
-                >
-                  Welcome, {user?.username} 👋
-                </h1>
+              {/* ==================================================
+                  TEAL WELCOME SECTION
+                  ================================================== */}
+
+              <div
+                className="relative overflow-hidden rounded-2xl p-6 mb-6"
+                style={{
+                  background:
+                    `linear-gradient(135deg, ${C.tealDark} 0%, ${C.teal} 100%)`,
+                  boxShadow:
+                    '0 8px 24px rgba(21,149,143,0.16)'
+                }}
+              >
+                <div className="relative z-10 max-w-2xl">
+
+                  
+
+                  <h1
+                    className="text-2xl font-bold mb-2"
+                    style={{
+                      color:
+                        '#ffffff'
+                    }}
+                  >
+                    Welcome back,{' '}
+                    {user?.full_name ||
+                      user?.username ||
+                      'there'}
+                    ! 👋
+                  </h1>
+
+                  <p
+                    className="text-sm max-w-xl leading-relaxed"
+                    style={{
+                      color:
+                        'rgba(255,255,255,0.88)'
+                    }}
+                  >
+                    Manage your career
+                    journey, explore job
+                    opportunities, continue
+                    learning and build your
+                    professional skills.
+                  </p>
+                </div>
+
+                {/* DECORATIVE SHAPES */}
+
+                <div
+                  className="absolute -right-12 -top-16 w-44 h-44 rounded-full"
+                  style={{
+                    background:
+                      'rgba(255,255,255,0.10)'
+                  }}
+                />
+
+                <div
+                  className="absolute right-20 -bottom-20 w-40 h-40 rounded-full"
+                  style={{
+                    background:
+                      'rgba(255,255,255,0.07)'
+                  }}
+                />
+
+                <div
+                  className="absolute right-10 bottom-8 w-14 h-14 rounded-2xl rotate-12"
+                  style={{
+                    border:
+                      '1px solid rgba(255,255,255,0.18)',
+                    background:
+                      'rgba(255,255,255,0.06)'
+                  }}
+                />
               </div>
 
-              {/* Search + Notification */}
-              <SearchAndBell />
+              {/* ==================================================
+                  STAT CARDS
+                  ================================================== */}
 
-              {/* Stat Cards — each now links to its own tab */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                {stats.map((s) => {
-                  const IconComp = s.icon
+              {/* ==================================================
+    STAT CARDS
+    ================================================== */}
 
-                  return (
-                    <button
-                      key={s.id}
-                      onClick={s.onClick}
-                      className="text-left rounded-2xl p-5 flex items-center gap-4 transition hover:-translate-y-0.5 hover:shadow-md"
-                      style={{
-                        background: C.card,
-                        boxShadow: cardShadow
-                      }}
-                    >
-                      <div
-                        className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-                        style={{
-                          background: s.soft
-                        }}
-                      >
-                        <IconComp
-                          size={20}
-                          color={s.color}
-                        />
-                      </div>
+{/* ==================================================
+    STAT CARDS
+    ================================================== */}
 
-                      <div>
-                        <p
-                          className="text-xl font-bold leading-none"
-                          style={{ color: C.ink }}
-                        >
-                          {s.value}
-                        </p>
+<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+  {stats.map(
+    (s) => {
+      const IconComp =
+        s.icon
 
-                        <p
-                          className="text-xs mt-1"
-                          style={{ color: C.sub }}
-                        >
-                          {s.label}
-                        </p>
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
+      return (
+        <button
+          key={s.id}
+          onClick={
+            s.onClick
+          }
+          className="relative text-left rounded-2xl overflow-hidden transition hover:-translate-y-0.5 hover:shadow-md"
+          style={{
+            background: C.card,
+            boxShadow: cardShadow,
+            border: `1px solid ${C.border}`
+          }}
+        >
+          {/* TOP ACCENT STRIP */}
+          <div
+            className="h-1.5 w-full"
+            style={{
+              background: s.color
+            }}
+          />
 
-              {/* My Courses — backed by /learning/my-courses,
-                  each row links into the real Learning Hub */}
+          <div className="p-5 flex items-center gap-4">
+            <div
+              className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{
+                background: s.soft
+              }}
+            >
+              <IconComp
+                size={20}
+                color={s.color}
+              />
+            </div>
+
+            <div>
+              <p
+                className="text-xl font-bold leading-none"
+                style={{
+                  color: C.ink
+                }}
+              >
+                {
+                  s.value
+                }
+              </p>
+
+              <p
+                className="text-xs mt-1"
+                style={{
+                  color: C.sub
+                }}
+              >
+                {
+                  s.label
+                }
+              </p>
+            </div>
+          </div>
+        </button>
+      )
+    }
+  )}
+</div>
+              {/* ==================================================
+                  MY COURSES
+                  ================================================== */}
+
               <div
                 className="rounded-2xl p-6"
                 style={{
-                  background: C.card,
-                  boxShadow: cardShadow
+                  background:
+                    C.card,
+                  boxShadow:
+                    cardShadow
                 }}
               >
                 <div className="flex justify-between items-center mb-4">
                   <h2
                     className="font-bold text-lg"
-                    style={{ color: C.ink }}
+                    style={{
+                      color:
+                        C.ink
+                    }}
                   >
                     My Courses
                   </h2>
 
                   <button
-                    onClick={() => setActiveTab('learning')}
+                    onClick={() =>
+                      setActiveTab(
+                        'learning'
+                      )
+                    }
                     className="text-sm font-medium hover:underline"
-                    style={{ color: C.accent }}
+                    style={{
+                      color:
+                        C.accent
+                    }}
                   >
                     View all
                   </button>
                 </div>
 
+                {/* COURSE TABS */}
                 <div
                   className="flex items-center gap-2 mb-5 border-b"
                   style={{
-                    borderColor: C.border
+                    borderColor:
+                      C.border
                   }}
                 >
-                  {courseTabs.map((t) => (
-                    <button
-                      key={t.id}
-                      onClick={() => setCourseFilter(t.id)}
-                      className="text-sm font-medium px-3 py-2 -mb-px border-b-2"
-                      style={{
-                        color:
-                          courseFilter === t.id
-                            ? C.accent
-                            : C.sub,
+                  {courseTabs.map(
+                    (t) => (
+                      <button
+                        key={t.id}
+                        onClick={() =>
+                          setCourseFilter(
+                            t.id
+                          )
+                        }
+                        className="text-sm font-medium px-3 py-2 -mb-px border-b-2"
+                        style={{
+                          color:
+                            courseFilter ===
+                            t.id
+                              ? C.accent
+                              : C.sub,
 
-                        borderColor:
-                          courseFilter === t.id
-                            ? C.accent
-                            : 'transparent'
-                      }}
-                    >
-                      {t.label}
-                    </button>
-                  ))}
+                          borderColor:
+                            courseFilter ===
+                            t.id
+                              ? C.accent
+                              : 'transparent'
+                        }}
+                      >
+                        {
+                          t.label
+                        }
+                      </button>
+                    )
+                  )}
                 </div>
 
+                {/* COURSE LIST */}
                 <div className="space-y-2">
                   {coursesLoading ? (
                     <div className="space-y-2">
-                      {[0, 1, 2].map((i) => (
-                        <div
-                          key={i}
-                          className="flex items-center gap-3 p-3 rounded-xl animate-pulse"
-                          style={{ background: C.softPanel }}
-                        >
+                      {[0, 1, 2].map(
+                        (i) => (
                           <div
-                            className="w-9 h-9 rounded-lg flex-shrink-0"
-                            style={{ background: C.border }}
-                          />
-                          <div className="flex-1 space-y-1.5">
-                            <div
-                              className="h-3 w-1/3 rounded"
-                              style={{ background: C.border }}
-                            />
-                            <div
-                              className="h-2.5 w-1/4 rounded"
-                              style={{ background: C.border }}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <>
-                      {visibleCourses.map((c) => {
-                        const IconComp = c.icon
-
-                        return (
-                          <div
-                            key={c.id}
-                            onClick={() => setActiveTab('learning')}
-                            className="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition hover:opacity-80"
+                            key={i}
+                            className="flex items-center gap-3 p-3 rounded-xl animate-pulse"
                             style={{
-                              background: C.softPanel
+                              background:
+                                C.softPanel
                             }}
                           >
                             <div
-                              className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                              className="w-9 h-9 rounded-lg flex-shrink-0"
                               style={{
-                                background: c.soft
+                                background:
+                                  C.border
                               }}
-                            >
-                              <IconComp
-                                size={16}
-                                color={c.color}
+                            />
+
+                            <div className="flex-1 space-y-1.5">
+                              <div
+                                className="h-3 w-1/3 rounded"
+                                style={{
+                                  background:
+                                    C.border
+                                }}
+                              />
+
+                              <div
+                                className="h-2.5 w-1/4 rounded"
+                                style={{
+                                  background:
+                                    C.border
+                                }}
                               />
                             </div>
-
-                            <div className="flex-1 min-w-0">
-                              <p
-                                className="text-sm font-medium truncate"
-                                style={{ color: C.ink }}
-                              >
-                                {c.title}
-                              </p>
-
-                              <p
-                                className="text-xs truncate"
-                                style={{ color: C.sub }}
-                              >
-                                {c.instructor}
-                              </p>
-                            </div>
-
-                            <span
-                              className="flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-full"
-                              style={{
-                                background: c.soft,
-                                color: c.color
-                              }}
-                            >
-                              {c.status}
-                            </span>
                           </div>
                         )
-                      })}
+                      )}
+                    </div>
+                  ) : (
+                    <>
+                      {visibleCourses.map(
+                        (c) => {
+                          const IconComp =
+                            c.icon
 
-                      {visibleCourses.length === 0 && (
+                          return (
+                            <div
+                              key={c.id}
+                              onClick={() =>
+                                setActiveTab(
+                                  'learning'
+                                )
+                              }
+                              className="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition hover:opacity-80"
+                              style={{
+                                background:
+                                  C.softPanel
+                              }}
+                            >
+                              <div
+                                className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                                style={{
+                                  background:
+                                    c.soft
+                                }}
+                              >
+                                <IconComp
+                                  size={16}
+                                  color={
+                                    c.color
+                                  }
+                                />
+                              </div>
+
+                              <div className="flex-1 min-w-0">
+                                <p
+                                  className="text-sm font-medium truncate"
+                                  style={{
+                                    color:
+                                      C.ink
+                                  }}
+                                >
+                                  {
+                                    c.title
+                                  }
+                                </p>
+
+                                <p
+                                  className="text-xs truncate"
+                                  style={{
+                                    color:
+                                      C.sub
+                                  }}
+                                >
+                                  {
+                                    c.instructor
+                                  }
+                                </p>
+                              </div>
+
+                              <span
+                                className="flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-full"
+                                style={{
+                                  background:
+                                    c.soft,
+                                  color:
+                                    c.color
+                                }}
+                              >
+                                {
+                                  c.status
+                                }
+                              </span>
+                            </div>
+                          )
+                        }
+                      )}
+
+                      {visibleCourses.length ===
+                        0 && (
                         <p
                           className="text-sm text-center py-8"
-                          style={{ color: C.sub }}
+                          style={{
+                            color:
+                              C.sub
+                          }}
                         >
-                          No courses here yet.
+                          No courses here
+                          yet.
                         </p>
                       )}
                     </>
@@ -1259,68 +1918,127 @@ export default function JobSeekerDashboard() {
             </div>
           )}
 
-          {/* AI JOBS */}
-          {activeTab === 'ai-jobs' && (
-            <div>
-              
+          {/* ====================================================
+              AI JOBS
+              ==================================================== */}
 
+          {activeTab ===
+            'ai-jobs' && (
+            <div>
               <JobPortal />
             </div>
           )}
 
-          {/* ROADMAP */}
-          {activeTab === 'roadmap' && <CareerRoadmap />}
+          {/* ====================================================
+              ROADMAP
+              ==================================================== */}
 
-          {/* LEARNING */}
-          {activeTab === 'learning' && (
+          {activeTab ===
+            'roadmap' && (
+            <CareerRoadmap />
+          )}
+
+          {/* ====================================================
+              LEARNING
+              ==================================================== */}
+
+          {activeTab ===
+            'learning' && (
             <div>
-              
-
               <LearningHub />
             </div>
           )}
 
-          {activeTab === 'jobs' && <JobVacancy />}
+          {/* ====================================================
+              JOBS
+              ==================================================== */}
 
-          {/* CHALLENGES */}
-          {activeTab === 'challenges' && <SkillChallenge />}
+          {activeTab ===
+            'jobs' && (
+            <JobVacancy />
+          )}
 
-          {/* PROFILE */}
-          {activeTab === 'profile' && <Profile />}
+          {/* ====================================================
+              CHALLENGES
+              ==================================================== */}
 
-          {/* HELP */}
-          {activeTab === 'help' && <Help />}
+          {activeTab ===
+            'challenges' && (
+            <SkillChallenge />
+          )}
+
+          {/* ====================================================
+              PROFILE
+              ==================================================== */}
+
+          {activeTab ===
+            'profile' && (
+            <Profile />
+          )}
+
+          {/* ====================================================
+              HELP
+              ==================================================== */}
+
+          {activeTab ===
+            'help' && (
+            <Help />
+          )}
         </div>
       </div>
 
-      {/* ── RIGHT PANEL ── */}
+      {/* ========================================================
+          RIGHT SIDEBAR
+          ======================================================== */}
+
       <div
         className="hidden xl:flex flex-col w-80 h-screen fixed right-0 top-0 z-30 border-l overflow-hidden p-5"
         style={{
-          background: C.panel,
-          borderColor: C.border
+          background:
+            C.panel,
+          borderColor:
+            C.border
         }}
       >
 
-        {/* Calendar */}
+        {/* ======================================================
+            RIGHT SIDEBAR HEADER
+
+            SEARCH + NOTIFICATION
+            ARE EXACTLY ON ONE LINE
+            ====================================================== */}
+
+        <RightSidebarHeader />
+
+        {/* ======================================================
+            CALENDAR
+            ====================================================== */}
+
         <div className="mb-5">
           <div className="flex justify-between items-center mb-3">
             <h2
               className="text-sm font-bold flex items-center gap-2"
-              style={{ color: C.ink }}
+              style={{
+                color: C.ink
+              }}
             >
               <IconCalendar
                 size={15}
-                color={C.accent}
+                color={C.teal}
               />
 
-              {monthNames[calMonth]} {calYear}
+              {monthNames[
+                calMonth
+              ]}{' '}
+              {calYear}
             </h2>
 
             <div className="flex items-center gap-1">
               <button
-                onClick={goPrevMonth}
-                className="w-6 h-6 rounded-lg flex items-center justify-center hover:bg-purple-50"
+                onClick={
+                  goPrevMonth
+                }
+                className="w-6 h-6 rounded-lg flex items-center justify-center hover:bg-teal-50"
               >
                 <IconChevronLeft
                   size={14}
@@ -1329,8 +2047,10 @@ export default function JobSeekerDashboard() {
               </button>
 
               <button
-                onClick={goNextMonth}
-                className="w-6 h-6 rounded-lg flex items-center justify-center hover:bg-purple-50"
+                onClick={
+                  goNextMonth
+                }
+                className="w-6 h-6 rounded-lg flex items-center justify-center hover:bg-teal-50"
               >
                 <IconChevronRight
                   size={14}
@@ -1340,6 +2060,7 @@ export default function JobSeekerDashboard() {
             </div>
           </div>
 
+          {/* WEEK DAYS */}
           <div className="grid grid-cols-7 gap-1 mb-1">
             {[
               'Su',
@@ -1353,73 +2074,95 @@ export default function JobSeekerDashboard() {
               <div
                 key={d}
                 className="text-center text-[10px] font-semibold py-0.5"
-                style={{ color: C.sub }}
+                style={{
+                  color: C.sub
+                }}
               >
                 {d}
               </div>
             ))}
           </div>
 
+          {/* CALENDAR DAYS */}
           <div className="grid grid-cols-7 gap-1">
-            {calendarDays.map((d, i) => (
-              <div
-                key={i}
-                className="aspect-square flex flex-col items-center justify-center rounded-full relative text-[11px]"
-                style={{
-                  background:
-                    d && isToday(d)
-                      ? C.accent
-                      : 'transparent',
+            {calendarDays.map(
+              (d, i) => (
+                <div
+                  key={i}
+                  className="aspect-square flex flex-col items-center justify-center rounded-full relative text-[11px]"
+                  style={{
+                    background:
+                      d &&
+                      isToday(d)
+                        ? C.teal
+                        : 'transparent',
 
-                  color:
-                    d && isToday(d)
-                      ? '#ffffff'
-                      : d
-                      ? C.ink
-                      : 'transparent',
+                    color:
+                      d &&
+                      isToday(d)
+                        ? '#ffffff'
+                        : d
+                        ? C.ink
+                        : 'transparent',
 
-                  fontWeight:
-                    d && isToday(d)
-                      ? 700
-                      : 500
-                }}
-              >
-                {d || ''}
+                    fontWeight:
+                      d &&
+                      isToday(d)
+                        ? 700
+                        : 500
+                  }}
+                >
+                  {d || ''}
 
-                {d &&
-                  eventDays.includes(d) &&
-                  !isToday(d) && (
-                    <span
-                      className="absolute bottom-0.5 w-1 h-1 rounded-full"
-                      style={{
-                        background: C.orange
-                      }}
-                    />
-                  )}
-              </div>
-            ))}
+                  {d &&
+                    eventDays.includes(
+                      d
+                    ) &&
+                    !isToday(d) && (
+                      <span
+                        className="absolute bottom-0.5 w-1 h-1 rounded-full"
+                        style={{
+                          background:
+                            C.orange
+                        }}
+                      />
+                    )}
+                </div>
+              )
+            )}
           </div>
         </div>
 
-        {/* Job Status Notifications — backed by /jobs/my-applications */}
+        {/* ======================================================
+            JOB STATUS NOTIFICATIONS
+            ====================================================== */}
+
         <div className="mb-5 flex flex-col">
           <div className="flex justify-between items-center mb-2.5 flex-shrink-0">
             <p
               className="text-xs font-semibold flex items-center gap-2"
-              style={{ color: C.ink }}
+              style={{
+                color: C.ink
+              }}
             >
               <IconBriefcase
                 size={14}
-                color={C.accent}
+                color={C.teal}
               />
 
               Job Status Notifications
             </p>
 
             <button
-              onClick={() => setActiveTab('jobs')}
+              onClick={() =>
+                setActiveTab(
+                  'jobs'
+                )
+              }
               className="text-[11px] font-medium"
-              style={{ color: C.accent }}
+              style={{
+                color: C.teal
+              }}
             >
               View all
             </button>
@@ -1427,82 +2170,136 @@ export default function JobSeekerDashboard() {
 
           <div className="space-y-2 overflow-hidden">
             {applicationsLoading ? (
-              [0, 1, 2].map((i) => (
-                <div
-                  key={i}
-                  className="rounded-xl p-2.5 pl-3 animate-pulse"
-                  style={{ background: C.softPanel }}
-                >
+              [0, 1, 2].map(
+                (i) => (
                   <div
-                    className="h-2.5 w-2/3 rounded mb-1.5"
-                    style={{ background: C.border }}
-                  />
-                  <div
-                    className="h-2 w-1/3 rounded"
-                    style={{ background: C.border }}
-                  />
-                </div>
-              ))
-            ) : jobStatusNotifications.length === 0 ? (
+                    key={i}
+                    className="rounded-xl p-2.5 pl-3 animate-pulse"
+                    style={{
+                      background:
+                        C.softPanel
+                    }}
+                  >
+                    <div
+                      className="h-2.5 w-2/3 rounded mb-1.5"
+                      style={{
+                        background:
+                          C.border
+                      }}
+                    />
+
+                    <div
+                      className="h-2 w-1/3 rounded"
+                      style={{
+                        background:
+                          C.border
+                      }}
+                    />
+                  </div>
+                )
+              )
+            ) : jobStatusNotifications.length ===
+              0 ? (
               <div
                 className="rounded-xl p-3 text-center"
-                style={{ background: C.softPanel }}
+                style={{
+                  background:
+                    C.softPanel
+                }}
               >
-                <p className="text-[11px]" style={{ color: C.sub }}>
-                  No applications yet — send a CV from Job Vacancy to see status here.
+                <p
+                  className="text-[11px]"
+                  style={{
+                    color:
+                      C.sub
+                  }}
+                >
+                  No applications
+                  yet — send a CV
+                  from Job Vacancy
+                  to see status
+                  here.
                 </p>
               </div>
             ) : (
-              jobStatusNotifications.map((j) => (
-                <div
-                  key={j.id}
-                  onClick={() => setActiveTab('jobs')}
-                  className="rounded-xl p-2.5 pl-3 border-l-4 cursor-pointer transition hover:opacity-80"
-                  style={{
-                    background: C.softPanel,
-                    borderColor: j.color
-                  }}
-                >
-                  <div className="flex justify-between items-start gap-2">
-                    <div className="min-w-0">
-                      <p
-                        className="text-[11px] font-semibold truncate"
-                        style={{ color: C.ink }}
-                      >
-                        {j.role}
-                      </p>
+              jobStatusNotifications.map(
+                (j) => (
+                  <div
+                    key={j.id}
+                    onClick={() =>
+                      setActiveTab(
+                        'jobs'
+                      )
+                    }
+                    className="rounded-xl p-2.5 pl-3 border-l-4 cursor-pointer transition hover:opacity-80"
+                    style={{
+                      background:
+                        C.softPanel,
+                      borderColor:
+                        j.color
+                    }}
+                  >
+                    <div className="flex justify-between items-start gap-2">
+                      <div className="min-w-0">
+                        <p
+                          className="text-[11px] font-semibold truncate"
+                          style={{
+                            color:
+                              C.ink
+                          }}
+                        >
+                          {
+                            j.role
+                          }
+                        </p>
 
-                      <p
-                        className="text-[10px] mt-0.5 truncate"
-                        style={{ color: C.sub }}
+                        <p
+                          className="text-[10px] mt-0.5 truncate"
+                          style={{
+                            color:
+                              C.sub
+                          }}
+                        >
+                          {
+                            j.company
+                          }
+                        </p>
+                      </div>
+
+                      <span
+                        className="text-[9px] font-semibold whitespace-nowrap flex-shrink-0"
+                        style={{
+                          color:
+                            j.color
+                        }}
                       >
-                        {j.company}
-                      </p>
+                        {
+                          j.status
+                        }
+                      </span>
                     </div>
-
-                    <span
-                      className="text-[9px] font-semibold whitespace-nowrap flex-shrink-0"
-                      style={{ color: j.color }}
-                    >
-                      {j.status}
-                    </span>
                   </div>
-                </div>
-              ))
+                )
+              )
             )}
           </div>
         </div>
 
-        {/* Achievement Badges — live from /challenge/badges */}
+        {/* ======================================================
+            ACHIEVEMENT BADGES
+            ====================================================== */}
+
         <div className="flex-shrink-0">
           <div className="flex justify-between items-center mb-2.5">
             <p
               className="text-xs font-semibold flex items-center gap-2"
-              style={{ color: C.ink }}
+              style={{
+                color: C.ink
+              }}
             >
               <IconMedal
                 size={14}
-                color={C.accent}
+                color={C.teal}
               />
 
               Achievement Badges
@@ -1510,10 +2307,14 @@ export default function JobSeekerDashboard() {
 
             <button
               onClick={() =>
-                setActiveTab('challenges')
+                setActiveTab(
+                  'challenges'
+                )
               }
               className="text-[11px] font-medium"
-              style={{ color: C.accent }}
+              style={{
+                color: C.teal
+              }}
             >
               View all
             </button>
@@ -1521,63 +2322,107 @@ export default function JobSeekerDashboard() {
 
           {badgesLoading ? (
             <div className="grid grid-cols-3 gap-2">
-              {[0, 1, 2].map((i) => (
-                <div
-                  key={i}
-                  className="rounded-xl p-2.5 flex flex-col items-center text-center animate-pulse"
-                  style={{ background: C.softPanel }}
-                >
+              {[0, 1, 2].map(
+                (i) => (
                   <div
-                    className="w-7 h-7 rounded-full mb-1"
-                    style={{ background: C.border }}
-                  />
-                  <div
-                    className="h-2 w-10 rounded"
-                    style={{ background: C.border }}
-                  />
-                </div>
-              ))}
+                    key={i}
+                    className="rounded-xl p-2.5 flex flex-col items-center text-center animate-pulse"
+                    style={{
+                      background:
+                        C.softPanel
+                    }}
+                  >
+                    <div
+                      className="w-7 h-7 rounded-full mb-1"
+                      style={{
+                        background:
+                          C.border
+                      }}
+                    />
+
+                    <div
+                      className="h-2 w-10 rounded"
+                      style={{
+                        background:
+                          C.border
+                      }}
+                    />
+                  </div>
+                )
+              )}
             </div>
-          ) : earnedBadges.length === 0 ? (
+          ) : earnedBadges.length ===
+            0 ? (
             <div
               className="rounded-xl p-4 text-center"
-              style={{ background: C.softPanel }}
+              style={{
+                background:
+                  C.softPanel
+              }}
             >
-              <p className="text-[11px]" style={{ color: C.sub }}>
-                No badges earned yet — complete a Skill Challenge to earn your first one.
+              <p
+                className="text-[11px]"
+                style={{
+                  color:
+                    C.sub
+                }}
+              >
+                No badges earned
+                yet — complete a
+                Skill Challenge to
+                earn your first
+                one.
               </p>
             </div>
           ) : (
             <div className="grid grid-cols-3 gap-2">
-              {earnedBadges.slice(0, 3).map((b, i) => {
-                const palette = BADGE_PALETTE[i % BADGE_PALETTE.length]
+              {earnedBadges
+                .slice(0, 3)
+                .map((b, i) => {
+                  const palette =
+                    BADGE_PALETTE[
+                      i %
+                        BADGE_PALETTE.length
+                    ]
 
-                return (
-                  <div
-                    key={b.id || i}
-                    className="rounded-xl p-2.5 flex flex-col items-center text-center"
-                    style={{
-                      background: C.softPanel
-                    }}
-                  >
+                  return (
                     <div
-                      className="w-7 h-7 rounded-full flex items-center justify-center mb-1 text-sm"
+                      key={
+                        b.id ||
+                        i
+                      }
+                      className="rounded-xl p-2.5 flex flex-col items-center text-center"
                       style={{
-                        background: palette.soft
+                        background:
+                          C.softPanel
                       }}
                     >
-                      {b.badge_icon}
-                    </div>
+                      <div
+                        className="w-7 h-7 rounded-full flex items-center justify-center mb-1 text-sm"
+                        style={{
+                          background:
+                            palette.soft
+                        }}
+                      >
+                        {
+                          b.badge_icon
+                        }
+                      </div>
 
-                    <p
-                      className="text-[10px] font-semibold leading-tight"
-                      style={{ color: C.ink }}
-                    >
-                      {b.badge_name}
-                    </p>
-                  </div>
-                )
-              })}
+                      <p
+                        className="text-[10px] font-semibold leading-tight"
+                        style={{
+                          color:
+                            C.ink
+                        }}
+                      >
+                        {
+                          b.badge_name
+                        }
+                      </p>
+                    </div>
+                  )
+                })}
             </div>
           )}
         </div>
