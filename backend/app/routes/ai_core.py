@@ -22,6 +22,11 @@ def _call_gemini(prompt, temperature=0.7, max_tokens=2048):
     Shared helper: sends a prompt to Gemini and returns the text response.
     Raises RuntimeError with a human-readable message on any failure so
     callers can turn it into a proper JSON error instead of failing silently.
+
+    If Gemini stops because it hit the output token cap (finishReason ==
+    'MAX_TOKENS'), the returned text is still whatever was generated so
+    far, but we log it loudly — a silently truncated roadmap/response is
+    much harder to debug than a printed warning.
     """
     if not GEMINI_API_KEY:
         raise RuntimeError('Server is missing GEMINI_API_KEY configuration')
@@ -41,10 +46,21 @@ def _call_gemini(prompt, temperature=0.7, max_tokens=2048):
         print(f"Gemini API error: {error_message}")
         raise RuntimeError(error_message)
 
-    text = result.get('candidates', [{}])[0].get('content', {}).get('parts', [{}])[0].get('text')
+    candidates = result.get('candidates', [{}])
+    candidate = candidates[0] if candidates else {}
+    text = candidate.get('content', {}).get('parts', [{}])[0].get('text')
+
     if not text:
         print(f"Gemini returned no usable text: {result}")
         raise RuntimeError('Gemini returned an empty response')
+
+    finish_reason = candidate.get('finishReason')
+    if finish_reason == 'MAX_TOKENS':
+        print(
+            f"⚠️ Gemini response was TRUNCATED (finishReason=MAX_TOKENS, "
+            f"max_tokens={max_tokens}). Consider raising max_tokens for this "
+            f"call — the returned text is incomplete."
+        )
 
     return text
 
@@ -594,7 +610,12 @@ def career_roadmap():
         return jsonify({'error': 'Prompt is required'}), 400
 
     try:
-        text = _call_gemini(prompt, temperature=0.7, max_tokens=2048)
+        # A full phase-by-phase roadmap (assessment + phases + tools +
+        # resources + milestones + job-market tips + salary ranges) is a
+        # long response — 2048 tokens was cutting it off mid-list. Gemini
+        # 1.5/2.x flash models comfortably support up to 8192 output
+        # tokens, which is enough headroom for the complete roadmap.
+        text = _call_gemini(prompt, temperature=0.7, max_tokens=8192)
         return jsonify({'text': text}), 200
     except RuntimeError as e:
         return jsonify({'error': str(e)}), 502

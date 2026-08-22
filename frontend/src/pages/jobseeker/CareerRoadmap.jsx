@@ -93,7 +93,7 @@ const QUESTIONS = [
 const iconProps = {
   fill: 'none',
   stroke: 'currentColor',
-  strokeWidth: 1.8,
+  strokeWidth: 1.7,
   strokeLinecap: 'round',
   strokeLinejoin: 'round',
   viewBox: '0 0 24 24',
@@ -287,18 +287,23 @@ const FEATURES = [
 ]
 
 // ============================================================
-// ROLE TAG
+// ROLE TAG — unified, muted label chip
 // ============================================================
-function RoleTag({ label, bg, color }) {
+function RoleTag({ label, dotColor }) {
   return (
     <span
-      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase"
+      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wide uppercase"
       style={{
-        background: bg,
-        color,
+        background: theme.softPanel,
+        color: theme.secondaryText,
+        border: `1px solid ${theme.border}`,
         fontFamily: FONT_DISPLAY,
       }}
     >
+      <span
+        className="w-1.5 h-1.5 rounded-full"
+        style={{ background: dotColor }}
+      />
       {label}
     </span>
   )
@@ -312,13 +317,29 @@ function RoadmapRenderer({ content }) {
 
   let phaseIndex = -1
   let currentAccent = ACCENTS[0]
+  let prevBlank = true // suppress a leading gap at the very top
 
   return (
     <div className="space-y-2">
       {lines.map((line, i) => {
+        // --------------------------------------------------------
+        // Blank lines — collapse runs of them into a single gap
+        // --------------------------------------------------------
         if (!line.trim()) {
+          if (prevBlank) return null
+          prevBlank = true
           return <div key={i} className="h-2" />
         }
+
+        // --------------------------------------------------------
+        // Markdown horizontal rules (---, ***, ___) — drop entirely,
+        // phase headers already carry their own spacing/divider
+        // --------------------------------------------------------
+        if (/^(-{3,}|\*{3,}|_{3,})$/.test(line.trim())) {
+          return null
+        }
+
+        prevBlank = false
 
         // --------------------------------------------------------
         // Phase headers
@@ -344,10 +365,10 @@ function RoadmapRenderer({ content }) {
               />
 
               <div
-                className="flex-1 flex items-center justify-between py-3 px-4 rounded-2xl"
+                className="flex-1 flex items-center justify-between py-3 px-4 rounded-lg"
                 style={{
                   background: currentAccent.bg,
-                  border: `1px solid ${currentAccent.bar}25`,
+                  border: `1px solid ${currentAccent.bar}30`,
                 }}
               >
                 <h3
@@ -364,7 +385,7 @@ function RoadmapRenderer({ content }) {
                   className="text-[10px] font-bold uppercase tracking-wider"
                   style={{
                     color: currentAccent.text,
-                    opacity: 0.7,
+                    opacity: 0.75,
                   }}
                 >
                   Stage {String(phaseIndex + 1).padStart(2, '0')}
@@ -410,14 +431,14 @@ function RoadmapRenderer({ content }) {
           return (
             <div
               key={i}
-              className="flex items-start gap-3 py-2 px-3 rounded-xl"
+              className="flex items-start gap-3 py-2 px-3 rounded-lg"
               style={{
                 background: theme.softPanel,
                 border: `1px solid ${theme.border}`,
               }}
             >
               <span
-                className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+                className="w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold text-white flex-shrink-0 mt-0.5"
                 style={{
                   background: currentAccent.bar,
                 }}
@@ -470,19 +491,22 @@ function RoadmapRenderer({ content }) {
         }
 
         // --------------------------------------------------------
-        // Time / duration indicators
+        // Time / duration indicators — only short, label-like lines
+        // (e.g. "Duration: 2 months", "Weeks 1-2"), never long
+        // descriptive sentences that merely mention a time unit
         // --------------------------------------------------------
-        if (
-          line.toLowerCase().includes('month') ||
-          line.toLowerCase().includes('week') ||
-          line.toLowerCase().includes('phase')
-        ) {
+        const isDurationLabel =
+          line.trim().length <= 60 &&
+          /\b\d+\s*(-|to|–)?\s*\d*\s*(months?|weeks?)\b/i.test(line) &&
+          !/[.!?]\s*\S/.test(line.trim()) // no mid-sentence punctuation
+
+        if (isDurationLabel) {
           const text = line.replace(/\*\*/g, '')
 
           return (
             <div
               key={i}
-              className="flex items-center gap-2 py-2 px-3 rounded-xl my-1"
+              className="flex items-center gap-2 py-2 px-3 rounded-lg my-1"
               style={{
                 background: theme.softGreen,
                 border: `1px solid ${theme.green}30`,
@@ -845,42 +869,18 @@ Please answer their question helpfully and specifically. Keep the response focus
   // ============================================================
   const roleTagFor = (msg) => {
     if (msg.type === 'user') {
-      return (
-        <RoleTag
-          label="You"
-          bg={theme.primary}
-          color={theme.white}
-        />
-      )
+      return <RoleTag label="You" dotColor={theme.primary} />
     }
 
     if (msg.role === 'question') {
-      return (
-        <RoleTag
-          label="Question"
-          bg={theme.softPurple}
-          color={theme.primaryDark}
-        />
-      )
+      return <RoleTag label="Question" dotColor={theme.blue} />
     }
 
     if (msg.role === 'ready') {
-      return (
-        <RoleTag
-          label="Roadmap ready"
-          bg={theme.softGreen}
-          color="#2f7d5e"
-        />
-      )
+      return <RoleTag label="Roadmap ready" dotColor={theme.green} />
     }
 
-    return (
-      <RoleTag
-        label="Advisor"
-        bg={theme.softBlue}
-        color="#3f5fa8"
-      />
-    )
+    return <RoleTag label="Advisor" dotColor={theme.orange} />
   }
 
   // ============================================================
@@ -908,18 +908,9 @@ Please answer their question helpfully and specifically. Keep the response focus
           }
         }
 
-        @keyframes blobFloat {
-          0%, 100% {
-            transform: translate(0, 0) scale(1);
-          }
-          50% {
-            transform: translate(10px, -14px) scale(1.05);
-          }
-        }
-
         @keyframes softPulse {
           0%, 100% {
-            opacity: 0.65;
+            opacity: 0.7;
           }
           50% {
             opacity: 1;
@@ -927,28 +918,22 @@ Please answer their question helpfully and specifically. Keep the response focus
         }
 
         .cr-msg {
-          animation: fadeInUp 0.25s ease both;
+          animation: fadeInUp 0.2s ease both;
         }
 
         .cr-card {
           transition:
-            transform 0.18s ease,
-            box-shadow 0.18s ease,
-            border-color 0.18s ease;
+            border-color 0.15s ease,
+            background 0.15s ease;
         }
 
         .cr-card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 12px 25px -12px rgba(91, 86, 181, 0.30);
-          border-color: rgba(91, 86, 181, 0.30) !important;
-        }
-
-        .cr-blob {
-          animation: blobFloat 9s ease-in-out infinite;
+          border-color: ${theme.primary}55 !important;
+          background: ${theme.white} !important;
         }
 
         .cr-online {
-          animation: softPulse 2s ease-in-out infinite;
+          animation: softPulse 2.2s ease-in-out infinite;
         }
 
         /* ======================================================
@@ -993,16 +978,15 @@ Please answer their question helpfully and specifically. Keep the response focus
           outline-offset: 2px;
         }
 
-        .cr-glass {
-          background: rgba(255, 255, 255, 0.78);
-          backdrop-filter: blur(14px);
-          -webkit-backdrop-filter: blur(14px);
-        }
-
         .cr-shadow {
           box-shadow:
-            0 18px 45px rgba(45, 41, 85, 0.08),
-            0 3px 12px rgba(45, 41, 85, 0.04);
+            0 1px 2px rgba(22, 26, 35, 0.04),
+            0 8px 24px rgba(22, 26, 35, 0.06);
+        }
+
+        .cr-dot-grid {
+          background-image: radial-gradient(${theme.border} 1px, transparent 1px);
+          background-size: 18px 18px;
         }
 
         @media (max-width: 1024px) {
@@ -1043,7 +1027,7 @@ Please answer their question helpfully and specifically. Keep the response focus
           }
 
           .cr-welcome-title {
-            font-size: 27px !important;
+            font-size: 25px !important;
           }
 
           .cr-welcome-grid {
@@ -1079,23 +1063,23 @@ Please answer their question helpfully and specifically. Keep the response focus
                 style={{
                   color: theme.mainText,
                   fontFamily: FONT_DISPLAY,
-                  letterSpacing: '-0.02em',
+                  letterSpacing: '-0.01em',
                 }}
               >
                 Career Roadmap
               </h1>
 
-             
+              
             </div>
           </div>
 
           {currentStep !== 'welcome' && (
             <button
               onClick={resetAll}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition hover:opacity-80"
+              className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition hover:bg-white"
               style={{
                 background: theme.white,
-                color: theme.primaryDark,
+                color: theme.mainText,
                 border: `1px solid ${theme.border}`,
                 fontFamily: FONT_DISPLAY,
               }}
@@ -1116,7 +1100,7 @@ Please answer their question helpfully and specifically. Keep the response focus
               LEFT / CHAT PANEL
               ================================================== */}
           <div
-            className="cr-chat-panel flex flex-col rounded-[26px] overflow-hidden relative cr-shadow"
+            className="cr-chat-panel flex flex-col rounded-xl overflow-hidden relative cr-shadow"
             style={{
               background: theme.white,
               border: `1px solid ${theme.border}`,
@@ -1137,14 +1121,7 @@ Please answer their question helpfully and specifically. Keep the response focus
                 borderColor: theme.border,
               }}
             >
-              <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center text-white"
-                style={{
-                  background: `linear-gradient(135deg, ${theme.primary}, ${theme.blue})`,
-                }}
-              >
-                <IconAdvisor />
-              </div>
+              
 
               <div className="flex-1">
                 <p
@@ -1177,10 +1154,11 @@ Please answer their question helpfully and specifically. Keep the response focus
               </div>
 
               <div
-                className="px-2.5 py-1 rounded-full text-[10px] font-bold"
+                className="px-2.5 py-1 rounded-md text-[10px] font-bold"
                 style={{
-                  background: theme.softPurple,
-                  color: theme.primaryDark,
+                  background: theme.white,
+                  color: theme.mainText,
+                  border: `1px solid ${theme.border}`,
                 }}
               >
                 AI
@@ -1198,39 +1176,21 @@ Please answer their question helpfully and specifically. Keep the response focus
                   ================================================= */}
               {currentStep === 'welcome' && (
                 <div className="h-full flex flex-col justify-between relative">
-                  {/* Decorative background */}
+                  {/* Quiet decorative backdrop */}
                   <div
-                    className="cr-blob absolute -top-16 -right-20 w-64 h-64 rounded-full pointer-events-none"
+                    className="cr-dot-grid absolute -top-4 -right-4 w-56 h-56 pointer-events-none"
                     style={{
-                      background: theme.softPurple,
-                      filter: 'blur(35px)',
-                      opacity: 0.8,
-                    }}
-                  />
-
-                  <div
-                    className="cr-blob absolute top-44 -left-20 w-48 h-48 rounded-full pointer-events-none"
-                    style={{
-                      background: theme.softBlue,
-                      filter: 'blur(35px)',
-                      opacity: 0.65,
-                      animationDelay: '2s',
+                      opacity: 0.6,
+                      maskImage:
+                        'radial-gradient(circle, black, transparent 70%)',
+                      WebkitMaskImage:
+                        'radial-gradient(circle, black, transparent 70%)',
                     }}
                   />
 
                   <div className="relative z-10">
                     {/* AI label */}
-                    <span
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider mb-5"
-                      style={{
-                        background: theme.softPurple,
-                        color: theme.primaryDark,
-                        fontFamily: FONT_DISPLAY,
-                      }}
-                    >
-                      <IconSpark />
-                      AI career advisor
-                    </span>
+                    
 
                     {/* Hero title */}
                     <h2
@@ -1255,15 +1215,22 @@ Please answer their question helpfully and specifically. Keep the response focus
                       <span
                         className="block text-3xl font-extrabold"
                         style={{
-                          color: theme.primary,
-                          letterSpacing: '-0.04em',
+                          color: theme.primaryDark,
+                          letterSpacing: '-0.03em',
                         }}
                       >
                         Plan your path in IT.
                       </span>
                     </h2>
 
-                    
+                    <p
+                      className="text-sm mb-6 max-w-md"
+                      style={{ color: theme.secondaryText }}
+                    >
+                      Answer a few quick questions and get a
+                      structured, phase by phase plan built
+                      around your goals and timeline.
+                    </p>
 
                     {/* Feature cards */}
                     <div
@@ -1272,16 +1239,18 @@ Please answer their question helpfully and specifically. Keep the response focus
                       {FEATURES.map((f, i) => (
                         <div
                           key={i}
-                          className="flex items-start gap-2.5 p-2.5 rounded-xl"
+                          className="flex items-start gap-2.5 p-2.5 rounded-lg"
                           style={{
-                            background: 'rgba(243,240,250,0.55)',
+                            background: theme.softPanel,
+                            border: `1px solid ${theme.border}`,
                           }}
                         >
                           <div
-                            className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
                             style={{
-                              background: theme.softPurple,
+                              background: theme.white,
                               color: theme.primary,
+                              border: `1px solid ${theme.border}`,
                             }}
                           >
                             <f.icon />
@@ -1321,14 +1290,14 @@ Please answer their question helpfully and specifically. Keep the response focus
                               prompt.label
                             )
                           }
-                          className="cr-card flex items-center gap-3 p-3 rounded-2xl text-left"
+                          className="cr-card flex items-center gap-3 p-3 rounded-lg text-left"
                           style={{
                             background: theme.softPanel,
                             border: `1px solid ${theme.border}`,
                           }}
                         >
                           <div
-                            className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                            className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
                             style={{
                               background: theme.white,
                               color: theme.primary,
@@ -1400,9 +1369,9 @@ Please answer their question helpfully and specifically. Keep the response focus
                   {/* Custom roadmap button */}
                   <button
                     onClick={startManual}
-                    className="relative z-10 w-full py-3.5 rounded-2xl font-bold text-white text-sm flex items-center justify-center gap-2 transition hover:opacity-90 shadow-sm"
+                    className="relative z-10 w-full py-3.5 rounded-lg font-bold text-white text-sm flex items-center justify-center gap-2 transition hover:bg-[#0b5647]"
                     style={{
-                      background: `linear-gradient(135deg, ${theme.primary}, ${theme.blue})`,
+                      background: theme.primary,
                       fontFamily: FONT_DISPLAY,
                     }}
                   >
@@ -1428,12 +1397,12 @@ Please answer their question helpfully and specifically. Keep the response focus
                   >
                     {/* Avatar */}
                     <div
-                      className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-white text-xs font-bold"
+                      className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 text-white text-xs font-bold"
                       style={{
                         background:
                           msg.type === 'user'
-                            ? `linear-gradient(135deg, ${theme.green}, ${theme.blue})`
-                            : `linear-gradient(135deg, ${theme.primary}, ${theme.blue})`,
+                            ? theme.mainText
+                            : theme.primary,
                       }}
                     >
                       {msg.type === 'user'
@@ -1462,7 +1431,7 @@ Please answer their question helpfully and specifically. Keep the response focus
                       {/* Loading */}
                       {msg.isLoading ? (
                         <div
-                          className="px-4 py-3.5 rounded-2xl rounded-tl-sm flex items-center gap-3"
+                          className="px-4 py-3.5 rounded-xl rounded-tl-sm flex items-center gap-3"
                           style={{
                             background: theme.softPanel,
                             border: `1px solid ${theme.border}`,
@@ -1498,15 +1467,13 @@ Please answer their question helpfully and specifically. Keep the response focus
                         <div
                           className={`px-4 py-3 text-sm leading-relaxed ${
                             msg.type === 'user'
-                              ? 'rounded-2xl rounded-tr-sm'
-                              : 'rounded-2xl rounded-tl-sm'
+                              ? 'rounded-xl rounded-tr-sm'
+                              : 'rounded-xl rounded-tl-sm'
                           }`}
                           style={{
                             background:
                               msg.type === 'user'
-                                ? `linear-gradient(135deg, ${theme.primary}, ${theme.blue})`
-                                : msg.isQuestion
-                                ? theme.softPurple
+                                ? theme.mainText
                                 : theme.softPanel,
 
                             color:
@@ -1515,15 +1482,18 @@ Please answer their question helpfully and specifically. Keep the response focus
                                 : theme.mainText,
 
                             border: msg.isQuestion
-                              ? `1px solid ${theme.primary}35`
+                              ? `1px solid ${theme.primary}40`
                               : `1px solid ${theme.border}`,
 
                             boxShadow:
-                              '0 4px 12px rgba(45,41,85,0.04)',
+                              '0 1px 3px rgba(22,26,35,0.04)',
                           }}
                         >
                           {msg.isRoadmap ? (
-                            <div className="flex items-center gap-2 font-semibold">
+                            <div
+                              className="flex items-center gap-2 font-semibold"
+                              style={{ color: theme.primaryDark }}
+                            >
                               <IconSpark />
                               {msg.content}
                             </div>
@@ -1598,7 +1568,7 @@ Please answer their question helpfully and specifically. Keep the response focus
                             handleFollowup
                           )
                         }
-                        className="flex-1 rounded-2xl px-4 py-3 text-sm"
+                        className="flex-1 rounded-lg px-4 py-3 text-sm"
                         style={{
                           background:
                             theme.softPanel,
@@ -1615,7 +1585,7 @@ Please answer their question helpfully and specifically. Keep the response focus
                           loading ||
                           !followupInput.trim()
                         }
-                        className="w-11 h-11 rounded-2xl flex items-center justify-center text-white disabled:opacity-50 transition hover:opacity-90"
+                        className="w-11 h-11 rounded-lg flex items-center justify-center text-white disabled:opacity-50 transition hover:bg-[#0b5647]"
                         style={{
                           background: theme.primary,
                         }}
@@ -1641,12 +1611,13 @@ Please answer their question helpfully and specifically. Keep the response focus
                             setFollowupInput(q)
                             inputRef.current?.focus()
                           }}
-                          className="text-[11px] px-3 py-1.5 rounded-full transition hover:opacity-80 font-medium"
+                          className="text-[11px] px-3 py-1.5 rounded-full transition hover:bg-white font-medium"
                           style={{
                             background:
-                              theme.softPurple,
+                              theme.softPanel,
                             color:
-                              theme.primaryDark,
+                              theme.mainText,
+                            border: `1px solid ${theme.border}`,
                           }}
                         >
                           {q}
@@ -1683,7 +1654,7 @@ Please answer their question helpfully and specifically. Keep the response focus
                             handleAnswer
                           )
                         }
-                        className="flex-1 rounded-2xl px-4 py-3 text-sm"
+                        className="flex-1 rounded-lg px-4 py-3 text-sm"
                         style={{
                           background:
                             theme.softPanel,
@@ -1697,7 +1668,7 @@ Please answer their question helpfully and specifically. Keep the response focus
                       <button
                         onClick={handleAnswer}
                         disabled={!inputValue.trim()}
-                        className="w-11 h-11 rounded-2xl flex items-center justify-center text-white disabled:opacity-50 transition hover:opacity-90"
+                        className="w-11 h-11 rounded-lg flex items-center justify-center text-white disabled:opacity-50 transition hover:bg-[#0b5647]"
                         style={{
                           background: theme.primary,
                         }}
@@ -1747,7 +1718,7 @@ Please answer their question helpfully and specifically. Keep the response focus
               ================================================== */}
           {currentStep === 'roadmap' && roadmap && (
             <div
-              className="cr-roadmap-panel flex flex-col rounded-[26px] overflow-hidden cr-shadow"
+              className="cr-roadmap-panel flex flex-col rounded-xl overflow-hidden cr-shadow"
               style={{
                 flex: 1,
                 background: theme.white,
@@ -1766,9 +1737,9 @@ Please answer their question helpfully and specifically. Keep the response focus
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <div
-                    className="w-9 h-9 rounded-xl flex items-center justify-center text-white flex-shrink-0"
+                    className="w-9 h-9 rounded-lg flex items-center justify-center text-white flex-shrink-0"
                     style={{
-                      background: `linear-gradient(135deg, ${theme.primary}, ${theme.blue})`,
+                      background: theme.primary,
                     }}
                   >
                     <IconCompass />
@@ -1797,34 +1768,19 @@ Please answer their question helpfully and specifically. Keep the response focus
                   </div>
                 </div>
 
-                <div className="flex gap-2 flex-shrink-0">
-                  {answers.experience && (
-                    <span
-                      className="text-[10px] px-2.5 py-1.5 rounded-full font-semibold hidden md:block"
-                      style={{
-                        background: theme.softPurple,
-                        color: theme.primaryDark,
-                      }}
-                    >
-                      {answers.experience.substring(
-                        0,
-                        20
-                      )}
-                    </span>
-                  )}
-
-                  {answers.timeline && (
-                    <span
-                      className="text-[10px] px-2.5 py-1.5 rounded-full font-semibold"
-                      style={{
-                        background: theme.softGreen,
-                        color: '#2f7d5e',
-                      }}
-                    >
-                      {answers.timeline}
-                    </span>
-                  )}
-                </div>
+                {answers.experience && (
+                  <span
+                    className="text-[11px] px-2.5 py-1.5 rounded-md font-semibold flex-shrink-0 max-w-[180px] truncate hidden sm:block"
+                    style={{
+                      background: theme.white,
+                      color: theme.mainText,
+                      border: `1px solid ${theme.border}`,
+                    }}
+                    title={answers.experience}
+                  >
+                    {answers.experience}
+                  </span>
+                )}
               </div>
 
               {/* ----------------------------------------------
@@ -1877,10 +1833,11 @@ Please answer their question helpfully and specifically. Keep the response focus
 
                       a.click()
                     }}
-                    className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-xl font-semibold transition hover:opacity-80"
+                    className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-semibold transition hover:bg-white"
                     style={{
-                      background: theme.softBlue,
-                      color: '#3f5fa8',
+                      background: theme.white,
+                      color: theme.mainText,
+                      border: `1px solid ${theme.border}`,
                     }}
                   >
                     <IconDownload />
@@ -1889,10 +1846,10 @@ Please answer their question helpfully and specifically. Keep the response focus
 
                   <button
                     onClick={resetAll}
-                    className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-xl font-semibold transition hover:opacity-80"
+                    className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-semibold transition hover:opacity-90"
                     style={{
-                      background: theme.softPurple,
-                      color: theme.primaryDark,
+                      background: theme.primary,
+                      color: theme.white,
                     }}
                   >
                     <IconRefresh />
