@@ -6,35 +6,35 @@ import API from '../../utils/api'
    COLOUR THEME (matches CompanyDashboard.jsx)
    ============================================================ */
 const C = {
-  bg: '#EAF7FC',
+  bg: '#FAF6F3',
 
   card: '#FFFFFF',
-  border: '#D8EAF2',
+  border: '#E9DDD2',
 
-  ink: '#12344D',
-  sub: '#64748B',
+  ink: '#2B1710',
+  sub: '#8B6F5E',
 
-  primary: '#075985',
-  primaryDark: '#064E73',
-  primarySoft: '#E0F2FE',
+  primary: '#A8434B',
+  primaryDark: '#5C0E04',
+  primarySoft: '#F7E3DF',
 
-  light: '#0EA5D9',
-  lightSoft: '#E0F6FD',
+  light: '#C99A6C',
+  lightSoft: '#F7EEE2',
 
-  green: '#16A34A',
-  greenSoft: '#DCFCE7',
+  green: '#3F7D58',
+  greenSoft: '#E3F0E7',
 
-  orange: '#F97316',
-  orangeSoft: '#FFEDD5',
+  amber: '#C08A2E',
+  amberSoft: '#F8EDD9',
 
-  red: '#DC2626',
-  redSoft: '#FEE2E2',
+  red: '#B23A2E',
+  redSoft: '#F8E2DE',
 
-  softPanel: '#F4FAFD'
+  softPanel: '#FBF7F4'
 }
 
 const cardShadow =
-  '0 2px 8px rgba(6, 78, 115, 0.06), 0 1px 3px rgba(6, 78, 115, 0.04)'
+  '0 2px 8px rgba(46, 10, 2, 0.07), 0 1px 3px rgba(46, 10, 2, 0.05)'
 
 /* ============================================================
    INLINE SVG ICONS
@@ -212,12 +212,12 @@ export default function CompanyProfile() {
         {error && (
           <div
             className="mb-3 p-3 rounded-xl text-xs font-medium flex items-center gap-2"
-            style={{ background: C.orangeSoft, color: '#B45309' }}
+            style={{ background: C.amberSoft, color: '#8A5A15' }}
           >
-            <IconAlertCircle size={15} color="#B45309" />
+            <IconAlertCircle size={15} color="#8A5A15" />
             <span>{error}</span>
-            <button onClick={() => setError('')} className="ml-auto" style={{ color: '#B45309' }}>
-              <IconX size={13} color="#B45309" />
+            <button onClick={() => setError('')} className="ml-auto" style={{ color: '#8A5A15' }}>
+              <IconX size={13} color="#8A5A15" />
             </button>
           </div>
         )}

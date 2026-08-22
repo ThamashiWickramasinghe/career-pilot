@@ -232,3 +232,78 @@ def update_profile():
         }), 200
     except Exception as e:
         return jsonify({'message': str(e)}), 500
+
+
+# ── ADMIN: GET ALL USERS ──────────────────────────────
+# Powers the Admin Dashboard's "Total Users" stat card, the
+# User Roles chart, User Growth chart, Recent Users list, and
+# the Manage Users table — all computed live from this list.
+@auth_bp.route('/admin/users', methods=['GET'])
+@jwt_required()
+def admin_get_all_users():
+    try:
+        from flask_jwt_extended import get_jwt
+        claims = get_jwt()
+        if claims.get('role') != 'admin':
+            return jsonify({'message': 'Admins only'}), 403
+
+        users = User.query.order_by(User.created_at.desc()).all()
+        return jsonify({'users': [u.to_dict() for u in users]}), 200
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
+
+
+# ── ADMIN: ACTIVATE / DEACTIVATE USER ─────────────────
+@auth_bp.route('/admin/users/<int:user_id>/status', methods=['PUT'])
+@jwt_required()
+def admin_update_user_status(user_id):
+    try:
+        from flask_jwt_extended import get_jwt
+        claims = get_jwt()
+        if claims.get('role') != 'admin':
+            return jsonify({'message': 'Admins only'}), 403
+
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'message': 'User not found'}), 404
+
+        data = request.get_json() or {}
+        if 'is_active' in data:
+            user.is_active = bool(data['is_active'])
+        else:
+            user.is_active = not user.is_active
+
+        db.session.commit()
+        return jsonify({
+            'message': f'User {"activated" if user.is_active else "deactivated"} successfully',
+            'user': user.to_dict()
+        }), 200
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
+
+
+# ── ADMIN: REMOVE USER ────────────────────────────────
+@auth_bp.route('/admin/users/<int:user_id>', methods=['DELETE'])
+@jwt_required()
+def admin_delete_user(user_id):
+    try:
+        from flask_jwt_extended import get_jwt
+        claims = get_jwt()
+        if claims.get('role') != 'admin':
+            return jsonify({'message': 'Admins only'}), 403
+
+        if claims.get('id') == user_id:
+            return jsonify({'message': 'You cannot remove your own account'}), 400
+
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'message': 'User not found'}), 404
+
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify({'message': 'User removed successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'message': 'Failed to remove user. They may still own content, jobs, or applications that reference their account.'
+        }), 500

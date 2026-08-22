@@ -301,6 +301,26 @@ def admin_get_all_jobs():
     return jsonify({'jobs': [j.to_dict() for j in jobs]}), 200
 
 
+# ── ADMIN: REMOVE ANY JOB ─────────────────────────────
+# Unlike the company-scoped delete above, this allows an admin
+# to remove any job post regardless of which company owns it.
+@job_bp.route('/admin/<int:job_id>', methods=['DELETE'])
+@jwt_required()
+def admin_delete_job(job_id):
+    user_id, user_role = get_user_from_token()
+    if not user_id:
+        return jsonify({'message': 'Invalid token'}), 422
+    if user_role != 'admin':
+        return jsonify({'message': 'Admins only'}), 403
+
+    job = Job.query.get_or_404(job_id)
+    JobApplication.query.filter_by(job_id=job_id).delete()
+    db.session.delete(job)
+    db.session.commit()
+
+    return jsonify({'message': 'Job removed successfully'}), 200
+
+
 # ── JOB SEEKER: GET APPLICATION-STATUS NOTIFICATIONS ─────────
 # Turns the job seeker's own applications into notification-style
 # entries so the bell can show "shortlisted / hired / rejected"

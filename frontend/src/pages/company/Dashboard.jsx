@@ -8,49 +8,68 @@ import {
 } from 'recharts'
 
 /* ============================================================
-   COLOUR THEME (from provided palette)
+   COLOUR THEME
+   A warm espresso/rose base (matches the brand), with true
+   secondary hues added for status + category variety so the
+   dashboard doesn't read as one-tone.
    ============================================================ */
 const C = {
-  bg: '#edf9fd',
+  bg: '#FAF6F3',
 
-  sidebar: '#064E73',
-  sidebarText: '#CDEAF7',
-  sidebarMuted: '#8FC4DC',
+  sidebar: '#481206',
+  sidebarText: '#F3DCC5',
+  sidebarMuted: '#B98B67',
 
   panel: '#FFFFFF',
   card: '#FFFFFF',
-  border: '#D8EAF2',
+  border: '#E9DDD2',
 
-  ink: '#12344D',
-  sub: '#64748B',
+  ink: '#2B1710',
+  sub: '#8B6F5E',
 
-  primary: '#588ca9',
-  primaryDark: '#064E73',
-  primarySoft: '#E0F2FE',
+  primary: '#A8434B',
+  primaryDark: '#5C0E04',
+  primarySoft: '#fff1ef',
 
-  light: '#0EA5D9',
-  lightSoft: '#E0F6FD',
+  light: '#C99A6C',
+  lightSoft: '#F7EEE2',
 
-  accent: '#F97316',
-  accentSoft: '#FFEDD5',
+  accent: '#8A4B32',
+  accentSoft: '#F3E5D8',
 
-  accent2: '#FBBF24',
-  accent2Soft: '#FEF3C7',
+  accent2: '#B5793B',
+  accent2Soft: '#F8ECD9',
 
-  green: '#16A34A',
-  greenSoft: '#DCFCE7',
+  green: '#3F7D58',
+  greenSoft: '#E3F0E7',
 
-  red: '#DC2626',
-  redSoft: '#FEE2E2',
+  red: '#B23A2E',
+  redSoft: '#F8E2DE',
 
-  purple: '#8067D9',
-  purpleSoft: '#F0ECFF',
+  purple: '#6B5590',
+  purpleSoft: '#EAE5F2',
 
-  softPanel: '#F4FAFD'
+  blue: '#3E6C8C',
+  blueSoft: '#E3EDF3',
+
+  amber: '#C08A2E',
+  amberSoft: '#F8EDD9',
+
+  softPanel: '#FBF7F4',
+
+  // Individual dashboard stat-card colours — each stat gets its own hue
+  stat1: '#5C0E04',
+  stat1Soft: '#F3DED8',
+  stat2: '#3E6C8C',
+  stat2Soft: '#E3EDF3',
+  stat3: '#C08A2E',
+  stat3Soft: '#F8EDD9',
+  stat4: '#3F7D58',
+  stat4Soft: '#E3F0E7'
 }
 
 const cardShadow =
-  '0 2px 10px rgba(6, 78, 115, 0.06), 0 1px 3px rgba(6, 78, 115, 0.04)'
+  '0 2px 10px rgba(46, 10, 2, 0.07), 0 1px 3px rgba(46, 10, 2, 0.05)'
 
 /* ============================================================
    INLINE SVG ICONS
@@ -190,25 +209,25 @@ const JOB_CATEGORIES = [
 ]
 
 const JOB_TYPE_META = {
-  'Full Time': { icon: IconBriefcase, color: '#075985', soft: '#E0F2FE' },
-  'Part Time': { icon: IconClock, color: '#0EA5D9', soft: '#E0F6FD' },
-  'Internship': { icon: IconGraduationCap, color: '#8067D9', soft: '#F0ECFF' },
-  'Remote': { icon: IconGlobe, color: '#16A34A', soft: '#DCFCE7' },
-  'Contract': { icon: IconFileText, color: '#F97316', soft: '#FFEDD5' }
+  'Full Time': { icon: IconBriefcase, color: C.primaryDark, soft: C.primarySoft },
+  'Part Time': { icon: IconClock, color: C.amber, soft: C.amberSoft },
+  'Internship': { icon: IconGraduationCap, color: C.purple, soft: C.purpleSoft },
+  'Remote': { icon: IconGlobe, color: C.blue, soft: C.blueSoft },
+  'Contract': { icon: IconFileText, color: C.accent, soft: C.accentSoft }
 }
 
-const PIE_COLORS = ['#075985', '#0EA5D9', '#F97316', '#8067D9', '#16A34A', '#FBBF24']
+const PIE_COLORS = [C.primaryDark, C.blue, C.amber, C.green, C.purple, C.accent]
 
 const JOB_STATUS_STYLE = {
-  Active: { color: '#16A34A', soft: '#DCFCE7' },
-  Closed: { color: '#64748B', soft: '#F1F5F9' }
+  Active: { color: C.green, soft: C.greenSoft },
+  Closed: { color: C.sub, soft: C.softPanel }
 }
 
 const APP_STATUS_STYLE = {
-  Pending: { color: '#B45309', soft: '#FEF3C7' },
-  Shortlisted: { color: '#075985', soft: '#E0F2FE' },
-  Hired: { color: '#16A34A', soft: '#DCFCE7' },
-  Rejected: { color: '#DC2626', soft: '#FEE2E2' }
+  Pending: { color: C.amber, soft: C.amberSoft },
+  Shortlisted: { color: C.blue, soft: C.blueSoft },
+  Hired: { color: C.green, soft: C.greenSoft },
+  Rejected: { color: C.red, soft: C.redSoft }
 }
 
 function timeAgo(dateStr) {
@@ -254,7 +273,7 @@ const CustomTooltip = ({ active, payload, label }) => {
   return (
     <div
       className="px-3 py-2 rounded-lg text-xs font-medium"
-      style={{ background: C.primaryDark, color: '#ffffff', boxShadow: '0 6px 16px rgba(6,78,115,0.25)' }}
+      style={{ background: C.primaryDark, color: '#ffffff', boxShadow: '0 6px 16px rgba(46,10,2,0.28)' }}
     >
       <p className="mb-0.5 opacity-80">{label}</p>
       <p>{payload[0].value} application{payload[0].value === 1 ? '' : 's'}</p>
@@ -471,10 +490,10 @@ export default function CompanyDashboard() {
      ============================================================ */
 
   const stats = [
-    { id: 'active', label: 'Active Jobs', value: myJobs.filter((j) => j.is_active).length, icon: IconBriefcase, color: C.primary, soft: C.primarySoft },
-    { id: 'total', label: 'Total Applications', value: applications.length, icon: IconClipboardList, color: C.light, soft: C.lightSoft },
-    { id: 'pending', label: 'Pending', value: applications.filter((a) => a.status === 'Pending').length, icon: IconClock, color: C.accent, soft: C.accentSoft },
-    { id: 'hired', label: 'Hired', value: applications.filter((a) => a.status === 'Hired').length, icon: IconCheckCircle, color: C.green, soft: C.greenSoft }
+    { id: 'active', label: 'Active Jobs', value: myJobs.filter((j) => j.is_active).length, icon: IconBriefcase, color: C.stat1, soft: C.stat1Soft },
+    { id: 'total', label: 'Total Applications', value: applications.length, icon: IconClipboardList, color: C.stat2, soft: C.stat2Soft },
+    { id: 'pending', label: 'Pending', value: applications.filter((a) => a.status === 'Pending').length, icon: IconClock, color: C.stat3, soft: C.stat3Soft },
+    { id: 'hired', label: 'Hired', value: applications.filter((a) => a.status === 'Hired').length, icon: IconCheckCircle, color: C.stat4, soft: C.stat4Soft }
   ]
 
   const trendData = useMemo(() => buildMonthlyTrend(applications), [applications])
@@ -619,6 +638,8 @@ export default function CompanyDashboard() {
   return (
     <div className="min-h-screen flex" style={{ background: C.bg }}>
       <style>{`
+        html, body, #root { background: ${C.bg}; }
+        body { margin: 0; }
         * { scrollbar-width: none; -ms-overflow-style: none; }
         *::-webkit-scrollbar { width: 0; height: 0; display: none; }
       `}</style>
@@ -632,7 +653,7 @@ export default function CompanyDashboard() {
         style={{ background: C.sidebar }}
       >
         <div className="px-6 pt-6 pb-12 flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(255,255,255,0.14)' }}>
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(255,230,204,0.14)' }}>
             <IconSparkle size={24} color="#ffffff" />
           </div>
           <p className="font-bold text-xl" style={{ color: '#ffffff' }}>Career Pilot</p>
@@ -647,7 +668,7 @@ export default function CompanyDashboard() {
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
                 className={navBtnClass(item.id)}
-                style={active ? { background: 'rgba(255,255,255,0.14)', color: '#ffffff' } : { color: C.sidebarText }}
+                style={active ? { background: 'rgba(255,230,204,0.14)', color: '#ffffff' } : { color: C.sidebarText }}
               >
                 <IconComp size={18} color={active ? '#ffffff' : C.sidebarMuted} strokeWidth={2} />
                 <span>{item.label}</span>
@@ -655,7 +676,7 @@ export default function CompanyDashboard() {
             )
           })}
 
-          <div className="mx-1 my-6 border-t" style={{ borderColor: 'rgba(255,255,255,0.12)' }} />
+          <div className="mx-1 my-6 border-t" style={{ borderColor: 'rgba(255,230,204,0.12)' }} />
 
           {secondaryNavItems.map((item) => {
             const IconComp = item.icon
@@ -665,7 +686,7 @@ export default function CompanyDashboard() {
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
                 className={navBtnClass(item.id)}
-                style={active ? { background: 'rgba(255,255,255,0.14)', color: '#ffffff' } : { color: C.sidebarText }}
+                style={active ? { background: 'rgba(255,230,204,0.14)', color: '#ffffff' } : { color: C.sidebarText }}
               >
                 <IconComp size={18} color={active ? '#ffffff' : C.sidebarMuted} strokeWidth={2} />
                 <span>{item.label}</span>
@@ -674,11 +695,11 @@ export default function CompanyDashboard() {
           })}
         </nav>
 
-        <div className="px-4 py-4 border-t" style={{ borderColor: 'rgba(255,255,255,0.12)' }}>
+        <div className="px-4 py-4 border-t" style={{ borderColor: 'rgba(255,230,204,0.12)' }}>
           <div className="flex items-center gap-3 px-2 py-2">
             <div
               className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
-              style={{ background: 'rgba(255,255,255,0.16)' }}
+              style={{ background: 'rgba(255,230,204,0.16)' }}
             >
               {(user?.company_name || user?.full_name)?.charAt(0).toUpperCase()}
             </div>
@@ -726,19 +747,19 @@ export default function CompanyDashboard() {
                 className="relative overflow-hidden rounded-2xl p-6 mb-6"
                 style={{
                   background: `linear-gradient(135deg, ${C.primaryDark} 0%, ${C.primary} 100%)`,
-                  boxShadow: '0 8px 24px rgba(6,78,115,0.20)'
+                  boxShadow: '0 8px 24px rgba(46,10,2,0.22)'
                 }}
               >
                 <div className="relative z-10 max-w-2xl">
                   <h1 className="text-2xl font-bold mb-2" style={{ color: '#ffffff' }}>
                     Welcome back, {user?.company_name || user?.full_name || 'there'}! 👋
                   </h1>
-                  <p className="text-sm max-w-xl leading-relaxed" style={{ color: 'rgba(255,255,255,0.88)' }}>
+                  <p className="text-sm max-w-xl leading-relaxed" style={{ color: 'rgba(255,230,204,0.88)' }}>
                     Company Account · Find the best IT talent for your team.
                   </p>
                 </div>
-                <div className="absolute -right-12 -top-16 w-44 h-44 rounded-full" style={{ background: 'rgba(255,255,255,0.10)' }} />
-                <div className="absolute right-20 -bottom-20 w-40 h-40 rounded-full" style={{ background: 'rgba(255,255,255,0.07)' }} />
+                <div className="absolute -right-12 -top-16 w-44 h-44 rounded-full" style={{ background: 'rgba(255,230,204,0.10)' }} />
+                <div className="absolute right-20 -bottom-20 w-40 h-40 rounded-full" style={{ background: 'rgba(255,230,204,0.07)' }} />
               </div>
 
               {/* STAT CARDS */}
