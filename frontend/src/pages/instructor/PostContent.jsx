@@ -5,36 +5,35 @@ import API from '../../utils/api'
    COLOUR THEME (matches InstructorDashboard.jsx)
    ============================================================ */
 const C = {
-  bg: '#F7F9FC',
+  bg: '#F8FBF9',
 
   panel: '#FFFFFF',
   card: '#FFFFFF',
-  border: '#E6EAF0',
+  border: '#E8EFEB',
 
-  ink: '#243B53',
-  sub: '#829AB1',
+  ink: '#3E4E5D',
+  sub: '#8E9993',
 
-  accent: '#394d5e',
-  accentDark: '#102A43',
-  accentSoft: '#E8F1FF',
+  accent: '#8BC4A3',
+  accentDark: '#78B694',
+  accentSoft: '#EEF8F2',
 
-  teal: '#20A39E',
-  tealSoft: '#E4F7F5',
+  teal: '#8BBCC9',
+  tealSoft: '#EFF8FA',
 
-  green: '#2FB171',
-  greenSoft: '#E7F8EF',
+  green: '#8BC4A3',
+  greenSoft: '#EEF8F2',
 
-  orange: '#F4A340',
-  orangeSoft: '#FFF2DE',
+  orange: '#EABF91',
+  orangeSoft: '#FDF5EC',
 
-  red: '#EF625C',
-  redSoft: '#FDEAE9',
+  red: '#DFA0AA',
+  redSoft: '#FBEFF1',
 
-  softPanel: '#F5F7FA'
+  softPanel: '#FAFCFB'
 }
 
-const cardShadow =
-  '0 2px 10px rgba(16, 42, 67, 0.06), 0 1px 3px rgba(16, 42, 67, 0.04)'
+const cardShadow = 'none'
 
 /* ============================================================
    INLINE SVG ICONS
@@ -185,9 +184,9 @@ const CATEGORIES = [
 ]
 
 const CONTENT_TYPES = [
-  { id: 'video_link', label: 'Video', sub: 'Google Drive link', icon: IconVideo, color: '#1769E0', soft: '#E8F1FF' },
-  { id: 'pdf', label: 'PDF Document', sub: 'Upload a file', icon: IconFileText, color: '#2FB171', soft: '#E7F8EF' },
-  { id: 'note', label: 'Notes', sub: 'Written material', icon: IconNotes, color: '#8067D9', soft: '#F0ECFF' }
+  { id: 'video_link', label: 'Video', sub: 'Google Drive link', icon: IconVideo, color: '#8BC4A3', soft: '#EEF8F2' },
+  { id: 'pdf', label: 'PDF Document', sub: 'Upload a file', icon: IconFileText, color: '#8BBCC9', soft: '#EFF8FA' },
+  { id: 'note', label: 'Notes', sub: 'Written material', icon: IconNotes, color: '#B3A4D7', soft: '#F5F2FA' }
 ]
 
 /* ============================================================
@@ -478,7 +477,7 @@ export default function PostContent({ onSuccess }) {
             className="rounded-xl p-4 cursor-pointer transition hover:opacity-90"
             style={{
               background: thumbnailPreview ? C.accentSoft : C.softPanel,
-              border: `1.5px dashed ${thumbnailPreview ? C.accent : C.border}`
+              border: `1.5px dashed ${thumbnailPreview ? C.accentDark : C.border}`
             }}
           >
             <input
@@ -522,8 +521,8 @@ export default function PostContent({ onSuccess }) {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3.5 rounded-xl font-semibold text-white text-sm transition disabled:opacity-60 flex items-center justify-center gap-2 hover:shadow-lg"
-          style={{ background: `linear-gradient(135deg, ${C.accentDark}, ${C.accent})` }}
+          className="w-full py-3.5 rounded-xl font-semibold text-white text-sm transition disabled:opacity-60 flex items-center justify-center gap-2 "
+          style={{ background: C.accent }}
         >
           {loading ? (
             <>

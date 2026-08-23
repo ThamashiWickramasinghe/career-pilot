@@ -2,22 +2,30 @@ import { useState } from 'react'
 
 /* ── Colour Theme — matches the rest of the Job Seeker Dashboard ── */
 const C = {
-  bg: '#f6f3ff',
-  card: '#ffffff',
-  border: '#e6e3f2',
-  ink: '#25243a',
-  sub: '#85839a',
-  accent: '#5b56b5',
-  accentSoft: '#e9e7f8',
-  green: '#5db192',
-  greenSoft: '#dffff0',
-  blue: '#6f8fd4',
-  blueSoft: '#e3eafb',
-  orange: '#e5a26d',
-  orangeSoft: '#ffefe0',
-  purple: '#bf5bbd',
-  purpleSoft: '#ffdcfc',
-  softPanel: '#f3f0fa'
+  /* Pastel purple theme based on #DBBCD4 */
+  bg: '#F8F3F7',
+  card: '#FFFFFF',
+  border: '#E5D8E4',
+  ink: '#2E2730',
+  sub: '#857A87',
+
+  /* Main purple palette */
+  accent: '#9B7FA0',
+  accentDark: '#765C7A',
+  accentSoft: '#DBBCD4',
+
+  /* Supporting colours */
+  green: '#6E9B86',
+  greenSoft: '#E3F1E9',
+  blue: '#7D89B8',
+  blueSoft: '#E9ECF7',
+  orange: '#B88655',
+  orangeSoft: '#F7EBDD',
+
+  purple: '#9B7FA0',
+  purpleSoft: '#DBBCD4',
+
+  softPanel: '#F5EFF5'
 }
 
 const cardShadow =
@@ -357,30 +365,12 @@ export default function Help() {
       <div className="max-w-4xl mx-auto px-2 py-2">
 
         {/* Header */}
-        <div
-          className="rounded-3xl p-8 mb-6 text-center text-white relative overflow-hidden"
-          style={{ background: `linear-gradient(135deg, #4d48a3, ${C.accent})` }}
-        >
-          <div
-            className="absolute top-[-40px] right-[-40px] w-48 h-48 rounded-full opacity-10"
-            style={{ background: 'radial-gradient(circle, #ffffff, transparent)' }}
-          />
-          <div
-            className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center relative z-10"
-            style={{ background: 'rgba(255,255,255,0.15)' }}
-          >
-            <IconHelp size={26} color="#ffffff" strokeWidth={1.6} />
-          </div>
-          <h1 className="text-2xl font-bold mb-2 relative z-10">Help &amp; Guidelines</h1>
-          <p className="text-sm relative z-10" style={{ color: C.accentSoft }}>
-            Everything you need to know to get the most out of your Career Pilot dashboard.
-          </p>
-        </div>
+        
 
         {/* Feature guide cards */}
         <div className="mb-8">
           <h2 className="font-bold text-lg mb-4" style={{ color: C.ink }}>
-            Using the Dashboard
+            Help & Support
           </h2>
 
           <div className="space-y-3">

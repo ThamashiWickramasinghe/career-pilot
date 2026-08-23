@@ -5,39 +5,38 @@ import API from '../../utils/api'
    COLOUR THEME (matches InstructorDashboard.jsx)
    ============================================================ */
 const C = {
-  bg: '#F7F9FC',
+  bg: '#F8FBF9',
 
   panel: '#FFFFFF',
   card: '#FFFFFF',
-  border: '#E6EAF0',
+  border: '#E8EFEB',
 
-  ink: '#243B53',
-  sub: '#829AB1',
+  ink: '#3E4E5D',
+  sub: '#8E9993',
 
-  accent: '#394d5e',
-  accentDark: '#102A43',
-  accentSoft: '#E8F1FF',
+  accent: '#8BC4A3',
+  accentDark: '#78B694',
+  accentSoft: '#EEF8F2',
 
-  teal: '#20A39E',
-  tealSoft: '#E4F7F5',
+  teal: '#8BBCC9',
+  tealSoft: '#EFF8FA',
 
-  green: '#2FB171',
-  greenSoft: '#E7F8EF',
+  green: '#8BC4A3',
+  greenSoft: '#EEF8F2',
 
-  orange: '#F4A340',
-  orangeSoft: '#FFF2DE',
+  orange: '#EABF91',
+  orangeSoft: '#FDF5EC',
 
-  red: '#EF625C',
-  redSoft: '#FDEAE9',
+  red: '#DFA0AA',
+  redSoft: '#FBEFF1',
 
-  purple: '#8067D9',
-  purpleSoft: '#F0ECFF',
+  purple: '#B3A4D7',
+  purpleSoft: '#F5F2FA',
 
-  softPanel: '#F5F7FA'
+  softPanel: '#FAFCFB'
 }
 
-const cardShadow =
-  '0 2px 10px rgba(16, 42, 67, 0.06), 0 1px 3px rgba(16, 42, 67, 0.04)'
+const cardShadow = 'none'
 
 /* ============================================================
    INLINE SVG ICONS
@@ -225,9 +224,9 @@ const IconLoader = (p) => (
 )
 
 const TYPE_META = {
-  video_link: { label: 'Video', icon: IconVideo, color: '#1769E0', soft: '#E8F1FF' },
-  pdf: { label: 'PDF', icon: IconFileText, color: '#2FB171', soft: '#E7F8EF' },
-  note: { label: 'Notes', icon: IconNotes, color: '#8067D9', soft: '#F0ECFF' }
+  video_link: { label: 'Video', icon: IconVideo, color: '#8BC4A3', soft: '#EEF8F2' },
+  pdf: { label: 'PDF', icon: IconFileText, color: '#8BBCC9', soft: '#EFF8FA' },
+  note: { label: 'Notes', icon: IconNotes, color: '#B3A4D7', soft: '#F5F2FA' }
 }
 
 const EDIT_CATEGORIES = [
@@ -390,7 +389,7 @@ export default function ManageContent() {
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition"
             style={
               activeSection === 'content'
-                ? { background: `linear-gradient(135deg, ${C.accentDark}, ${C.accent})`, color: '#ffffff' }
+                ? { background: C.accent, color: '#ffffff' }
                 : { background: C.card, color: C.sub, border: `1px solid ${C.border}` }
             }
           >
@@ -403,7 +402,7 @@ export default function ManageContent() {
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition"
             style={
               activeSection === 'requests'
-                ? { background: `linear-gradient(135deg, ${C.accentDark}, ${C.accent})`, color: '#ffffff' }
+                ? { background: C.accent, color: '#ffffff' }
                 : { background: C.card, color: C.sub, border: `1px solid ${C.border}` }
             }
           >
@@ -631,7 +630,7 @@ export default function ManageContent() {
                   <div key={c.id} className="flex gap-3">
                     <div
                       className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
-                      style={{ background: `linear-gradient(135deg, ${C.accentDark}, ${C.accent})` }}
+                      style={{ background: C.accent }}
                     >
                       {c.user_name?.charAt(0).toUpperCase()}
                     </div>
@@ -680,7 +679,7 @@ export default function ManageContent() {
                   <div className="flex items-center gap-3 mb-4">
                     <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
-                      style={{ background: `linear-gradient(135deg, ${C.accentDark}, ${C.accent})` }}
+                      style={{ background: C.accent }}
                     >
                       {req.user_name?.charAt(0).toUpperCase()}
                     </div>
@@ -734,7 +733,7 @@ export default function ManageContent() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div
             className="rounded-2xl p-6 w-full max-w-lg"
-            style={{ background: C.card, boxShadow: '0 20px 50px rgba(16,42,67,0.25)' }}
+            style={{ background: C.card, boxShadow: '0 10px 30px rgba(62,78,93,0.10)' }}
           >
             <div className="flex items-center justify-between mb-5">
               <h3 className="font-bold text-base flex items-center gap-2" style={{ color: C.ink }}>
@@ -802,8 +801,8 @@ export default function ManageContent() {
                 <button
                   onClick={saveEdit}
                   disabled={editLoading}
-                  className="flex-1 py-3 rounded-xl font-semibold text-white text-sm disabled:opacity-60 flex items-center justify-center gap-2 hover:shadow-md transition"
-                  style={{ background: `linear-gradient(135deg, ${C.accentDark}, ${C.accent})` }}
+                  className="flex-1 py-3 rounded-xl font-semibold text-white text-sm disabled:opacity-60 flex items-center justify-center gap-2 transition"
+                  style={{ background: C.accent }}
                 >
                   {editLoading ? <IconLoader size={15} /> : null}
                   {editLoading ? 'Saving...' : 'Save Changes'}

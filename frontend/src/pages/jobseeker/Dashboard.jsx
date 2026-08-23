@@ -3,7 +3,8 @@ import { useAuth } from '../../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import API from '../../utils/api'
 import LearningHub from './LearningHub'
-import JobPortal from './JobPortal'
+import Quiz from './Quiz'
+import AIResults from './AIResults'
 import Profile from './Profile'
 import JobVacancy from './JobVacancy'
 import CareerRoadmap from './CareerRoadmap'
@@ -14,46 +15,49 @@ import Help from './Help'
    COLOUR THEME
    ============================================================ */
 const C = {
-  bg: '#f6f3ff',
+  /* User-provided pastel purple: #DBBCD4 */
+  pastelPurple: '#DBBCD4',
+  /* Main purple theme — based on the uploaded #C9B4C8 */
+  bg: '#F8F4F8',
 
-  sidebar: '#5b56b5',
+  sidebar: '#6F5872',
 
-  panel: '#ffffff',
-  card: '#ffffff',
-  border: '#e6e3f2',
+  panel: '#FFFFFF',
+  card: '#FFFFFF',
+  border: '#E5DDE6',
 
-  ink: '#25243a',
-  sub: '#85839a',
+  ink: '#2E2730',
+  sub: '#857A87',
 
-  accent: '#5b56b5',
-  accentDark: '#4d48a3',
-  accentSoft: '#e9e7f8',
+  accent: '#9B7FA0',
+  accentDark: '#765C7A',
+  accentSoft: '#DBBCD4',
 
-  /* Teal dashboard colours */
-  teal: '#a48dec',
-  tealDark: '#5b56b5',
-  tealSoft: '#e1f5f3',
-  tealLight: '#eefafa',
+  /* Purple dashboard colours */
+  teal: '#9B7FA0',
+  tealDark: '#6F5872',
+  tealSoft: '#DBBCD4',
+  tealLight: '#F8F3F8',
 
-  green: '#5db192',
-  greenSoft: '#dffff0',
+  green: '#6E9B86',
+  greenSoft: '#E3F1E9',
 
-  orange: '#e5a26d',
-  orangeSoft: '#ffefe0',
+  orange: '#B88655',
+  orangeSoft: '#F7EBDD',
 
-  purple: '#e5a26d',
-  purpleSoft: '#ffefe0',
+  purple: '#9B7FA0',
+  purpleSoft: '#DBBCD4',
 
-  pink: '#171b8d',
-  pinkSoft: '#caceff',
+  pink: '#A76C88',
+  pinkSoft: '#F3E2EA',
 
-  blue: '#bf5bbd',
-  blueSoft: '#ffdcfc',
+  blue: '#7D89B8',
+  blueSoft: '#E9ECF7',
 
-  sidebarText: '#dedcf5',
-  sidebarMuted: '#bcb9df',
+  sidebarText: '#E9DFEA',
+  sidebarMuted: '#CDBDCE',
 
-  softPanel: '#f3f0fa'
+  softPanel: '#F5F0F5'
 }
 
 const cardShadow =
@@ -309,6 +313,29 @@ const IconHelp = (p) => (
   />
 )
 
+const IconRefresh = (p) => (
+  <Icon
+    {...p}
+    path={
+      <>
+        <path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+      </>
+    }
+  />
+)
+
+const IconCheckCircle = (p) => (
+  <Icon
+    {...p}
+    path={
+      <>
+        <path d="M9 12.75L11.25 15 15 9.75" />
+        <circle cx="12" cy="12" r="9" />
+      </>
+    }
+  />
+)
+
 /* ============================================================
    BADGE / COURSE COLOURS
    ============================================================ */
@@ -375,6 +402,22 @@ export default function JobSeekerDashboard() {
   const [notifOpen, setNotifOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [courseFilter, setCourseFilter] = useState('all')
+
+  /* ============================================================
+     AI JOB MATCH (Quiz + AI Results) — connected directly, no
+     JobPortal wrapper in between. This is the only place that
+     owns quiz/results state now.
+     ============================================================ */
+
+  const [showQuiz, setShowQuiz] = useState(false)
+  const [showAIResults, setShowAIResults] = useState(false)
+  const [quizResult, setQuizResult] = useState(null)
+
+  const handleQuizComplete = (result) => {
+    setQuizResult(result)
+    setShowQuiz(false)
+    setShowAIResults(true)
+  }
 
   /* ============================================================
      EARNED BADGES
@@ -1061,7 +1104,7 @@ export default function JobSeekerDashboard() {
                       )
                       setSearchQuery('')
                     }}
-                    className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-left hover:bg-teal-50 transition"
+                    className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-left hover:bg-purple-50 transition"
                     style={{
                       color: C.ink
                     }}
@@ -1106,7 +1149,7 @@ export default function JobSeekerDashboard() {
             <span
               className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full text-white text-[9px] flex items-center justify-center font-bold"
               style={{
-                background: 'red'
+                background: '#EF4444'
               }}
             >
               {unreadCount}
@@ -1290,6 +1333,90 @@ export default function JobSeekerDashboard() {
       </div>
     </div>
   )
+
+  /* ============================================================
+     AI JOB MATCH TAB CONTENT
+     Directly connects to Quiz + AIResults. Quiz.jsx already has
+     its own intro/rules screen, so we never render a second one.
+     ============================================================ */
+
+  const renderAIJobMatch = () => {
+    // Already have a result and viewing the analysis
+    if (showAIResults && quizResult) {
+      return (
+        <AIResults
+          quizData={quizResult}
+          onBack={() => setShowAIResults(false)}
+        />
+      )
+    }
+
+    // Actively taking (or retaking) the quiz
+    if (showQuiz || !quizResult) {
+      return (
+        <Quiz onComplete={handleQuizComplete} />
+      )
+    }
+
+    // Have a result, not currently viewing it — small completed card
+    return (
+      <div className="max-w-2xl mx-auto py-10">
+        <div
+          className="rounded-2xl overflow-hidden"
+          style={{
+            background: C.card,
+            border: `1px solid ${C.border}`,
+            boxShadow: cardShadow
+          }}
+        >
+          <div
+            className="p-8 text-center text-white"
+            style={{
+              background: `linear-gradient(135deg, ${C.tealDark} 0%, ${C.teal} 100%)`
+            }}
+          >
+            <div
+              className="w-14 h-14 rounded-2xl mx-auto mb-3 flex items-center justify-center"
+              style={{ background: 'rgba(255,255,255,0.18)' }}
+            >
+              <IconCheckCircle size={26} color="#ffffff" strokeWidth={1.8} />
+            </div>
+
+            <h2 className="text-xl font-bold mb-1">Quiz Completed</h2>
+
+            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.85)' }}>
+              Your AI career analysis is ready to view
+            </p>
+          </div>
+
+          <div className="p-6 flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={() => setShowAIResults(true)}
+              className="flex-1 py-3 rounded-xl font-bold text-white flex items-center justify-center gap-2"
+              style={{
+                background: `linear-gradient(135deg, ${C.tealDark} 0%, ${C.teal} 100%)`
+              }}
+            >
+              <IconSparkle size={16} color="#ffffff" />
+              View AI Analysis
+            </button>
+
+            <button
+              onClick={() => setShowQuiz(true)}
+              className="flex-1 py-3 rounded-xl font-semibold border-2 flex items-center justify-center gap-2 transition"
+              style={{
+                borderColor: C.border,
+                color: C.sub
+              }}
+            >
+              <IconRefresh size={16} color={C.sub} strokeWidth={2} />
+              Retake Quiz
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   /* ============================================================
      MAIN RETURN
@@ -1498,14 +1625,7 @@ export default function JobSeekerDashboard() {
                 {user?.full_name}
               </p>
 
-              <p
-                className="text-[11px]"
-                style={{
-                  color: '#43ba84'
-                }}
-              >
-                ● Active
-              </p>
+              
             </div>
 
             <button
@@ -1549,7 +1669,7 @@ export default function JobSeekerDashboard() {
                   background:
                     `linear-gradient(135deg, ${C.tealDark} 0%, ${C.teal} 100%)`,
                   boxShadow:
-                    '0 8px 24px rgba(21,149,143,0.16)'
+                    '0 8px 24px rgba(111,88,114,0.16)'
                 }}
               >
                 <div className="relative z-10 max-w-2xl">
@@ -1567,7 +1687,7 @@ export default function JobSeekerDashboard() {
                     {user?.full_name ||
                       user?.username ||
                       'there'}
-                    ! 👋
+                    ! 
                   </h1>
 
                   <p
@@ -1585,46 +1705,11 @@ export default function JobSeekerDashboard() {
                   </p>
                 </div>
 
-                {/* DECORATIVE SHAPES */}
-
-                <div
-                  className="absolute -right-12 -top-16 w-44 h-44 rounded-full"
-                  style={{
-                    background:
-                      'rgba(255,255,255,0.10)'
-                  }}
-                />
-
-                <div
-                  className="absolute right-20 -bottom-20 w-40 h-40 rounded-full"
-                  style={{
-                    background:
-                      'rgba(255,255,255,0.07)'
-                  }}
-                />
-
-                <div
-                  className="absolute right-10 bottom-8 w-14 h-14 rounded-2xl rotate-12"
-                  style={{
-                    border:
-                      '1px solid rgba(255,255,255,0.18)',
-                    background:
-                      'rgba(255,255,255,0.06)'
-                  }}
-                />
               </div>
 
               {/* ==================================================
                   STAT CARDS
                   ================================================== */}
-
-              {/* ==================================================
-    STAT CARDS
-    ================================================== */}
-
-{/* ==================================================
-    STAT CARDS
-    ================================================== */}
 
 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
   {stats.map(
@@ -1919,13 +2004,13 @@ export default function JobSeekerDashboard() {
           )}
 
           {/* ====================================================
-              AI JOBS
+              AI JOB MATCH (Quiz + AI Results, direct connection)
               ==================================================== */}
 
           {activeTab ===
             'ai-jobs' && (
             <div>
-              <JobPortal />
+              {renderAIJobMatch()}
             </div>
           )}
 
@@ -2038,7 +2123,7 @@ export default function JobSeekerDashboard() {
                 onClick={
                   goPrevMonth
                 }
-                className="w-6 h-6 rounded-lg flex items-center justify-center hover:bg-teal-50"
+                className="w-6 h-6 rounded-lg flex items-center justify-center hover:bg-purple-50"
               >
                 <IconChevronLeft
                   size={14}
@@ -2050,7 +2135,7 @@ export default function JobSeekerDashboard() {
                 onClick={
                   goNextMonth
                 }
-                className="w-6 h-6 rounded-lg flex items-center justify-center hover:bg-teal-50"
+                className="w-6 h-6 rounded-lg flex items-center justify-center hover:bg-purple-50"
               >
                 <IconChevronRight
                   size={14}

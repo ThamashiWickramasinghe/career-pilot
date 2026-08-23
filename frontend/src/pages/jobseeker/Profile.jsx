@@ -2,6 +2,116 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import API from '../../utils/api'
 
+/* ============================================================
+   COLOUR THEME (matches JobSeekerDashboard.jsx `C` tokens)
+   ============================================================ */
+const C = {
+  bg: '#F8F4F8',
+  sidebar: '#6F5872',
+
+  panel: '#FFFFFF',
+  card: '#FFFFFF',
+  border: '#E5DDE6',
+
+  ink: '#2E2730',
+  sub: '#857A87',
+
+  accent: '#9B7FA0',
+  accentDark: '#765C7A',
+  accentSoft: '#DBBCD4',
+
+  teal: '#9B7FA0',
+  tealDark: '#6F5872',
+  tealSoft: '#DBBCD4',
+  tealLight: '#F8F3F8',
+
+  green: '#6E9B86',
+  greenSoft: '#E3F1E9',
+
+  orange: '#B88655',
+  orangeSoft: '#F7EBDD',
+
+  purple: '#9B7FA0',
+  purpleSoft: '#DBBCD4',
+
+  pink: '#A76C88',
+  pinkSoft: '#F3E2EA',
+
+  blue: '#7D89B8',
+  blueSoft: '#E9ECF7',
+
+  softPanel: '#F5F0F5'
+}
+
+const cardShadow =
+  '0 2px 8px rgba(74, 69, 130, 0.06), 0 1px 3px rgba(74, 69, 130, 0.04)'
+
+const SKILL_PALETTE = [
+  { bg: C.purpleSoft, color: C.accentDark },
+  { bg: C.blueSoft, color: C.blue },
+  { bg: C.greenSoft, color: C.green }
+]
+
+/* ============================================================
+   INLINE SVG ICONS
+   ============================================================ */
+
+const Icon = ({ path, size = 16, color = 'currentColor', strokeWidth = 2 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke={color}
+    strokeWidth={strokeWidth}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="flex-shrink-0"
+  >
+    {path}
+  </svg>
+)
+
+const IconUser = (p) => (
+  <Icon
+    {...p}
+    path={
+      <>
+        <circle cx="12" cy="8" r="4" />
+        <path d="M4 21c0-4 3.5-7 8-7s8 3 8 7" />
+      </>
+    }
+  />
+)
+
+const IconCheckCircle = (p) => (
+  <Icon
+    {...p}
+    path={
+      <>
+        <path d="M9 12.75L11.25 15 15 9.75" />
+        <circle cx="12" cy="12" r="9" />
+      </>
+    }
+  />
+)
+
+const IconAlert = (p) => (
+  <Icon
+    {...p}
+    path={
+      <>
+        <path d="M12 9v4M12 17h.01" />
+        <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+      </>
+    }
+  />
+)
+
+const IconX = (p) => (
+  <Icon {...p} path={<path d="M18 6L6 18M6 6l12 12" />} />
+)
+
 export default function Profile() {
   const { user } = useAuth()
 
@@ -104,10 +214,6 @@ export default function Profile() {
     setError('')
   }
 
-  const handleBack = () => {
-    window.history.back()
-  }
-
   const skills = form.skills
     ? form.skills
         .split(',')
@@ -115,20 +221,35 @@ export default function Profile() {
         .filter(Boolean)
     : []
 
+  const fieldStyle = {
+    background: C.softPanel,
+    border: `1px solid ${C.border}`,
+    color: C.ink,
+    '--tw-ring-color': C.accent,
+  }
+
+  const infoCardStyle = {
+    background: C.softPanel,
+    borderColor: C.border,
+  }
+
   if (fetchLoading) {
     return (
       <div
         className="h-screen flex items-center justify-center overflow-hidden"
-        style={{ background: '#f6f3ff' }}
+        style={{ background: C.bg }}
       >
         <div className="text-center">
-          <div className="text-4xl mb-3 animate-pulse">
-            👤
+          <div
+            className="w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center animate-pulse"
+            style={{ background: C.purpleSoft }}
+          >
+            <IconUser size={22} color={C.accentDark} />
           </div>
 
           <p
             className="text-sm"
-            style={{ color: '#85839a' }}
+            style={{ color: C.sub }}
           >
             Loading profile...
           </p>
@@ -142,14 +263,12 @@ export default function Profile() {
       <div className="w-full max-w-4xl h-full mx-auto px-4 sm:px-5 py-3">
 
         {/* =====================================================
-            PAGE HEADER (Back button + Title)
+            PAGE HEADER
         ====================================================== */}
         <div className="flex items-center gap-3 mb-3">
-          
-
           <h1
             className="text-2xl font-bold"
-            style={{ color: '#25243a' }}
+            style={{ color: C.ink }}
           >
             My Profile
           </h1>
@@ -162,11 +281,11 @@ export default function Profile() {
           <div
             className="mb-3 p-3 rounded-xl text-xs font-medium flex items-center gap-2"
             style={{
-              background: '#dffff0',
-              color: '#3f8069',
+              background: C.greenSoft,
+              color: C.green,
             }}
           >
-            <span>✅</span>
+            <IconCheckCircle size={15} color={C.green} />
             <span>{success}</span>
           </div>
         )}
@@ -178,20 +297,20 @@ export default function Profile() {
           <div
             className="mb-3 p-3 rounded-xl text-xs font-medium flex items-center gap-2"
             style={{
-              background: '#ffefe0',
-              color: '#b66b35',
+              background: C.orangeSoft,
+              color: C.orange,
             }}
           >
-            <span>⚠️</span>
+            <IconAlert size={15} color={C.orange} />
 
             <span>{error}</span>
 
             <button
               onClick={() => setError('')}
               className="ml-auto"
-              style={{ color: '#b66b35' }}
+              style={{ color: C.orange }}
             >
-              ✕
+              <IconX size={13} color={C.orange} />
             </button>
           </div>
         )}
@@ -203,56 +322,26 @@ export default function Profile() {
           <div
             className="h-full rounded-2xl overflow-y-auto"
             style={{
-              background: '#ffffff',
-              boxShadow:
-                '0 2px 8px rgba(74, 69, 130, 0.06), 0 1px 3px rgba(74, 69, 130, 0.04)',
+              background: C.card,
+              border: `1px solid ${C.border}`,
+              boxShadow: cardShadow,
             }}
           >
-
-            {/* Card Header */}
-            <div
-              className="relative overflow-hidden"
-              style={{
-                minHeight: '10px',
-                background: '#ffffff',
-              }}
-            >
-
-              {/* Decorative circles */}
-              <div />
-
-              <div />
-
-              <div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start gap-4">
-
-                {/* Profile Avatar */}
-
-                {/* Edit Button */}
-
-              </div>
-            </div>
-
-            {/* =================================================
-                PERSONAL INFORMATION
-            ================================================== */}
             <div className="p-5">
 
               <div className="flex items-center justify-between mb-3">
-
-                <div>
-                  <h3
-                    className="text-base font-bold flex items-center gap-2"
-                    style={{ color: '#25243a' }}
-                  >
-                    Personal Information
-                  </h3>
-                </div>
+                <h3
+                  className="text-base font-bold flex items-center gap-2"
+                  style={{ color: C.ink }}
+                >
+                  Personal Information
+                </h3>
 
                 <button
                   onClick={() => setEditing(true)}
                   className="text-xs px-3 py-1.5 rounded-lg text-white font-medium hover:shadow-md transition"
                   style={{
-                    background: '#5b56b5',
+                    background: `linear-gradient(135deg, ${C.tealDark} 0%, ${C.teal} 100%)`,
                   }}
                 >
                   Edit
@@ -263,305 +352,138 @@ export default function Profile() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
                 {/* Full Name */}
-                <div
-                  className="p-3 rounded-xl border"
-                  style={{
-                    background: '#f3f0fa',
-                    borderColor: '#e6e3f2',
-                  }}
-                >
-                  <p
-                    className="text-[11px] mb-0.5"
-                    style={{ color: '#85839a' }}
-                  >
+                <div className="p-3 rounded-xl border" style={infoCardStyle}>
+                  <p className="text-[11px] mb-0.5" style={{ color: C.sub }}>
                     Full Name
                   </p>
-
-                  <p
-                    className="text-xs font-semibold"
-                    style={{ color: '#25243a' }}
-                  >
+                  <p className="text-xs font-semibold" style={{ color: C.ink }}>
                     {form.full_name || 'Not set'}
                   </p>
                 </div>
 
                 {/* Username */}
-                <div
-                  className="p-3 rounded-xl border"
-                  style={{
-                    background: '#f3f0fa',
-                    borderColor: '#e6e3f2',
-                  }}
-                >
-                  <p
-                    className="text-[11px] mb-0.5"
-                    style={{ color: '#85839a' }}
-                  >
+                <div className="p-3 rounded-xl border" style={infoCardStyle}>
+                  <p className="text-[11px] mb-0.5" style={{ color: C.sub }}>
                     Username
                   </p>
-
-                  <p
-                    className="text-xs font-semibold"
-                    style={{ color: '#25243a' }}
-                  >
-                    {form.username
-                      ? `@${form.username}`
-                      : 'Not set'}
+                  <p className="text-xs font-semibold" style={{ color: C.ink }}>
+                    {form.username ? `@${form.username}` : 'Not set'}
                   </p>
                 </div>
 
                 {/* Email */}
-                <div
-                  className="p-3 rounded-xl border"
-                  style={{
-                    background: '#f3f0fa',
-                    borderColor: '#e6e3f2',
-                  }}
-                >
-                  <p
-                    className="text-[11px] mb-0.5"
-                    style={{ color: '#85839a' }}
-                  >
+                <div className="p-3 rounded-xl border" style={infoCardStyle}>
+                  <p className="text-[11px] mb-0.5" style={{ color: C.sub }}>
                     Email Address
                   </p>
-
-                  <p
-                    className="text-xs font-semibold break-all"
-                    style={{ color: '#25243a' }}
-                  >
+                  <p className="text-xs font-semibold break-all" style={{ color: C.ink }}>
                     {form.email || 'Not set'}
                   </p>
                 </div>
 
                 {/* Current Role */}
-                <div
-                  className="p-3 rounded-xl border"
-                  style={{
-                    background: '#f3f0fa',
-                    borderColor: '#e6e3f2',
-                  }}
-                >
-                  <p
-                    className="text-[11px] mb-0.5"
-                    style={{ color: '#85839a' }}
-                  >
+                <div className="p-3 rounded-xl border" style={infoCardStyle}>
+                  <p className="text-[11px] mb-0.5" style={{ color: C.sub }}>
                     Current Role / Post
                   </p>
-
-                  <p
-                    className="text-xs font-semibold"
-                    style={{ color: '#25243a' }}
-                  >
+                  <p className="text-xs font-semibold" style={{ color: C.ink }}>
                     {form.current_post || 'Not set'}
                   </p>
                 </div>
 
                 {/* Experience */}
-                <div
-                  className="p-3 rounded-xl border"
-                  style={{
-                    background: '#f3f0fa',
-                    borderColor: '#e6e3f2',
-                  }}
-                >
-                  <p
-                    className="text-[11px] mb-0.5"
-                    style={{ color: '#85839a' }}
-                  >
+                <div className="p-3 rounded-xl border" style={infoCardStyle}>
+                  <p className="text-[11px] mb-0.5" style={{ color: C.sub }}>
                     Years of Experience
                   </p>
-
-                  <p
-                    className="text-xs font-semibold"
-                    style={{ color: '#25243a' }}
-                  >
+                  <p className="text-xs font-semibold" style={{ color: C.ink }}>
                     {form.experience_years || 0}{' '}
-                    {Number(form.experience_years) === 1
-                      ? 'year'
-                      : 'years'}
+                    {Number(form.experience_years) === 1 ? 'year' : 'years'}
                   </p>
                 </div>
 
                 {/* Account Type */}
-                <div
-                  className="p-3 rounded-xl border"
-                  style={{
-                    background: '#f3f0fa',
-                    borderColor: '#e6e3f2',
-                  }}
-                >
-                  <p
-                    className="text-[11px] mb-0.5"
-                    style={{ color: '#85839a' }}
-                  >
+                <div className="p-3 rounded-xl border" style={infoCardStyle}>
+                  <p className="text-[11px] mb-0.5" style={{ color: C.sub }}>
                     Account Type
                   </p>
-
-                  <p
-                    className="text-xs font-semibold"
-                    style={{ color: '#25243a' }}
-                  >
+                  <p className="text-xs font-semibold" style={{ color: C.ink }}>
                     Job Seeker
                   </p>
                 </div>
 
               </div>
 
-              {/* =================================================
-                  BIO
-              ================================================== */}
-              <div
-                className="mt-3 p-3 rounded-xl border"
-                style={{
-                  background: '#f3f0fa',
-                  borderColor: '#e6e3f2',
-                }}
-              >
-                <p
-                  className="text-[11px] mb-1"
-                  style={{ color: '#85839a' }}
-                >
+              {/* BIO */}
+              <div className="mt-3 p-3 rounded-xl border" style={infoCardStyle}>
+                <p className="text-[11px] mb-1" style={{ color: C.sub }}>
                   About Me
                 </p>
-
-                <p
-                  className="text-xs leading-5"
-                  style={{ color: '#3f3d52' }}
-                >
-                  {form.bio ||
-                    'No biography has been added yet.'}
+                <p className="text-xs leading-5" style={{ color: C.ink }}>
+                  {form.bio || 'No biography has been added yet.'}
                 </p>
               </div>
 
-              {/* =================================================
-                  SKILLS
-              ================================================== */}
-              <div
-                className="mt-3 p-3 rounded-xl border"
-                style={{
-                  background: '#f3f0fa',
-                  borderColor: '#e6e3f2',
-                }}
-              >
-                <p
-                  className="text-[11px] mb-2"
-                  style={{ color: '#85839a' }}
-                >
+              {/* SKILLS */}
+              <div className="mt-3 p-3 rounded-xl border" style={infoCardStyle}>
+                <p className="text-[11px] mb-2" style={{ color: C.sub }}>
                   Skills
                 </p>
 
                 {skills.length > 0 ? (
                   <div className="flex flex-wrap gap-1.5">
+                    {skills.map((skill, index) => {
+                      const palette = SKILL_PALETTE[index % SKILL_PALETTE.length]
 
-                    {skills.map((skill, index) => (
-                      <span
-                        key={index}
-                        className="text-[11px] px-2.5 py-1 rounded-full font-medium"
-                        style={{
-                          background:
-                            index % 3 === 0
-                              ? '#e9e7f8'
-                              : index % 3 === 1
-                              ? '#e3eafb'
-                              : '#dffff0',
-
-                          color:
-                            index % 3 === 0
-                              ? '#4d48a3'
-                              : index % 3 === 1
-                              ? '#4f6fb4'
-                              : '#3f8069',
-                        }}
-                      >
-                        {skill}
-                      </span>
-                    ))}
-
+                      return (
+                        <span
+                          key={index}
+                          className="text-[11px] px-2.5 py-1 rounded-full font-medium"
+                          style={{
+                            background: palette.bg,
+                            color: palette.color,
+                          }}
+                        >
+                          {skill}
+                        </span>
+                      )
+                    })}
                   </div>
                 ) : (
-                  <p
-                    className="text-xs"
-                    style={{ color: '#85839a' }}
-                  >
+                  <p className="text-xs" style={{ color: C.sub }}>
                     No skills added yet.
                   </p>
                 )}
               </div>
 
-              {/* =================================================
-                  SOCIAL / PORTFOLIO
-              ================================================== */}
+              {/* SOCIAL / PORTFOLIO */}
               <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-2.5">
-
-                {/* GitHub */}
-                <div
-                  className="p-3 rounded-xl border"
-                  style={{
-                    background: '#f3f0fa',
-                    borderColor: '#e6e3f2',
-                  }}
-                >
-                  <p
-                    className="text-[11px] mb-0.5"
-                    style={{ color: '#85839a' }}
-                  >
+                <div className="p-3 rounded-xl border" style={infoCardStyle}>
+                  <p className="text-[11px] mb-0.5" style={{ color: C.sub }}>
                     GitHub
                   </p>
-
-                  <p
-                    className="text-xs font-medium break-all"
-                    style={{ color: '#3f3d52' }}
-                  >
+                  <p className="text-xs font-medium break-all" style={{ color: C.ink }}>
                     {form.github || 'Not added'}
                   </p>
                 </div>
 
-                {/* LinkedIn */}
-                <div
-                  className="p-3 rounded-xl border"
-                  style={{
-                    background: '#f3f0fa',
-                    borderColor: '#e6e3f2',
-                  }}
-                >
-                  <p
-                    className="text-[11px] mb-0.5"
-                    style={{ color: '#85839a' }}
-                  >
+                <div className="p-3 rounded-xl border" style={infoCardStyle}>
+                  <p className="text-[11px] mb-0.5" style={{ color: C.sub }}>
                     LinkedIn
                   </p>
-
-                  <p
-                    className="text-xs font-medium break-all"
-                    style={{ color: '#3f3d52' }}
-                  >
+                  <p className="text-xs font-medium break-all" style={{ color: C.ink }}>
                     {form.linkedin || 'Not added'}
                   </p>
                 </div>
 
-                {/* Portfolio */}
-                <div
-                  className="p-3 rounded-xl border"
-                  style={{
-                    background: '#f3f0fa',
-                    borderColor: '#e6e3f2',
-                  }}
-                >
-                  <p
-                    className="text-[11px] mb-0.5"
-                    style={{ color: '#85839a' }}
-                  >
+                <div className="p-3 rounded-xl border" style={infoCardStyle}>
+                  <p className="text-[11px] mb-0.5" style={{ color: C.sub }}>
                     Portfolio
                   </p>
-
-                  <p
-                    className="text-xs font-medium break-all"
-                    style={{ color: '#3f3d52' }}
-                  >
+                  <p className="text-xs font-medium break-all" style={{ color: C.ink }}>
                     {form.portfolio || 'Not added'}
                   </p>
                 </div>
-
               </div>
 
             </div>
@@ -573,29 +495,21 @@ export default function Profile() {
         ====================================================== */}
         {editing && (
           <div
-            className="h-full rounded-2xl p-5 shadow-sm overflow-y-auto"
+            className="h-full rounded-2xl p-5 overflow-y-auto"
             style={{
-              background: '#ffffff',
-              boxShadow:
-                '0 2px 8px rgba(74, 69, 130, 0.06), 0 1px 3px rgba(74, 69, 130, 0.04)',
+              background: C.card,
+              border: `1px solid ${C.border}`,
+              boxShadow: cardShadow,
             }}
           >
-
             {/* Edit Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-
-              <div>
-                <h2
-                  className="text-lg font-bold"
-                  style={{ color: '#25243a' }}
-                >
-                  Edit Profile
-                </h2>
-              </div>
-
-              <div className="flex gap-2">
-              </div>
-
+              <h2
+                className="text-lg font-bold"
+                style={{ color: C.ink }}
+              >
+                Edit Profile
+              </h2>
             </div>
 
             {/* Form */}
@@ -603,157 +517,78 @@ export default function Profile() {
 
               {/* Full Name */}
               <div>
-                <label
-                  className="block text-xs font-medium mb-1"
-                  style={{ color: '#3f3d52' }}
-                >
+                <label className="block text-xs font-medium mb-1" style={{ color: C.ink }}>
                   Full Name
                 </label>
-
                 <input
                   type="text"
                   value={form.full_name}
-                  onChange={e =>
-                    handleChange(
-                      'full_name',
-                      e.target.value
-                    )
-                  }
+                  onChange={e => handleChange('full_name', e.target.value)}
                   className="w-full rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2"
-                  style={{
-                    background: '#f3f0fa',
-                    border: '1px solid #e6e3f2',
-                    color: '#25243a',
-                    '--tw-ring-color': '#5b56b5',
-                  }}
+                  style={fieldStyle}
                   placeholder="Enter your full name"
                 />
               </div>
 
               {/* Username */}
               <div>
-                <label
-                  className="block text-xs font-medium mb-1"
-                  style={{ color: '#3f3d52' }}
-                >
+                <label className="block text-xs font-medium mb-1" style={{ color: C.ink }}>
                   Username
                 </label>
-
                 <input
                   type="text"
                   value={form.username}
-                  onChange={e =>
-                    handleChange(
-                      'username',
-                      e.target.value
-                    )
-                  }
+                  onChange={e => handleChange('username', e.target.value)}
                   className="w-full rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2"
-                  style={{
-                    background: '#f3f0fa',
-                    border: '1px solid #e6e3f2',
-                    color: '#25243a',
-                    '--tw-ring-color': '#5b56b5',
-                  }}
+                  style={fieldStyle}
                   placeholder="Enter username"
                 />
               </div>
 
               {/* Email */}
               <div>
-                <label
-                  className="block text-xs font-medium mb-1"
-                  style={{ color: '#3f3d52' }}
-                >
+                <label className="block text-xs font-medium mb-1" style={{ color: C.ink }}>
                   Email Address
                 </label>
-
                 <input
                   type="email"
                   value={form.email}
-                  onChange={e =>
-                    handleChange(
-                      'email',
-                      e.target.value
-                    )
-                  }
+                  onChange={e => handleChange('email', e.target.value)}
                   className="w-full rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2"
-                  style={{
-                    background: '#f3f0fa',
-                    border: '1px solid #e6e3f2',
-                    color: '#25243a',
-                    '--tw-ring-color': '#5b56b5',
-                  }}
+                  style={fieldStyle}
                   placeholder="Enter email address"
                 />
               </div>
 
               {/* Current Role */}
               <div>
-                <label
-                  className="block text-xs font-medium mb-1"
-                  style={{ color: '#3f3d52' }}
-                >
+                <label className="block text-xs font-medium mb-1" style={{ color: C.ink }}>
                   Current Role / Post
                 </label>
-
                 <input
                   type="text"
                   value={form.current_post}
-                  onChange={e =>
-                    handleChange(
-                      'current_post',
-                      e.target.value
-                    )
-                  }
+                  onChange={e => handleChange('current_post', e.target.value)}
                   className="w-full rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2"
-                  style={{
-                    background: '#f3f0fa',
-                    border: '1px solid #e6e3f2',
-                    color: '#25243a',
-                    '--tw-ring-color': '#5b56b5',
-                  }}
+                  style={fieldStyle}
                   placeholder="e.g. Frontend Developer"
                 />
               </div>
 
               {/* Experience */}
               <div>
-                <label
-                  className="block text-xs font-medium mb-1"
-                  style={{ color: '#3f3d52' }}
-                >
+                <label className="block text-xs font-medium mb-1" style={{ color: C.ink }}>
                   Years of Experience
                 </label>
-
                 <select
                   value={form.experience_years}
-                  onChange={e =>
-                    handleChange(
-                      'experience_years',
-                      e.target.value
-                    )
-                  }
+                  onChange={e => handleChange('experience_years', e.target.value)}
                   className="w-full rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2"
-                  style={{
-                    background: '#f3f0fa',
-                    border: '1px solid #e6e3f2',
-                    color: '#25243a',
-                    '--tw-ring-color': '#5b56b5',
-                  }}
+                  style={fieldStyle}
                 >
                   {[0,1,2,3,4,5,6,7,8,9,10].map(n => (
-                    <option
-                      key={n}
-                      value={n}
-                    >
-                      {n === 0
-                        ? 'Fresher / No Experience'
-                        : `${n} ${
-                            n === 1
-                              ? 'year'
-                              : 'years'
-                          }`}
+                    <option key={n} value={n}>
+                      {n === 0 ? 'Fresher / No Experience' : `${n} ${n === 1 ? 'year' : 'years'}`}
                     </option>
                   ))}
                 </select>
@@ -761,152 +596,78 @@ export default function Profile() {
 
               {/* Skills */}
               <div>
-                <label
-                  className="block text-xs font-medium mb-1"
-                  style={{ color: '#3f3d52' }}
-                >
+                <label className="block text-xs font-medium mb-1" style={{ color: C.ink }}>
                   Skills
                 </label>
-
                 <input
                   type="text"
                   value={form.skills}
-                  onChange={e =>
-                    handleChange(
-                      'skills',
-                      e.target.value
-                    )
-                  }
+                  onChange={e => handleChange('skills', e.target.value)}
                   className="w-full rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2"
-                  style={{
-                    background: '#f3f0fa',
-                    border: '1px solid #e6e3f2',
-                    color: '#25243a',
-                    '--tw-ring-color': '#5b56b5',
-                  }}
+                  style={fieldStyle}
                   placeholder="Python, React, SQL, JavaScript"
                 />
-
-                <p
-                  className="text-[10px] mt-1"
-                  style={{ color: '#85839a' }}
-                >
+                <p className="text-[10px] mt-1" style={{ color: C.sub }}>
                   Separate skills using commas
                 </p>
               </div>
 
               {/* GitHub */}
               <div>
-                <label
-                  className="block text-xs font-medium mb-1"
-                  style={{ color: '#3f3d52' }}
-                >
+                <label className="block text-xs font-medium mb-1" style={{ color: C.ink }}>
                   GitHub URL
                 </label>
-
                 <input
                   type="text"
                   value={form.github}
-                  onChange={e =>
-                    handleChange(
-                      'github',
-                      e.target.value
-                    )
-                  }
+                  onChange={e => handleChange('github', e.target.value)}
                   className="w-full rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2"
-                  style={{
-                    background: '#f3f0fa',
-                    border: '1px solid #e6e3f2',
-                    color: '#25243a',
-                    '--tw-ring-color': '#5b56b5',
-                  }}
+                  style={fieldStyle}
                   placeholder="github.com/yourusername"
                 />
               </div>
 
               {/* LinkedIn */}
               <div>
-                <label
-                  className="block text-xs font-medium mb-1"
-                  style={{ color: '#3f3d52' }}
-                >
+                <label className="block text-xs font-medium mb-1" style={{ color: C.ink }}>
                   LinkedIn URL
                 </label>
-
                 <input
                   type="text"
                   value={form.linkedin}
-                  onChange={e =>
-                    handleChange(
-                      'linkedin',
-                      e.target.value
-                    )
-                  }
+                  onChange={e => handleChange('linkedin', e.target.value)}
                   className="w-full rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2"
-                  style={{
-                    background: '#f3f0fa',
-                    border: '1px solid #e6e3f2',
-                    color: '#25243a',
-                    '--tw-ring-color': '#5b56b5',
-                  }}
+                  style={fieldStyle}
                   placeholder="linkedin.com/in/yourusername"
                 />
               </div>
 
               {/* Portfolio */}
               <div>
-                <label
-                  className="block text-xs font-medium mb-1"
-                  style={{ color: '#3f3d52' }}
-                >
+                <label className="block text-xs font-medium mb-1" style={{ color: C.ink }}>
                   Portfolio URL
                 </label>
-
                 <input
                   type="text"
                   value={form.portfolio}
-                  onChange={e =>
-                    handleChange(
-                      'portfolio',
-                      e.target.value
-                    )
-                  }
+                  onChange={e => handleChange('portfolio', e.target.value)}
                   className="w-full rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2"
-                  style={{
-                    background: '#f3f0fa',
-                    border: '1px solid #e6e3f2',
-                    color: '#25243a',
-                    '--tw-ring-color': '#5b56b5',
-                  }}
+                  style={fieldStyle}
                   placeholder="yourportfolio.com"
                 />
               </div>
 
               {/* Bio */}
               <div className="md:col-span-2">
-                <label
-                  className="block text-xs font-medium mb-1"
-                  style={{ color: '#3f3d52' }}
-                >
+                <label className="block text-xs font-medium mb-1" style={{ color: C.ink }}>
                   About Me / Bio
                 </label>
-
                 <textarea
                   rows={3}
                   value={form.bio}
-                  onChange={e =>
-                    handleChange(
-                      'bio',
-                      e.target.value
-                    )
-                  }
+                  onChange={e => handleChange('bio', e.target.value)}
                   className="w-full rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 resize-none"
-                  style={{
-                    background: '#f3f0fa',
-                    border: '1px solid #e6e3f2',
-                    color: '#25243a',
-                    '--tw-ring-color': '#5b56b5',
-                  }}
+                  style={fieldStyle}
                   placeholder="Tell us a little about yourself..."
                 />
               </div>
@@ -916,18 +677,15 @@ export default function Profile() {
             {/* Bottom Buttons */}
             <div
               className="flex justify-end gap-2 mt-4 pt-4"
-              style={{
-                borderTop: '1px solid #e6e3f2',
-              }}
+              style={{ borderTop: `1px solid ${C.border}` }}
             >
-
               <button
                 onClick={handleCancel}
                 className="px-4 py-2 rounded-lg text-xs font-medium transition"
                 style={{
-                  border: '1px solid #e6e3f2',
-                  color: '#85839a',
-                  background: '#ffffff',
+                  border: `1px solid ${C.border}`,
+                  color: C.sub,
+                  background: C.card,
                 }}
               >
                 Cancel
@@ -938,14 +696,11 @@ export default function Profile() {
                 disabled={loading}
                 className="px-6 py-2 rounded-lg text-xs font-bold text-white disabled:opacity-50 transition hover:shadow-lg"
                 style={{
-                  background: '#5b56b5',
+                  background: `linear-gradient(135deg, ${C.tealDark} 0%, ${C.teal} 100%)`,
                 }}
               >
-                {loading
-                  ? 'Saving...'
-                  : 'Save Changes'}
+                {loading ? 'Saving...' : 'Save Changes'}
               </button>
-
             </div>
 
           </div>

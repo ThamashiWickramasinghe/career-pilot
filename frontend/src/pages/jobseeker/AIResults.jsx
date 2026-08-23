@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import API from '../../utils/api'
 
+// PASTEL PURPLE THEME — primary soft color: #DBBCD4
+
 export default function AIResults({ quizData, onBack }) {
   const [loading, setLoading] = useState(true)
   const [results, setResults] = useState(null)
@@ -42,14 +44,14 @@ export default function AIResults({ quizData, onBack }) {
     return (
       <div
         className="min-h-screen flex items-center justify-center px-4"
-        style={{ background: '#f6f3ff' }}
+        style={{ background: '#F8F3F7' }}
       >
         <div
           className="w-full max-w-md rounded-3xl p-10 text-center"
           style={{
             background: '#ffffff',
-            border: '1px solid #e6e3f2',
-            boxShadow: '0 10px 35px rgba(91,86,181,0.10)'
+            border: '1px solid #E5D8E4',
+            boxShadow: '0 10px 35px rgba(155,127,160,0.10)'
           }}
         >
           <div className="relative mx-auto mb-6 w-20 h-20">
@@ -57,15 +59,15 @@ export default function AIResults({ quizData, onBack }) {
             <div
               className="w-20 h-20 rounded-full border-4 animate-spin"
               style={{
-                borderColor: '#e9e7f8',
-                borderTopColor: '#5b56b5'
+                borderColor: '#DBBCD4',
+                borderTopColor: '#9B7FA0'
               }}
             />
 
             <div className="absolute inset-0 flex items-center justify-center">
               <svg
                 className="w-8 h-8"
-                style={{ color: '#5b56b5' }}
+                style={{ color: '#9B7FA0' }}
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.5"
@@ -83,21 +85,21 @@ export default function AIResults({ quizData, onBack }) {
 
           <p
             className="text-xs font-semibold uppercase tracking-wider mb-2"
-            style={{ color: '#5b56b5' }}
+            style={{ color: '#9B7FA0' }}
           >
             AI Career Analysis
           </p>
 
           <h3
             className="text-xl font-bold mb-2"
-            style={{ color: '#25243a' }}
+            style={{ color: '#2E2730' }}
           >
             Analyzing your results
           </h3>
 
           <p
             className="text-sm mb-6"
-            style={{ color: '#85839a' }}
+            style={{ color: '#857A87' }}
           >
             Our AI is working to predict your career path
           </p>
@@ -115,16 +117,16 @@ export default function AIResults({ quizData, onBack }) {
                 key={i}
                 className="flex items-center gap-3 text-sm rounded-xl p-3"
                 style={{
-                  background: '#f3f0fa',
-                  color: '#85839a'
+                  background: '#F5EFF5',
+                  color: '#857A87'
                 }}
               >
                 <div
                   className="w-4 h-4 rounded-full border-2 animate-spin flex-shrink-0"
                   style={{
                     animationDelay: `${i * 0.2}s`,
-                    borderColor: '#e9e7f8',
-                    borderTopColor: '#5b56b5'
+                    borderColor: '#DBBCD4',
+                    borderTopColor: '#9B7FA0'
                   }}
                 />
 
@@ -146,26 +148,26 @@ export default function AIResults({ quizData, onBack }) {
     return (
       <div
         className="min-h-screen flex items-center justify-center px-4"
-        style={{ background: '#f6f3ff' }}
+        style={{ background: '#F8F3F7' }}
       >
         <div
           className="rounded-3xl p-10 text-center max-w-md w-full"
           style={{
             background: '#ffffff',
-            border: '1px solid #e6e3f2',
-            boxShadow: '0 10px 35px rgba(91,86,181,0.10)'
+            border: '1px solid #E5D8E4',
+            boxShadow: '0 10px 35px rgba(155,127,160,0.10)'
           }}
         >
 
           <div
             className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center"
             style={{
-              background: '#ffefe0'
+              background: '#F7EBDD'
             }}
           >
             <svg
               className="w-8 h-8"
-              style={{ color: '#e5a26d' }}
+              style={{ color: '#B88655' }}
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
@@ -181,14 +183,14 @@ export default function AIResults({ quizData, onBack }) {
 
           <h3
             className="text-xl font-bold mb-2"
-            style={{ color: '#25243a' }}
+            style={{ color: '#2E2730' }}
           >
             Analysis Failed
           </h3>
 
           <p
             className="text-sm mb-6"
-            style={{ color: '#85839a' }}
+            style={{ color: '#857A87' }}
           >
             {error}
           </p>
@@ -197,7 +199,7 @@ export default function AIResults({ quizData, onBack }) {
             onClick={fetchAnalysis}
             className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white"
             style={{
-              background: '#5b56b5'
+              background: '#9B7FA0'
             }}
           >
             Try Again
@@ -274,7 +276,7 @@ export default function AIResults({ quizData, onBack }) {
     <div
       className="min-h-screen"
       style={{
-        background: '#f6f3ff'
+        background: '#F8F3F7'
       }}
     >
 
@@ -297,8 +299,8 @@ export default function AIResults({ quizData, onBack }) {
           className="relative overflow-hidden rounded-2xl mb-5"
           style={{
             background: '#ffffff',
-            border: '1px solid #e6e3f2',
-            boxShadow: '0 8px 28px rgba(91,86,181,0.10)'
+            border: '1px solid #E5D8E4',
+            boxShadow: '0 8px 28px rgba(155,127,160,0.10)'
           }}
         >
 
@@ -307,7 +309,7 @@ export default function AIResults({ quizData, onBack }) {
             className="h-1.5 w-full"
             style={{
               background:
-                'linear-gradient(90deg, #5b56b5 0%, #6f8fd4 55%, #e5a26d 100%)'
+                'linear-gradient(90deg, #9B7FA0 0%, #7D89B8 55%, #B88655 100%)'
             }}
           />
 
@@ -322,8 +324,8 @@ export default function AIResults({ quizData, onBack }) {
                   className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
                   style={{
                     background:
-                      'linear-gradient(135deg, #5b56b5 0%, #6f8fd4 100%)',
-                    boxShadow: '0 6px 16px rgba(91,86,181,0.30)'
+                      'linear-gradient(135deg, #9B7FA0 0%, #7D89B8 100%)',
+                    boxShadow: '0 6px 16px rgba(155,127,160,0.30)'
                   }}
                 >
                   <svg
@@ -349,8 +351,8 @@ export default function AIResults({ quizData, onBack }) {
                     <span
                       className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
                       style={{
-                        background: '#e9e7f8',
-                        color: '#5b56b5'
+                        background: '#DBBCD4',
+                        color: '#9B7FA0'
                       }}
                     >
                       AI Career Match
@@ -359,8 +361,8 @@ export default function AIResults({ quizData, onBack }) {
                     <span
                       className="text-[10px] font-semibold px-2.5 py-1 rounded-full"
                       style={{
-                        background: '#dffff0',
-                        color: '#5db192'
+                        background: '#E3F1E9',
+                        color: '#6E9B86'
                       }}
                     >
                       Top Recommendation
@@ -371,7 +373,7 @@ export default function AIResults({ quizData, onBack }) {
                   <h1
                     className="text-2xl md:text-3xl font-bold truncate"
                     style={{
-                      color: '#25243a'
+                      color: '#2E2730'
                     }}
                   >
                     {top_career}
@@ -396,7 +398,7 @@ export default function AIResults({ quizData, onBack }) {
             <div
               className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-6"
               style={{
-                borderTop: '1px solid #e6e3f2'
+                borderTop: '1px solid #E5D8E4'
               }}
             >
 
@@ -438,7 +440,7 @@ export default function AIResults({ quizData, onBack }) {
           className="rounded-2xl p-1.5 mb-5 flex gap-1 overflow-x-auto"
           style={{
             background: '#ffffff',
-            border: '1px solid #e6e3f2'
+            border: '1px solid #E5D8E4'
           }}
         >
 
@@ -454,12 +456,12 @@ export default function AIResults({ quizData, onBack }) {
               style={
                 activeTab === tab.id
                   ? {
-                      background: '#5b56b5',
+                      background: '#9B7FA0',
                       color: '#ffffff'
                     }
                   : {
                       background: 'transparent',
-                      color: '#85839a'
+                      color: '#857A87'
                     }
               }
             >
@@ -473,11 +475,11 @@ export default function AIResults({ quizData, onBack }) {
                     background:
                       activeTab === tab.id
                         ? 'rgba(255,255,255,0.18)'
-                        : '#f3f0fa',
+                        : '#F5EFF5',
                     color:
                       activeTab === tab.id
                         ? '#ffffff'
-                        : '#85839a'
+                        : '#857A87'
                   }}
                 >
                   {tab.count}
@@ -548,18 +550,18 @@ function StatPill({ label, value }) {
     <div
       className="rounded-xl px-4 py-3"
       style={{
-        background: '#f3f0fa'
+        background: '#F5EFF5'
       }}
     >
       <p
         className="text-lg font-bold leading-none"
-        style={{ color: '#25243a' }}
+        style={{ color: '#2E2730' }}
       >
         {value}
       </p>
       <p
         className="text-[10px] mt-1.5 uppercase tracking-wide font-semibold"
-        style={{ color: '#85839a' }}
+        style={{ color: '#857A87' }}
       >
         {label}
       </p>
@@ -579,14 +581,14 @@ function ResultInfo({
     <div
       className="rounded-xl px-4 py-3"
       style={{
-        background: '#f3f0fa'
+        background: '#F5EFF5'
       }}
     >
 
       <p
         className="text-[10px] mb-1"
         style={{
-          color: '#85839a'
+          color: '#857A87'
         }}
       >
         {label}
@@ -595,7 +597,7 @@ function ResultInfo({
       <p
         className="text-xs font-bold truncate"
         style={{
-          color: '#25243a'
+          color: '#2E2730'
         }}
       >
         {value}
@@ -617,9 +619,9 @@ function CareerPaths({
     predictions?.slice(0, 3) || []
 
   const chartColors = [
-    '#5b56b5',
-    '#6f8fd4',
-    '#e5a26d'
+    '#9B7FA0',
+    '#7D89B8',
+    '#B88655'
   ]
 
   const total = chartData.reduce(
@@ -664,9 +666,9 @@ function CareerPaths({
       className="rounded-2xl overflow-hidden"
       style={{
         background: '#ffffff',
-        border: '1px solid #e6e3f2',
+        border: '1px solid #E5D8E4',
         boxShadow:
-          '0 3px 15px rgba(91,86,181,0.06)'
+          '0 3px 15px rgba(155,127,160,0.06)'
       }}
     >
 
@@ -680,7 +682,7 @@ function CareerPaths({
             <h2
               className="text-lg font-bold"
               style={{
-                color: '#25243a'
+                color: '#2E2730'
               }}
             >
               Career Paths
@@ -689,7 +691,7 @@ function CareerPaths({
             <p
               className="text-xs mt-1"
               style={{
-                color: '#85839a'
+                color: '#857A87'
               }}
             >
               Your strongest predicted career directions
@@ -700,8 +702,8 @@ function CareerPaths({
           <span
             className="text-[10px] px-3 py-1.5 rounded-full font-semibold"
             style={{
-              background: '#e9e7f8',
-              color: '#5b56b5'
+              background: '#DBBCD4',
+              color: '#9B7FA0'
             }}
           >
             AI Prediction
@@ -738,13 +740,13 @@ function CareerPaths({
                   style={{
                     background:
                       index === 0
-                        ? '#f3f0fa'
+                        ? '#F5EFF5'
                         : '#fafafa',
 
                     border:
                       index === 0
-                        ? '1px solid #e9e7f8'
-                        : '1px solid #f0eef5'
+                        ? '1px solid #DBBCD4'
+                        : '1px solid #EEE5ED'
                   }}
                 >
 
@@ -761,7 +763,7 @@ function CareerPaths({
                     <p
                       className="text-sm font-semibold"
                       style={{
-                        color: '#25243a'
+                        color: '#2E2730'
                       }}
                     >
                       {item.career}
@@ -770,7 +772,7 @@ function CareerPaths({
                     <p
                       className="text-[10px] mt-0.5"
                       style={{
-                        color: '#85839a'
+                        color: '#857A87'
                       }}
                     >
                       {index === 0
@@ -785,9 +787,9 @@ function CareerPaths({
                       className="text-[9px] px-2 py-1 rounded-full font-semibold"
                       style={{
                         background:
-                          '#e9e7f8',
+                          '#DBBCD4',
                         color:
-                          '#5b56b5'
+                          '#9B7FA0'
                       }}
                     >
                       Best Match
@@ -810,15 +812,15 @@ function CareerPaths({
       <div
         className="border-t"
         style={{
-          borderColor: '#e6e3f2'
+          borderColor: '#E5D8E4'
         }}
       >
 
         <div
           className="hidden md:grid grid-cols-12 px-5 py-3 text-[10px] uppercase tracking-wide font-semibold"
           style={{
-            background: '#f3f0fa',
-            color: '#85839a'
+            background: '#F5EFF5',
+            color: '#857A87'
           }}
         >
 
@@ -845,7 +847,7 @@ function CareerPaths({
               className="px-5 py-4 border-t"
               style={{
                 borderColor:
-                  '#e6e3f2'
+                  '#E5D8E4'
               }}
             >
 
@@ -858,13 +860,13 @@ function CareerPaths({
                     style={{
                       background:
                         i === 0
-                          ? '#e9e7f8'
-                          : '#f3f0fa',
+                          ? '#DBBCD4'
+                          : '#F5EFF5',
 
                       color:
                         i === 0
-                          ? '#5b56b5'
-                          : '#85839a'
+                          ? '#9B7FA0'
+                          : '#857A87'
                     }}
                   >
                     {i + 1}
@@ -878,7 +880,7 @@ function CareerPaths({
                   <p
                     className="text-sm font-bold"
                     style={{
-                      color: '#25243a'
+                      color: '#2E2730'
                     }}
                   >
                     {pred.career}
@@ -887,7 +889,7 @@ function CareerPaths({
                   <p
                     className="text-[10px] mt-0.5"
                     style={{
-                      color: '#85839a'
+                      color: '#857A87'
                     }}
                   >
                     AI recommended career path
@@ -903,13 +905,13 @@ function CareerPaths({
                     style={{
                       background:
                         i === 0
-                          ? '#e9e7f8'
-                          : '#f3f0fa',
+                          ? '#DBBCD4'
+                          : '#F5EFF5',
 
                       color:
                         i === 0
-                          ? '#5b56b5'
-                          : '#85839a'
+                          ? '#9B7FA0'
+                          : '#857A87'
                     }}
                   >
                     {i === 0
@@ -1010,7 +1012,7 @@ function HalfPieChart({
         <path
           d="M 20 100 A 80 80 0 0 1 180 100"
           fill="none"
-          stroke="#f3f0fa"
+          stroke="#F5EFF5"
           strokeWidth="24"
           strokeLinecap="round"
         />
@@ -1050,7 +1052,7 @@ function HalfPieChart({
         <p
           className="text-xs font-medium"
           style={{
-            color: '#85839a'
+            color: '#857A87'
           }}
         >
           Career Distribution
@@ -1074,9 +1076,9 @@ function SkillGap({
 
   const readinessColor =
     skill_gap.overall_readiness >= 70
-      ? '#5db192'
+      ? '#6E9B86'
       : skill_gap.overall_readiness >= 40
-      ? '#e5a26d'
+      ? '#B88655'
       : '#dc4c4c'
 
   const readinessLabel =
@@ -1094,8 +1096,8 @@ function SkillGap({
         className="rounded-2xl overflow-hidden"
         style={{
           background: '#ffffff',
-          border: '1px solid #e6e3f2',
-          boxShadow: '0 3px 15px rgba(91,86,181,0.06)'
+          border: '1px solid #E5D8E4',
+          boxShadow: '0 3px 15px rgba(155,127,160,0.06)'
         }}
       >
 
@@ -1106,8 +1108,8 @@ function SkillGap({
             <div
               className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
               style={{
-                background: '#e9e7f8',
-                color: '#5b56b5'
+                background: '#DBBCD4',
+                color: '#9B7FA0'
               }}
             >
               <svg
@@ -1129,21 +1131,21 @@ function SkillGap({
 
               <p
                 className="text-[10px] font-bold uppercase tracking-wider mb-1"
-                style={{ color: '#5b56b5' }}
+                style={{ color: '#9B7FA0' }}
               >
                 Skill Gap Analysis
               </p>
 
               <h2
                 className="text-xl font-bold"
-                style={{ color: '#25243a' }}
+                style={{ color: '#2E2730' }}
               >
                 {top_career}
               </h2>
 
               <p
                 className="text-xs mt-1"
-                style={{ color: '#85839a' }}
+                style={{ color: '#857A87' }}
               >
                 How your current skills compare with what this role requires
               </p>
@@ -1166,7 +1168,7 @@ function SkillGap({
                   cy="18"
                   r="15.5"
                   fill="none"
-                  stroke="#f3f0fa"
+                  stroke="#F5EFF5"
                   strokeWidth="3.5"
                 />
                 <circle
@@ -1184,13 +1186,13 @@ function SkillGap({
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span
                   className="text-2xl font-bold"
-                  style={{ color: '#25243a' }}
+                  style={{ color: '#2E2730' }}
                 >
                   {skill_gap.overall_readiness}%
                 </span>
                 <span
                   className="text-[9px] uppercase tracking-wide"
-                  style={{ color: '#85839a' }}
+                  style={{ color: '#857A87' }}
                 >
                   Readiness
                 </span>
@@ -1222,8 +1224,8 @@ function SkillGap({
           title="Strengths"
           subtitle="Skills already meeting the bar"
           items={skill_gap.strengths || []}
-          color="#5db192"
-          bg="#dffff0"
+          color="#6E9B86"
+          bg="#E3F1E9"
           icon="check"
         />
 
@@ -1231,8 +1233,8 @@ function SkillGap({
           title="Needs Improvement"
           subtitle="Skills below the required level"
           items={skill_gap.weaknesses || []}
-          color="#e5a26d"
-          bg="#ffefe0"
+          color="#B88655"
+          bg="#F7EBDD"
           icon="alert"
         />
 
@@ -1247,7 +1249,7 @@ function SkillGap({
           subtitle="Not yet covered by your quiz results"
           items={skill_gap.missing_skills}
           color="#dc4c4c"
-          bg="#fde8e8"
+          bg="#FDE8E8"
           icon="x"
         />
 
@@ -1258,8 +1260,8 @@ function SkillGap({
       <div
         className="rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4"
         style={{
-          background: 'linear-gradient(135deg, #5b56b5 0%, #6f8fd4 100%)',
-          boxShadow: '0 10px 25px rgba(91,86,181,0.25)'
+          background: 'linear-gradient(135deg, #9B7FA0 0%, #7D89B8 100%)',
+          boxShadow: '0 10px 25px rgba(155,127,160,0.25)'
         }}
       >
 
@@ -1286,7 +1288,7 @@ function SkillGap({
           className="px-6 py-3 rounded-xl font-semibold text-sm transition hover:opacity-90 whitespace-nowrap"
           style={{
             background: '#ffffff',
-            color: '#5b56b5'
+            color: '#9B7FA0'
           }}
         >
           View Recommended Courses →
@@ -1340,9 +1342,9 @@ function SkillGroup({
       className="rounded-2xl p-5"
       style={{
         background: '#ffffff',
-        border: '1px solid #e6e3f2',
+        border: '1px solid #E5D8E4',
         boxShadow:
-          '0 3px 15px rgba(91,86,181,0.06)'
+          '0 3px 15px rgba(155,127,160,0.06)'
       }}
     >
 
@@ -1370,7 +1372,7 @@ function SkillGroup({
 
             <h3
               className="text-sm font-bold truncate"
-              style={{ color: '#25243a' }}
+              style={{ color: '#2E2730' }}
             >
               {title}
             </h3>
@@ -1378,7 +1380,7 @@ function SkillGroup({
             {subtitle && (
               <p
                 className="text-[10px] truncate"
-                style={{ color: '#85839a' }}
+                style={{ color: '#857A87' }}
               >
                 {subtitle}
               </p>
@@ -1406,14 +1408,14 @@ function SkillGroup({
         <div
           className="rounded-xl p-4 text-center"
           style={{
-            background: '#f3f0fa'
+            background: '#F5EFF5'
           }}
         >
 
           <p
             className="text-xs"
             style={{
-              color: '#85839a'
+              color: '#857A87'
             }}
           >
             No items in this category
@@ -1471,7 +1473,7 @@ function SkillBar({
           <p
             className="text-xs font-semibold truncate"
             style={{
-              color: '#25243a'
+              color: '#2E2730'
             }}
           >
             {item.category_name}
@@ -1480,7 +1482,7 @@ function SkillBar({
           <p
             className="text-[10px] mt-0.5"
             style={{
-              color: '#85839a'
+              color: '#857A87'
             }}
           >
             Your score: {item.your_score}/100
@@ -1551,9 +1553,9 @@ function Courses({
       className="rounded-2xl overflow-hidden"
       style={{
         background: '#ffffff',
-        border: '1px solid #e6e3f2',
+        border: '1px solid #E5D8E4',
         boxShadow:
-          '0 3px 15px rgba(91,86,181,0.06)'
+          '0 3px 15px rgba(155,127,160,0.06)'
       }}
     >
 
@@ -1567,7 +1569,7 @@ function Courses({
             <h2
               className="text-lg font-bold"
               style={{
-                color: '#25243a'
+                color: '#2E2730'
               }}
             >
               Recommended Courses
@@ -1576,7 +1578,7 @@ function Courses({
             <p
               className="text-xs mt-1"
               style={{
-                color: '#85839a'
+                color: '#857A87'
               }}
             >
               Courses selected to help improve your career skills
@@ -1587,8 +1589,8 @@ function Courses({
           <span
             className="text-[10px] px-3 py-1.5 rounded-full font-semibold"
             style={{
-              background: '#e9e7f8',
-              color: '#5b56b5'
+              background: '#DBBCD4',
+              color: '#9B7FA0'
             }}
           >
             {courses?.length || 0} Courses
@@ -1620,9 +1622,9 @@ function Courses({
                 key={i}
                 className="rounded-2xl p-5 flex flex-col transition hover:-translate-y-0.5"
                 style={{
-                  background: '#fafafe',
-                  border: '1px solid #e6e3f2',
-                  boxShadow: '0 2px 10px rgba(91,86,181,0.04)'
+                  background: '#FCF9FC',
+                  border: '1px solid #E5D8E4',
+                  boxShadow: '0 2px 10px rgba(155,127,160,0.04)'
                 }}
               >
 
@@ -1631,8 +1633,8 @@ function Courses({
                   <div
                     className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
                     style={{
-                      background: '#e9e7f8',
-                      color: '#5b56b5'
+                      background: '#DBBCD4',
+                      color: '#9B7FA0'
                     }}
                   >
 
@@ -1673,8 +1675,8 @@ function Courses({
                   <span
                     className="text-[9px] px-2.5 py-1 rounded-full font-semibold"
                     style={{
-                      background: '#f3f0fa',
-                      color: '#5b56b5'
+                      background: '#F5EFF5',
+                      color: '#9B7FA0'
                     }}
                   >
                     {course.category}
@@ -1686,7 +1688,7 @@ function Courses({
                 <h3
                   className="text-sm font-bold mb-1.5"
                   style={{
-                    color: '#25243a'
+                    color: '#2E2730'
                   }}
                 >
                   {course.title}
@@ -1695,7 +1697,7 @@ function Courses({
                 <p
                   className="text-[11px] leading-relaxed line-clamp-3 flex-1"
                   style={{
-                    color: '#85839a'
+                    color: '#857A87'
                   }}
                 >
                   {course.description}
@@ -1705,14 +1707,14 @@ function Courses({
                 <div
                   className="flex items-center justify-between mt-4 pt-4"
                   style={{
-                    borderTop: '1px solid #f0eef5'
+                    borderTop: '1px solid #EEE5ED'
                   }}
                 >
 
                   <span
                     className="text-[10px] font-medium"
                     style={{
-                      color: '#85839a'
+                      color: '#857A87'
                     }}
                   >
                     {course.content_type === 'video_link'
@@ -1727,7 +1729,7 @@ function Courses({
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 px-4 py-2 rounded-lg text-xs font-semibold transition hover:opacity-90"
                       style={{
-                        background: '#5b56b5',
+                        background: '#9B7FA0',
                         color: '#ffffff'
                       }}
                     >
@@ -1737,7 +1739,7 @@ function Courses({
                   ) : (
                     <span
                       className="text-[10px] italic"
-                      style={{ color: '#85839a' }}
+                      style={{ color: '#857A87' }}
                     >
                       Link unavailable
                     </span>
@@ -1771,9 +1773,9 @@ function Jobs({
       className="rounded-2xl overflow-hidden"
       style={{
         background: '#ffffff',
-        border: '1px solid #e6e3f2',
+        border: '1px solid #E5D8E4',
         boxShadow:
-          '0 3px 15px rgba(91,86,181,0.06)'
+          '0 3px 15px rgba(155,127,160,0.06)'
       }}
     >
 
@@ -1786,7 +1788,7 @@ function Jobs({
             <h2
               className="text-lg font-bold"
               style={{
-                color: '#25243a'
+                color: '#2E2730'
               }}
             >
               Matched Job Opportunities
@@ -1795,7 +1797,7 @@ function Jobs({
             <p
               className="text-xs mt-1"
               style={{
-                color: '#85839a'
+                color: '#857A87'
               }}
             >
               Job opportunities matched with your career profile
@@ -1806,8 +1808,8 @@ function Jobs({
           <span
             className="text-[10px] px-3 py-1.5 rounded-full font-semibold"
             style={{
-              background: '#dffff0',
-              color: '#5db192'
+              background: '#E3F1E9',
+              color: '#6E9B86'
             }}
           >
             {jobs?.length || 0} Jobs
@@ -1835,17 +1837,17 @@ function Jobs({
 
               const matchColor =
                 job.match_score >= 70
-                  ? '#5db192'
+                  ? '#6E9B86'
                   : job.match_score >= 40
-                  ? '#e5a26d'
-                  : '#85839a'
+                  ? '#B88655'
+                  : '#857A87'
 
               const matchBg =
                 job.match_score >= 70
-                  ? '#dffff0'
+                  ? '#E3F1E9'
                   : job.match_score >= 40
-                  ? '#ffefe0'
-                  : '#f3f0fa'
+                  ? '#F7EBDD'
+                  : '#F5EFF5'
 
               const matchLabel =
                 job.match_score >= 70
@@ -1860,8 +1862,8 @@ function Jobs({
                   key={i}
                   className="rounded-2xl p-5 transition hover:shadow-md"
                   style={{
-                    background: '#fafafe',
-                    border: '1px solid #e6e3f2'
+                    background: '#FCF9FC',
+                    border: '1px solid #E5D8E4'
                   }}
                 >
 
@@ -1874,7 +1876,7 @@ function Jobs({
                         className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0"
                         style={{
                           background:
-                            'linear-gradient(135deg, #5b56b5 0%, #6f8fd4 100%)'
+                            'linear-gradient(135deg, #9B7FA0 0%, #7D89B8 100%)'
                         }}
                       >
                         {job.company_name
@@ -1887,7 +1889,7 @@ function Jobs({
                         <p
                           className="text-sm font-bold truncate"
                           style={{
-                            color: '#25243a'
+                            color: '#2E2730'
                           }}
                         >
                           {job.title}
@@ -1896,7 +1898,7 @@ function Jobs({
                         <p
                           className="text-xs font-medium mt-0.5"
                           style={{
-                            color: '#5b56b5'
+                            color: '#9B7FA0'
                           }}
                         >
                           {job.company_name}
@@ -1907,8 +1909,8 @@ function Jobs({
                           <span
                             className="inline-flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-full font-medium"
                             style={{
-                              background: '#e9e7f8',
-                              color: '#5b56b5'
+                              background: '#DBBCD4',
+                              color: '#9B7FA0'
                             }}
                           >
                             {job.job_type}
@@ -1917,8 +1919,8 @@ function Jobs({
                           <span
                             className="inline-flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-full font-medium"
                             style={{
-                              background: '#f3f0fa',
-                              color: '#85839a'
+                              background: '#F5EFF5',
+                              color: '#857A87'
                             }}
                           >
                             <svg
@@ -1944,7 +1946,7 @@ function Jobs({
 
                           <span
                             className="text-[10px] font-medium"
-                            style={{ color: '#85839a' }}
+                            style={{ color: '#857A87' }}
                           >
                             {job.category}
                           </span>
@@ -1974,7 +1976,7 @@ function Jobs({
                         <div
                           className="flex-1 h-1.5 rounded-full"
                           style={{
-                            background: '#e9e7f8'
+                            background: '#DBBCD4'
                           }}
                         >
                           <div
@@ -2005,7 +2007,7 @@ function Jobs({
                     <div
                       className="mt-4 pt-4 flex flex-wrap gap-1.5"
                       style={{
-                        borderTop: '1px solid #f0eef5'
+                        borderTop: '1px solid #EEE5ED'
                       }}
                     >
 
@@ -2018,8 +2020,8 @@ function Jobs({
                             key={skill}
                             className="text-[10px] px-2.5 py-1 rounded-md font-medium"
                             style={{
-                              background: '#e9e7f8',
-                              color: '#5b56b5'
+                              background: '#DBBCD4',
+                              color: '#9B7FA0'
                             }}
                           >
                             {skill.trim()}
@@ -2061,7 +2063,7 @@ function EmptyState({
         className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center text-2xl"
         style={{
           background:
-            '#e9e7f8'
+            '#DBBCD4'
         }}
       >
         {icon}
@@ -2070,7 +2072,7 @@ function EmptyState({
       <h3
         className="font-bold mb-2"
         style={{
-          color: '#25243a'
+          color: '#2E2730'
         }}
       >
         {title}
@@ -2079,7 +2081,7 @@ function EmptyState({
       <p
         className="text-sm"
         style={{
-          color: '#85839a'
+          color: '#857A87'
         }}
       >
         {description}

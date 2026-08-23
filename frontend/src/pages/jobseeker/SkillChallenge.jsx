@@ -3,11 +3,22 @@ import { useAuth } from '../../context/AuthContext'
 import API from '../../utils/api'
 
 const theme = {
-  bg: '#f6f3ff', primary: '#5b56b5', primaryDark: '#4d48a3',
-  softPurple: '#e9e7f8', white: '#ffffff', softPanel: '#f3f0fa',
-  border: '#e6e3f2', mainText: '#25243a', secondaryText: '#85839a',
-  green: '#5db192', softGreen: '#dffff0', blue: '#6f8fd4',
-  softBlue: '#e3eafb', orange: '#e5a26d', softOrange: '#ffefe0',
+  /* Pastel purple theme based on #DBBCD4 */
+  bg: '#F8F3F7',
+  primary: '#9B7FA0',
+  primaryDark: '#765C7A',
+  softPurple: '#DBBCD4',
+  white: '#FFFFFF',
+  softPanel: '#F5EFF5',
+  border: '#E5D8E4',
+  mainText: '#2E2730',
+  secondaryText: '#857A87',
+  green: '#6E9B86',
+  softGreen: '#E3F1E9',
+  blue: '#7D89B8',
+  softBlue: '#E9ECF7',
+  orange: '#B88655',
+  softOrange: '#F7EBDD',
 }
 
 const CATEGORIES = [
@@ -27,7 +38,7 @@ const CATEGORIES = [
 
 const DIFFICULTIES = [
   { id: 'Beginner', color: theme.green, bg: theme.softGreen, time: 300, points: 50 },
-  { id: 'Intermediate', color: theme.blue, bg: theme.softBlue, time: 420, points: 75 },
+  { id: 'Intermediate', color: theme.primary, bg: theme.softBlue, time: 420, points: 75 },
   { id: 'Advanced', color: theme.orange, bg: theme.softOrange, time: 600, points: 100 },
 ]
 
@@ -446,7 +457,7 @@ Be fair but strict. Score based on technical accuracy and completeness.`
             <button key={tab.id} onClick={() => { setActiveTab(tab.id); if (tab.id === 'play') resetChallenge() }}
               className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition"
               style={activeTab === tab.id
-                ? {background: `linear-gradient(135deg, ${theme.primary}, ${theme.blue})`, color: 'white'}
+                ? {background: `linear-gradient(135deg, ${theme.primary}, ${theme.primary})`, color: 'white'}
                 : {color: theme.secondaryText}}>
               {tab.icon}
               <span className="hidden sm:inline">{tab.label}</span>
@@ -552,7 +563,7 @@ Be fair but strict. Score based on technical accuracy and completeness.`
                   onClick={generateChallenge}
                   disabled={!selectedCategory || !selectedDifficulty || !selectedType || loading}
                   className="w-full py-4 rounded-2xl font-bold text-white text-base flex items-center justify-center gap-3 disabled:opacity-40 transition hover:opacity-90"
-                  style={{background: `linear-gradient(135deg, ${theme.primary}, ${theme.blue})`}}>
+                  style={{background: `linear-gradient(135deg, ${theme.primaryDark}, ${theme.primary})`}}>
                   {loading ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -670,7 +681,7 @@ Be fair but strict. Score based on technical accuracy and completeness.`
                 <button onClick={() => submitAnswer(false)}
                   disabled={!userAnswer.trim() || submitting}
                   className="w-full py-3.5 rounded-2xl font-bold text-white disabled:opacity-40 flex items-center justify-center gap-2"
-                  style={{background: `linear-gradient(135deg, ${theme.primary}, ${theme.blue})`}}>
+                  style={{background: `linear-gradient(135deg, ${theme.primaryDark}, ${theme.primary})`}}>
                   {submitting ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -689,7 +700,7 @@ Be fair but strict. Score based on technical accuracy and completeness.`
                 <div className="rounded-2xl overflow-hidden"
                   style={{border: `1px solid ${theme.border}`}}>
                   <div className="p-6 text-center text-white"
-                    style={{background: `linear-gradient(135deg, ${theme.primary}, ${theme.blue})`}}>
+                    style={{background: `linear-gradient(135deg, ${theme.primaryDark}, ${theme.primary})`}}>
                     <p className="text-sm mb-2 opacity-80">
                       {result.timedOut ? 'Time ran out!' : 'Challenge Complete!'}
                     </p>
@@ -758,11 +769,11 @@ Be fair but strict. Score based on technical accuracy and completeness.`
                     {/* Sample Answer */}
                     {result.evaluation.sample_answer && (
                       <div className="p-4 rounded-xl"
-                        style={{background: theme.softBlue, border: `1px solid ${theme.blue}30`}}>
-                        <p className="text-xs font-bold mb-2" style={{color: theme.blue}}>
+                        style={{background: theme.softBlue, border: `1px solid ${theme.primary}30`}}>
+                        <p className="text-xs font-bold mb-2" style={{color: theme.primary}}>
                           Model Answer / Key Points
                         </p>
-                        <p className="text-xs leading-relaxed" style={{color: theme.blue}}>
+                        <p className="text-xs leading-relaxed" style={{color: theme.primary}}>
                           {result.evaluation.sample_answer}
                         </p>
                       </div>
@@ -799,7 +810,7 @@ Be fair but strict. Score based on technical accuracy and completeness.`
                 <div className="grid grid-cols-2 gap-3">
                   <button onClick={resetChallenge}
                     className="py-3 rounded-xl font-bold text-white"
-                    style={{background: `linear-gradient(135deg, ${theme.primary}, ${theme.blue})`}}>
+                    style={{background: `linear-gradient(135deg, ${theme.primaryDark}, ${theme.primary})`}}>
                     Try Another
                   </button>
                   <button onClick={() => { setActiveTab('history'); fetchHistory() }}
@@ -828,7 +839,7 @@ Be fair but strict. Score based on technical accuracy and completeness.`
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {[
                     { label: 'Total Challenges', value: stats.total_challenges, color: theme.primary, bg: theme.softPurple },
-                    { label: 'Avg Score', value: `${stats.avg_score}%`, color: theme.blue, bg: theme.softBlue },
+                    { label: 'Avg Score', value: `${stats.avg_score}%`, color: theme.primary, bg: theme.softBlue },
                     { label: 'Best Score', value: `${stats.best_score}%`, color: theme.green, bg: theme.softGreen },
                     { label: 'Badges Earned', value: stats.total_badges, color: theme.orange, bg: theme.softOrange },
                   ].map((s, i) => (

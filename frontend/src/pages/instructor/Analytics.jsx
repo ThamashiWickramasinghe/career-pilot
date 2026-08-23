@@ -9,38 +9,37 @@ import {
    COLOUR THEME (matches InstructorDashboard.jsx)
    ============================================================ */
 const C = {
-  bg: '#F7F9FC',
+  bg: '#F8FBF9',
 
   card: '#FFFFFF',
-  border: '#E6EAF0',
+  border: '#E8EFEB',
 
-  ink: '#243B53',
-  sub: '#829AB1',
+  ink: '#3E4E5D',
+  sub: '#8E9993',
 
-  accent: '#394d5e',
-  accentDark: '#102A43',
-  accentSoft: '#E8F1FF',
+  accent: '#8BC4A3',
+  accentDark: '#78B694',
+  accentSoft: '#EEF8F2',
 
-  teal: '#20A39E',
-  tealSoft: '#E4F7F5',
+  teal: '#8BBCC9',
+  tealSoft: '#EFF8FA',
 
-  green: '#2FB171',
-  greenSoft: '#E7F8EF',
+  green: '#8BC4A3',
+  greenSoft: '#EEF8F2',
 
-  orange: '#F4A340',
-  orangeSoft: '#FFF2DE',
+  orange: '#EABF91',
+  orangeSoft: '#FDF5EC',
 
-  red: '#EF625C',
-  redSoft: '#FDEAE9',
+  red: '#DFA0AA',
+  redSoft: '#FBEFF1',
 
-  purple: '#8067D9',
-  purpleSoft: '#F0ECFF',
+  purple: '#B3A4D7',
+  purpleSoft: '#F5F2FA',
 
-  softPanel: '#F5F7FA'
+  softPanel: '#FAFCFB'
 }
 
-const cardShadow =
-  '0 2px 10px rgba(16, 42, 67, 0.06), 0 1px 3px rgba(16, 42, 67, 0.04)'
+const cardShadow = 'none'
 
 /* ============================================================
    INLINE SVG ICONS
@@ -123,19 +122,19 @@ const IconInbox = (p) => (
    ============================================================ */
 
 const TYPE_META = {
-  video_link: { label: 'Video', icon: IconVideo, color: '#1769E0', soft: '#E8F1FF' },
-  pdf: { label: 'PDF', icon: IconFileText, color: '#2FB171', soft: '#E7F8EF' },
-  note: { label: 'Notes', icon: IconNotes, color: '#8067D9', soft: '#F0ECFF' }
+  video_link: { label: 'Video', icon: IconVideo, color: '#8BC4A3', soft: '#EEF8F2' },
+  pdf: { label: 'PDF', icon: IconFileText, color: '#8BBCC9', soft: '#EFF8FA' },
+  note: { label: 'Notes', icon: IconNotes, color: '#B3A4D7', soft: '#F5F2FA' }
 }
 
-const PIE_COLORS = ['#1769E0', '#2FB171', '#8067D9', '#F4A340', '#EF625C', '#20A39E']
+const PIE_COLORS = ['#8BC4A3', '#8BBCC9', '#B3A4D7', '#EABF91', '#DFA0AA', '#82B7AE']
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload || !payload.length) return null
   return (
     <div
       className="px-3 py-2 rounded-lg text-xs font-medium"
-      style={{ background: C.accentDark, color: '#ffffff', boxShadow: '0 6px 16px rgba(16,42,67,0.25)' }}
+      style={{ background: C.accentDark, color: '#ffffff', boxShadow: 'none' }}
     >
       {label && <p className="mb-0.5 opacity-80">{label}</p>}
       {payload.map((p, i) => (

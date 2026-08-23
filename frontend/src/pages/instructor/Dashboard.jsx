@@ -11,45 +11,44 @@ import Analytics from './Analytics'
    COLOUR THEME
    ============================================================ */
 const C = {
-  bg: '#F7F9FC',
+  bg: '#f5fff9',
 
-  sidebar: '#102A43',
-  sidebarDark: '#0B1F33',
-  sidebarText: '#D9E2EC',
-  sidebarMuted: '#829AB1',
+  sidebar: '#8BC4A3',
+  sidebarDark: '#78B694',
+  sidebarText: '#ffffff',
+  sidebarMuted: '#E4F2EA',
 
   panel: '#FFFFFF',
-  card: '#FFFFFF',
-  border: '#E6EAF0',
+  card: '#ffffff',
+  border: '#E8EFEB',
 
-  ink: '#243B53',
-  sub: '#829AB1',
+  ink: '#3E4E5D',
+  sub: '#8E9993',
 
-  accent: '#394d5e',
-  accentDark: '#102A43',
-  accentSoft: '#E8F1FF',
+  accent: '#8BC4A3',
+  accentDark: '#78B694',
+  accentSoft: '#EEF8F2',
 
-  teal: '#20A39E',
-  tealDark: '#16847F',
-  tealSoft: '#E4F7F5',
+  teal: '#8BBCC9',
+  tealDark: '#6FA5B3',
+  tealSoft: '#EFF8FA',
 
-  green: '#2FB171',
-  greenSoft: '#E7F8EF',
+  green: '#8BC4A3',
+  greenSoft: '#EEF8F2',
 
-  orange: '#F4A340',
-  orangeSoft: '#FFF2DE',
+  orange: '#EABF91',
+  orangeSoft: '#FDF5EC',
 
-  red: '#EF625C',
-  redSoft: '#FDEAE9',
+  red: '#DFA0AA',
+  redSoft: '#FBEFF1',
 
-  purple: '#8067D9',
-  purpleSoft: '#F0ECFF',
+  purple: '#B3A4D7',
+  purpleSoft: '#F5F2FA',
 
-  softPanel: '#F5F7FA'
+  softPanel: '#FAFCFB'
 }
 
-const cardShadow =
-  '0 2px 10px rgba(16, 42, 67, 0.06), 0 1px 3px rgba(16, 42, 67, 0.04)'
+const cardShadow = 'none'
 
 /* ============================================================
    INLINE SVG ICONS
@@ -174,17 +173,17 @@ const IconLoader = (p) => (
    ============================================================ */
 
 const TYPE_META = {
-  video_link: { label: 'Video', icon: IconVideo, color: '#1769E0', soft: '#E8F1FF' },
-  pdf: { label: 'PDF', icon: IconFileText, color: '#2FB171', soft: '#E7F8EF' },
-  note: { label: 'Notes', icon: IconNotes, color: '#8067D9', soft: '#F0ECFF' }
+  video_link: { label: 'Video', icon: IconVideo, color: '#74B28D', soft: '#E8F3ED' },
+  pdf: { label: 'PDF', icon: IconFileText, color: '#79AFC0', soft: '#EAF4F7' },
+  note: { label: 'Notes', icon: IconNotes, color: '#A493CF', soft: '#F1EEF8' }
 }
 
-const PIE_COLORS = ['#1769E0', '#2FB171', '#8067D9', '#F4A340', '#EF625C', '#20A39E']
+const PIE_COLORS = ['#8BC4A3', '#8BBCC9', '#B3A4D7', '#EABF91', '#DFA0AA', '#82B7AE']
 
 const STATUS_STYLE = {
-  Approved: { color: '#2FB171', soft: '#E7F8EF' },
-  Pending: { color: '#F4A340', soft: '#FFF2DE' },
-  Rejected: { color: '#EF625C', soft: '#FDEAE9' }
+  Approved: { color: '#6FA889', soft: '#EEF8F2' },
+  Pending: { color: '#B9895D', soft: '#FDF5EC' },
+  Rejected: { color: '#BD7784', soft: '#FBEFF1' }
 }
 
 function timeAgo(dateStr) {
@@ -497,7 +496,7 @@ export default function InstructorDashboard() {
 
         {filteredNavItems.length > 0 && (
           <div
-            className="absolute left-0 right-0 top-12 rounded-xl shadow-lg border z-50 overflow-hidden"
+            className="absolute left-0 right-0 top-12 rounded-xl border z-50 overflow-hidden"
             style={{ background: C.card, borderColor: C.border }}
           >
             {filteredNavItems.map((item) => {
@@ -524,7 +523,7 @@ export default function InstructorDashboard() {
       <div className="relative flex-shrink-0">
         <button
           onClick={() => setNotifOpen(!notifOpen)}
-          className="w-10 h-10 rounded-xl border flex items-center justify-center transition hover:shadow-sm"
+          className="w-10 h-10 rounded-xl border flex items-center justify-center transition"
           style={{ background: C.bg, borderColor: C.border }}
           title="Notifications"
         >
@@ -541,7 +540,7 @@ export default function InstructorDashboard() {
 
         {notifOpen && (
           <div
-            className="absolute right-0 top-12 w-80 rounded-2xl shadow-xl border z-50 overflow-hidden"
+            className="absolute right-0 top-12 w-80 rounded-2xl border z-50 overflow-hidden"
             style={{ background: C.card, borderColor: C.border }}
           >
             <div className="p-4 border-b flex justify-between items-center" style={{ borderColor: C.border }}>
@@ -633,7 +632,7 @@ export default function InstructorDashboard() {
         <div className="px-6 pt-6 pb-10 flex items-center gap-3">
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ background: 'rgba(255,255,255,0.14)' }}
+            style={{ background: 'rgba(255,255,255,0.18)' }}
           >
             <IconSparkle size={24} color="#ffffff" />
           </div>
@@ -679,7 +678,7 @@ export default function InstructorDashboard() {
                     : { color: C.sidebarText }
                 }
               >
-                <IconComp size={18} color={active ? '#ffffff' : C.sidebarMuted} strokeWidth={2} />
+                <IconComp size={18} color={active ? '#1a652e' : C.sidebarMuted} strokeWidth={2} />
                 <span>{item.label}</span>
               </button>
             )
@@ -698,7 +697,6 @@ export default function InstructorDashboard() {
 
             <div className="flex-1 overflow-hidden">
               <p className="text-xs font-semibold truncate" style={{ color: '#ffffff' }}>{user?.full_name}</p>
-              <p className="text-[11px]" style={{ color: C.sidebarText }}>● Active</p>
             </div>
 
             <button onClick={handleLogout} className="p-1.5 rounded-lg hover:bg-white/10" title="Log out">
@@ -726,26 +724,20 @@ export default function InstructorDashboard() {
               <div
                 className="relative overflow-hidden rounded-2xl p-6 mb-6"
                 style={{
-                  background: `linear-gradient(135deg, ${C.accentDark} 0%, ${C.accent} 100%)`,
-                  boxShadow: '0 8px 24px rgba(23,105,224,0.18)'
+                  background: C.accent,
+                  boxShadow: 'none'
                 }}
               >
                 <div className="relative z-10 max-w-2xl">
                   <h1 className="text-2xl font-bold mb-2" style={{ color: '#ffffff' }}>
-                    Welcome back, {user?.full_name || user?.username || 'there'}! 👋
+                    Welcome back, {user?.full_name || user?.username || 'there'}! 
                   </h1>
-                  <p className="text-sm max-w-xl leading-relaxed" style={{ color: 'rgba(255,255,255,0.88)' }}>
+                  <p className="text-sm max-w-xl leading-relaxed" style={{ color: 'rgb(255, 255, 255)' }}>
                     {user?.current_post || 'Instructor'} · Track your content performance, manage
                     student access and keep growing your reach.
                   </p>
                 </div>
 
-                <div className="absolute -right-12 -top-16 w-44 h-44 rounded-full" style={{ background: 'rgba(255,255,255,0.10)' }} />
-                <div className="absolute right-20 -bottom-20 w-40 h-40 rounded-full" style={{ background: 'rgba(255,255,255,0.07)' }} />
-                <div
-                  className="absolute right-10 bottom-8 w-14 h-14 rounded-2xl rotate-12"
-                  style={{ border: '1px solid rgba(255,255,255,0.18)', background: 'rgba(255,255,255,0.06)' }}
-                />
               </div>
 
               {/* ACTION MESSAGE */}
@@ -775,7 +767,7 @@ export default function InstructorDashboard() {
                   return (
                     <div
                       key={s.id}
-                      className="rounded-2xl overflow-hidden transition hover:-translate-y-0.5 hover:shadow-md cursor-pointer"
+                      className="rounded-2xl overflow-hidden transition cursor-pointer"
                       style={{ background: C.card, boxShadow: cardShadow }}
                       onClick={() => setActiveTab(s.id === 'requests' ? 'manage-content' : (s.id === 'students' || s.id === 'approved') ? 'analytics' : 'manage-content')}
                     >

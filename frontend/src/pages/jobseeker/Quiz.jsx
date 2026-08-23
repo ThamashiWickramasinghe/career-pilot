@@ -6,23 +6,28 @@ import API from '../../utils/api'
 // COLOR TOKENS
 // ============================================================
 const COLORS = {
-  bg: '#f6f3ff',
-  primary: '#5b56b5',
-  primaryDark: '#4d48a3',
-  softPurple: '#e9e7f8',
-  panel: '#ffffff',
-  softPanel: '#f3f0fa',
-  border: '#e6e3f2',
-  text: '#25243a',
-  textSecondary: '#85839a',
-  green: '#5db192',
-  softGreen: '#dffff0',
-  blue: '#6f8fd4',
-  softBlue: '#e3eafb',
-  orange: '#e5a26d',
-  softOrange: '#ffefe0',
-  red: '#dc4c4c',
-  softRed: '#fde8e8'
+  /* Pastel purple theme based on #DBBCD4 */
+  bg: '#F8F3F7',
+  primary: '#9B7FA0',
+  primaryDark: '#765C7A',
+  softPurple: '#DBBCD4',
+  panel: '#FFFFFF',
+  softPanel: '#F5EFF5',
+  border: '#E5D8E4',
+  text: '#2E2730',
+  textSecondary: '#857A87',
+
+  /* Supporting colours */
+  green: '#6E9B86',
+  softGreen: '#E3F1E9',
+  blue: '#7D89B8',
+  softBlue: '#E9ECF7',
+  orange: '#B88655',
+  softOrange: '#F7EBDD',
+
+  /* Keep warning/error states clearly visible */
+  red: '#DC4C4C',
+  softRed: '#FDE8E8'
 }
 
 const PRIMARY_GRADIENT = `linear-gradient(135deg, ${COLORS.primaryDark}, ${COLORS.primary})`
@@ -70,19 +75,7 @@ function PageHeader({ title, onBack }) {
         {title}
       </h1>
 
-      <button
-        type="button"
-        onClick={onBack}
-        className="flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-lg transition hover:opacity-80"
-        style={{ color: COLORS.primary }}
-      >
-        Back
-        <Icon
-          name="skip"
-          className="w-4 h-4 rotate-180"
-          strokeWidth={2.2}
-        />
-      </button>
+      
     </div>
   )
 }

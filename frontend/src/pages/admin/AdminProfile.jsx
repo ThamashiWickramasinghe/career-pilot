@@ -6,32 +6,31 @@ import API from '../../utils/api'
    COLOUR THEME (matches AdminDashboard.jsx)
    ============================================================ */
 const C = {
-  bg: '#F2F8EC',
+  bg: '#F4F7FB',
 
   card: '#FFFFFF',
-  border: '#E4E9DF',
+  border: '#E4EAF2',
 
-  ink: '#26332A',
-  sub: '#7A817B',
+  ink: '#34445A',
+  sub: '#7F8A9B',
 
-  primary: '#7DB343',
-  primaryDark: '#5C8531',
+  primary: '#6C93C7',
+  primaryDark: '#587EAE',
 
-  green: '#72B53D',
-  orange: '#F2A65A',
-  red: '#E95D5D',
+  green: '#78B892',
+  orange: '#E8B17C',
+  red: '#D98C98',
 
-  softPanel: '#F7F8F5',
-  lightGreen: '#DCECC8'
+  softPanel: '#F7F9FC',
+  lightGreen: '#E8F3EC'
 }
 
-const primarySoft = 'rgba(125,179,67,0.14)'
-const greenSoft = 'rgba(114,181,61,0.14)'
-const orangeSoft = 'rgba(242,166,90,0.16)'
-const redSoft = 'rgba(233,93,93,0.14)'
+const primarySoft = 'rgba(108,147,199,0.12)'
+const greenSoft = 'rgba(120,184,146,0.14)'
+const orangeSoft = 'rgba(232,177,124,0.16)'
+const redSoft = 'rgba(217,140,152,0.14)'
 
-const cardShadow =
-  '0 2px 8px rgba(38, 51, 42, 0.06), 0 1px 3px rgba(38, 51, 42, 0.04)'
+const cardShadow = 'none'
 
 /* ============================================================
    INLINE SVG ICONS
@@ -192,7 +191,7 @@ export default function AdminProfile() {
         {success && (
           <div
             className="mb-3 p-3 rounded-xl text-xs font-medium flex items-center gap-2"
-            style={{ background: greenSoft, color: '#3F7A22' }}
+            style={{ background: greenSoft, color: '#4E7D61' }}
           >
             <IconCheckCircle size={15} color="#3F7A22" />
             <span>{success}</span>
@@ -203,11 +202,11 @@ export default function AdminProfile() {
         {error && (
           <div
             className="mb-3 p-3 rounded-xl text-xs font-medium flex items-center gap-2"
-            style={{ background: orangeSoft, color: '#B45309' }}
+            style={{ background: orangeSoft, color: '#A56F3E' }}
           >
             <IconAlertCircle size={15} color="#B45309" />
             <span>{error}</span>
-            <button onClick={() => setError('')} className="ml-auto" style={{ color: '#B45309' }}>
+            <button onClick={() => setError('')} className="ml-auto" style={{ color: '#A56F3E' }}>
               <IconX size={13} color="#B45309" />
             </button>
           </div>
@@ -220,22 +219,16 @@ export default function AdminProfile() {
 
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  <div
-                    className="w-11 h-11 rounded-xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
-                    style={{ background: `linear-gradient(135deg, ${C.primaryDark}, ${C.primary})` }}
-                  >
-                    {form.full_name?.charAt(0).toUpperCase() || 'A'}
-                  </div>
+                  
                   <div>
                     <h3 className="text-base font-bold" style={{ color: C.ink }}>Personal Information</h3>
-                    <p className="text-[11px]" style={{ color: C.sub }}>Your administrator account details</p>
                   </div>
                 </div>
 
                 <button
                   onClick={() => setEditing(true)}
-                  className="text-xs px-3 py-1.5 rounded-lg text-white font-medium hover:shadow-md transition"
-                  style={{ background: `linear-gradient(135deg, ${C.primaryDark}, ${C.primary})` }}
+                  className="text-xs px-3 py-1.5 rounded-lg text-white font-medium transition"
+                  style={{ background: C.primary }}
                 >
                   Edit
                 </button>
@@ -368,8 +361,8 @@ export default function AdminProfile() {
               <button
                 onClick={handleSave}
                 disabled={loading}
-                className="px-6 py-2 rounded-lg text-xs font-bold text-white disabled:opacity-50 transition hover:shadow-lg flex items-center gap-2"
-                style={{ background: `linear-gradient(135deg, ${C.primaryDark}, ${C.primary})` }}
+                className="px-6 py-2 rounded-lg text-xs font-bold text-white disabled:opacity-50 transition flex items-center gap-2"
+                style={{ background: C.primary }}
               >
                 {loading ? <IconLoader size={13} /> : null}
                 {loading ? 'Saving...' : 'Save Changes'}

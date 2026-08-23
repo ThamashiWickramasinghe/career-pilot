@@ -10,56 +10,54 @@ import {
 } from 'recharts'
 
 /* ============================================================
-   COLOUR THEME (from provided palette)
+   COLOUR THEME — PixelAdmin-inspired, light & airy
    ============================================================ */
 const C = {
-  bg: '#F2F8EC',
+  bg: '#F5F7FA',
 
-  sidebar: '#7DB343',
-  sidebarDark: '#5C8531',
-  sidebarDarker: '#4A6B27',
-  sidebarText: '#F2F8EC',
-  sidebarMuted: '#DCECC8',
+  sidebarDark: '#6F95C9',
+  sidebarDarker: '#5B7FAF',
+  sidebarText: '#F0F5FB',
+  sidebarMuted: '#DDE7F2',
 
   panel: '#FFFFFF',
   card: '#FFFFFF',
-  border: '#E4E9DF',
+  border: '#E4E9F0',
 
-  ink: '#26332A',
-  sub: '#7A817B',
+  ink: '#344054',
+  sub: '#667085',
 
-  primary: '#7DB343',
-  primaryDark: '#5C8531',
+  primary: '#6F95C9',
+  primaryDark: '#5B7FAF',
 
-  mainBg: '#A8CF72',
-  lightGreen: '#DCECC8',
-  veryLightGreen: '#F2F8EC',
+  mainBg: '#EEF3F8',
+  lightGreen: '#F0F5FB',
+  veryLightGreen: '#F5F7FA',
 
-  green: '#72B53D',
-  orange: '#F2A65A',
-  red: '#E95D5D',
+  green: '#74B28D',
+  orange: '#E2AD78',
+  red: '#D98996',
 
-  teal: '#0EA5D9',
-  purple: '#8067D9',
+  teal: '#72AFC2',
+  purple: '#A493D0',
 
-  softPanel: '#F7F8F5'
+  softPanel: '#F8FAFC'
 }
 
 // Soft tints derived from the base palette via opacity, since the
 // provided palette only includes solid colours.
-const primarySoft = 'rgba(125,179,67,0.14)'
-const greenSoft = 'rgba(114,181,61,0.14)'
-const orangeSoft = 'rgba(242,166,90,0.16)'
-const redSoft = 'rgba(233,93,93,0.14)'
-const darkSoft = 'rgba(74,107,39,0.14)'
-const tealSoft = 'rgba(14,165,217,0.14)'
-const purpleSoft = 'rgba(128,103,217,0.14)'
+const primarySoft = 'rgba(111,149,201,0.12)'
+const greenSoft = 'rgba(116,178,141,0.16)'
+const orangeSoft = 'rgba(226,173,120,0.20)'
+const redSoft = 'rgba(217,137,150,0.20)'
+const darkSoft = 'rgba(91,127,175,0.12)'
+const tealSoft = 'rgba(114,175,194,0.18)'
+const purpleSoft = 'rgba(164,147,208,0.18)'
 
-const cardShadow =
-  '0 2px 10px rgba(38, 51, 42, 0.06), 0 1px 3px rgba(38, 51, 42, 0.04)'
+const cardShadow = 'none'
 
-// Chart colour set — green as primary, orange as highlight, teal/purple for extra variety
-const CHART_COLORS = ['#7DB343', '#F2A65A', '#0EA5D9', '#8067D9']
+// Chart colour set — muted blue as primary, soft orange as highlight, teal/purple for variety
+const CHART_COLORS = ['#6F95C9', '#E2AD78', '#72AFC2', '#A493D0']
 
 /* ============================================================
    INLINE SVG ICONS
@@ -208,15 +206,15 @@ const IconSend = (p) => (
    ============================================================ */
 
 const TYPE_META = {
-  video_link: { label: 'Video', icon: IconVideo, color: '#0EA5D9', soft: tealSoft },
-  pdf: { label: 'PDF', icon: IconFileText, color: '#F2A65A', soft: orangeSoft },
-  note: { label: 'Notes', icon: IconNotes, color: '#26332A', soft: 'rgba(38,51,42,0.08)' }
+  video_link: { label: 'Video', icon: IconVideo, color: '#72AFC2', soft: tealSoft },
+  pdf: { label: 'PDF', icon: IconFileText, color: '#E2AD78', soft: orangeSoft },
+  note: { label: 'Notes', icon: IconNotes, color: '#344054', soft: 'rgba(62,76,99,0.08)' }
 }
 
 const CONTENT_STATUS_STYLE = {
-  Approved: { color: '#3F7A22', soft: greenSoft },
-  Pending: { color: '#B45309', soft: orangeSoft },
-  Rejected: { color: '#B42318', soft: redSoft }
+  Approved: { color: '#3F7D5A', soft: greenSoft },
+  Pending: { color: '#A66F2E', soft: orangeSoft },
+  Rejected: { color: '#B13F55', soft: redSoft }
 }
 
 const ROLE_LABELS = {
@@ -270,7 +268,7 @@ const CustomTooltip = ({ active, payload, label }) => {
   return (
     <div
       className="px-3 py-2 rounded-lg text-xs font-medium"
-      style={{ background: C.primaryDark, color: '#ffffff', boxShadow: '0 6px 16px rgba(38,51,42,0.25)' }}
+      style={{ background: C.primaryDark, color: '#ffffff', boxShadow: 'none' }}
     >
       {label && <p className="mb-0.5 opacity-80">{label}</p>}
       {payload.map((p, i) => (
@@ -318,7 +316,6 @@ export default function AdminDashboard() {
     format: 'PDF Report',
     email: ''
   })
-  const [generatedReports, setGeneratedReports] = useState([])
   const [reportActionLoading, setReportActionLoading] = useState(false)
 
   const [notificationForm, setNotificationForm] = useState({
@@ -478,19 +475,19 @@ export default function AdminDashboard() {
     const win = window.open('', '_blank')
     if (!win) return false
     const headHtml = columns
-      .map((c) => `<th style="padding:8px 10px;border:1px solid #E4E9DF;background:#F2F8EC;text-align:left;font-size:12px;color:#26332A;">${c}</th>`)
+      .map((c) => `<th style="padding:8px 10px;border:1px solid #E4E9F0;background:#F5F7FA;text-align:left;font-size:12px;color:#344054;">${c}</th>`)
       .join('')
     const rowsHtml = rows
-      .map((r) => `<tr>${r.map((c) => `<td style="padding:8px 10px;border:1px solid #E4E9DF;font-size:12px;color:#26332A;">${c}</td>`).join('')}</tr>`)
+      .map((r) => `<tr>${r.map((c) => `<td style="padding:8px 10px;border:1px solid #E4E9F0;font-size:12px;color:#344054;">${c}</td>`).join('')}</tr>`)
       .join('')
     win.document.write(`
       <html>
         <head>
           <title>${title}</title>
           <style>
-            body { font-family: Arial, Helvetica, sans-serif; padding: 32px; color: #26332A; }
+            body { font-family: Arial, Helvetica, sans-serif; padding: 32px; color: #344054; }
             h1 { font-size: 20px; margin-bottom: 4px; }
-            p.meta { font-size: 12px; color: #7A817B; margin-top: 0; margin-bottom: 20px; }
+            p.meta { font-size: 12px; color: #667085; margin-top: 0; margin-bottom: 20px; }
             table { border-collapse: collapse; width: 100%; }
           </style>
         </head>
@@ -580,19 +577,6 @@ export default function AdminDashboard() {
     }
   }
 
-  const addGeneratedReport = (dataset, format, sent) => {
-    const entry = {
-      id: Date.now(),
-      title: dataset.title,
-      dateLabel: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-      type: format === 'PDF Report' ? 'PDF' : 'Excel',
-      sent,
-      columns: dataset.columns,
-      rows: dataset.rows
-    }
-    setGeneratedReports((prev) => [entry, ...prev].slice(0, 10))
-  }
-
   const downloadReportEntry = (entry) => {
     if (entry.type === 'Excel') {
       downloadBlob(buildCSV(entry.columns, entry.rows), `${entry.title.replace(/\s+/g, '_')}.csv`, 'text/csv')
@@ -613,7 +597,6 @@ export default function AdminDashboard() {
         return
       }
     }
-    addGeneratedReport(dataset, reportForm.format, false)
     showSuccess('Report downloaded successfully.')
   }
 
@@ -624,7 +607,6 @@ export default function AdminDashboard() {
     }
     setReportActionLoading(true)
     const dataset = buildReportDataset()
-    let sent = false
 
     try {
       await API.post('/admin/reports/send', {
@@ -637,7 +619,6 @@ export default function AdminDashboard() {
         columns: dataset.columns,
         rows: dataset.rows
       })
-      sent = true
       showSuccess(`Report emailed to ${reportForm.email}.`)
     } catch (err) {
       // No backend email endpoint yet — generate the file locally and open
@@ -657,7 +638,6 @@ export default function AdminDashboard() {
       showSuccess("Email delivery isn't connected to a backend yet — the report was downloaded and your mail client opened so you can attach and send it manually.")
     }
 
-    addGeneratedReport(dataset, reportForm.format, sent)
     setReportActionLoading(false)
   }
 
@@ -995,7 +975,7 @@ export default function AdminDashboard() {
       `}</style>
 
       {/* ========================================================
-          LEFT SIDEBAR — single solid colour, no gradient mix
+          LEFT SIDEBAR
           ======================================================== */}
 
       <div
@@ -1026,7 +1006,7 @@ export default function AdminDashboard() {
             )
           })}
 
-          <div className="mx-1 my-6 border-t" style={{ borderColor: 'rgba(255,255,255,0.14)' }} />
+          <div className="mx-1 my-6 border-t" style={{ borderColor: 'rgba(255,255,255,0.22)' }} />
 
           {secondaryNavItems.map((item) => {
             const IconComp = item.icon
@@ -1045,17 +1025,16 @@ export default function AdminDashboard() {
           })}
         </nav>
 
-        <div className="px-4 py-4 border-t" style={{ borderColor: 'rgba(255,255,255,0.14)' }}>
+        <div className="px-4 py-4 border-t" style={{ borderColor: 'rgba(255,255,255,0.22)' }}>
           <div className="flex items-center gap-3 px-2 py-2">
             <div
               className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
-              style={{ background: 'rgba(255,255,255,0.2)' }}
+              style={{ background: 'rgba(255,255,255,0.24)' }}
             >
               {user?.full_name?.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 overflow-hidden">
               <p className="text-xs font-semibold truncate" style={{ color: '#ffffff' }}>{user?.full_name}</p>
-              <p className="text-[11px]" style={{ color: C.sidebarText }}>● Administrator</p>
             </div>
             <button onClick={handleLogout} className="p-1.5 rounded-lg hover:bg-white/10" title="Log out">
               <IconLogout size={16} color={C.sidebarMuted} />
@@ -1073,17 +1052,17 @@ export default function AdminDashboard() {
 
           {/* ALERTS */}
           {error && (
-            <div className="mb-4 p-3.5 rounded-xl text-sm font-medium flex items-center gap-2.5" style={{ background: redSoft, color: '#B42318' }}>
-              <IconAlertCircle size={16} color="#B42318" />
+            <div className="mb-4 p-3.5 rounded-xl text-sm font-medium flex items-center gap-2.5" style={{ background: redSoft, color: '#B13F55' }}>
+              <IconAlertCircle size={16} color="#B13F55" />
               <span className="flex-1">{error}</span>
-              <button onClick={() => setError('')}><IconX size={14} color="#B42318" /></button>
+              <button onClick={() => setError('')}><IconX size={14} color="#B13F55" /></button>
             </div>
           )}
           {success && (
-            <div className="mb-4 p-3.5 rounded-xl text-sm font-medium flex items-center gap-2.5" style={{ background: greenSoft, color: '#3F7A22' }}>
-              <IconCheckCircle size={16} color="#3F7A22" />
+            <div className="mb-4 p-3.5 rounded-xl text-sm font-medium flex items-center gap-2.5" style={{ background: greenSoft, color: '#3F7D5A' }}>
+              <IconCheckCircle size={16} color="#3F7D5A" />
               <span className="flex-1">{success}</span>
-              <button onClick={() => setSuccess('')}><IconX size={14} color="#3F7A22" /></button>
+              <button onClick={() => setSuccess('')}><IconX size={14} color="#3F7D5A" /></button>
             </div>
           )}
 
@@ -1096,18 +1075,16 @@ export default function AdminDashboard() {
               <div
                 className="relative overflow-hidden rounded-2xl p-6 mb-6"
                 style={{
-                  background: `linear-gradient(135deg, ${C.sidebarDarker} 0%, ${C.primary} 70%, ${C.mainBg} 130%)`,
-                  boxShadow: '0 8px 24px rgba(92,133,49,0.25)'
+                  background: C.primary,
+                  boxShadow: '0 8px 24px rgba(91,127,175,0.22)'
                 }}
               >
                 <div className="relative z-10 max-w-2xl">
-                  <h1 className="text-2xl font-bold mb-2" style={{ color: '#ffffff' }}>Welcome back, {user?.full_name || 'there'}! 👋</h1>
+                  <h1 className="text-2xl font-bold mb-2" style={{ color: '#ffffff' }}>Welcome back, {user?.full_name || 'there'}! </h1>
                   <p className="text-sm max-w-xl leading-relaxed" style={{ color: 'rgba(255,255,255,0.9)' }}>
                     Administrator · Managing the Career Pilot platform
                   </p>
                 </div>
-                <div className="absolute -right-12 -top-16 w-44 h-44 rounded-full" style={{ background: 'rgba(255,255,255,0.10)' }} />
-                <div className="absolute right-20 -bottom-20 w-40 h-40 rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }} />
               </div>
 
               {/* STAT CARDS */}
@@ -1275,7 +1252,7 @@ export default function AdminDashboard() {
                         <div key={u.id} className="flex items-center gap-3">
                           <div
                             className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
-                            style={{ background: `linear-gradient(135deg, ${C.primaryDark}, ${C.primary})` }}
+                            style={{ background: C.primary }}
                           >
                             {u.full_name?.charAt(0)}
                           </div>
@@ -1441,7 +1418,7 @@ export default function AdminDashboard() {
                               <div className="flex items-center gap-3">
                                 <div
                                   className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
-                                  style={{ background: `linear-gradient(135deg, ${C.primaryDark}, ${C.primary})` }}
+                                  style={{ background: C.primary }}
                                 >
                                   {u.full_name?.charAt(0)}
                                 </div>
@@ -1458,7 +1435,7 @@ export default function AdminDashboard() {
                             <td className="px-5 py-4">
                               <span
                                 className="text-[11px] font-semibold px-2.5 py-1 rounded-full"
-                                style={u.is_active ? { background: greenSoft, color: '#3F7A22' } : { background: redSoft, color: '#B42318' }}
+                                style={u.is_active ? { background: greenSoft, color: '#3F7D5A' } : { background: redSoft, color: '#B13F55' }}
                               >
                                 {u.is_active ? 'Active' : 'Inactive'}
                               </span>
@@ -1481,7 +1458,7 @@ export default function AdminDashboard() {
                                   style={{ background: redSoft }}
                                   title="Remove"
                                 >
-                                  <IconTrash size={13} color="#B42318" />
+                                  <IconTrash size={13} color="#B13F55" />
                                 </button>
                               </div>
                             </td>
@@ -1515,7 +1492,7 @@ export default function AdminDashboard() {
                     className="px-4 py-2 rounded-xl text-sm font-medium transition capitalize"
                     style={
                       contentFilter === f
-                        ? { background: `linear-gradient(135deg, ${C.primaryDark}, ${C.primary})`, color: '#ffffff' }
+                        ? { background: C.primary, color: '#ffffff' }
                         : { background: C.card, color: C.sub, border: `1px solid ${C.border}` }
                     }
                   >
@@ -1681,7 +1658,7 @@ export default function AdminDashboard() {
                             <td className="px-5 py-4">
                               <span
                                 className="text-[11px] font-semibold px-2.5 py-1 rounded-full"
-                                style={job.is_active ? { background: greenSoft, color: '#3F7A22' } : { background: 'rgba(38,51,42,0.08)', color: C.sub }}
+                                style={job.is_active ? { background: greenSoft, color: '#3F7D5A' } : { background: 'rgba(62,76,99,0.08)', color: C.sub }}
                               >
                                 {job.is_active ? 'Active' : 'Closed'}
                               </span>
@@ -1694,7 +1671,7 @@ export default function AdminDashboard() {
                                 style={{ background: redSoft }}
                                 title="Remove"
                               >
-                                {jobActionLoading === job.id ? <IconLoader size={13} color="#B42318" /> : <IconTrash size={13} color="#B42318" />}
+                                {jobActionLoading === job.id ? <IconLoader size={13} color="#B13F55" /> : <IconTrash size={13} color="#B13F55" />}
                               </button>
                             </td>
                           </tr>
@@ -1718,7 +1695,7 @@ export default function AdminDashboard() {
                   Generate Reports
                 </h2>
               </div>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="max-w-2xl">
                 <div className="rounded-2xl p-6" style={{ background: C.card, boxShadow: cardShadow }}>
                   <h3 className="font-bold mb-5 flex items-center gap-2" style={{ color: C.ink }}>
                     Generate Report
@@ -1803,7 +1780,7 @@ export default function AdminDashboard() {
                         onClick={handleGenerateAndSend}
                         disabled={reportActionLoading}
                         className="flex-1 py-3 rounded-xl font-semibold text-white text-sm flex items-center justify-center gap-2 disabled:opacity-60 transition hover:shadow-md"
-                        style={{ background: `linear-gradient(135deg, ${C.primaryDark}, ${C.primary})` }}
+                        style={{ background: C.primary }}
                       >
                         {reportActionLoading ? <IconLoader size={15} /> : <IconMail size={15} color="#ffffff" />}
                         {reportActionLoading ? 'Sending...' : 'Generate & Send Email'}
@@ -1817,51 +1794,7 @@ export default function AdminDashboard() {
                         Download
                       </button>
                     </div>
-                    
                   </div>
-                </div>
-
-                <div className="rounded-2xl p-6" style={{ background: C.card, boxShadow: cardShadow }}>
-                  <h3 className="font-bold mb-5 flex items-center gap-2" style={{ color: C.ink }}>
-                    <IconClock size={16} color={C.primary} />
-                    Recent Reports
-                  </h3>
-                  {generatedReports.length === 0 ? (
-                    <div className="text-center py-10">
-                      <div className="w-11 h-11 rounded-xl flex items-center justify-center mx-auto mb-2.5" style={{ background: C.softPanel }}>
-                        <IconFileText size={18} color={C.sub} />
-                      </div>
-                      <p className="text-sm" style={{ color: C.sub }}>No reports generated yet</p>
-                      <p className="text-xs mt-1" style={{ color: C.sub }}>Generated and sent reports will appear here automatically.</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {generatedReports.map((report) => (
-                        <div key={report.id} className="flex items-center gap-4 p-3 rounded-xl transition hover:opacity-90" style={{ background: C.softPanel }}>
-                          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: report.type === 'PDF' ? orangeSoft : primarySoft }}>
-                            <IconFileText size={17} color={report.type === 'PDF' ? C.orange : C.primary} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate" style={{ color: C.ink }}>{report.title}</p>
-                            <p className="text-xs mt-0.5" style={{ color: C.sub }}>{report.dateLabel} · {report.type}</p>
-                          </div>
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            {report.sent && (
-                              <span className="text-[11px] px-2 py-0.5 rounded-full" style={{ background: greenSoft, color: '#3F7A22' }}>Sent</span>
-                            )}
-                            <button
-                              onClick={() => downloadReportEntry(report)}
-                              title="Download"
-                              className="w-7 h-7 rounded-lg flex items-center justify-center transition hover:opacity-80"
-                              style={{ background: primarySoft }}
-                            >
-                              <IconDownload size={13} color={C.primaryDark} />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
@@ -1922,12 +1855,11 @@ export default function AdminDashboard() {
                       onClick={handleSendNotification}
                       disabled={notifSendLoading}
                       className="w-full py-3 rounded-xl font-semibold text-white text-sm flex items-center justify-center gap-2 disabled:opacity-60 transition hover:shadow-md"
-                      style={{ background: `linear-gradient(135deg, ${C.primaryDark}, ${C.primary})` }}
+                      style={{ background: C.primary }}
                     >
                       {notifSendLoading ? <IconLoader size={15} /> : <IconSend size={15} color="#ffffff" />}
                       {notifSendLoading ? 'Sending...' : 'Send Notification'}
                     </button>
-                    
                   </div>
                 </div>
 
@@ -1940,9 +1872,9 @@ export default function AdminDashboard() {
                       notifications.map((n) => {
                         const typeStyle =
                           n.type === 'content'
-                            ? { soft: orangeSoft, color: '#B45309', label: 'Content' }
+                            ? { soft: orangeSoft, color: '#A66F2E', label: 'Content' }
                             : n.type === 'announcement'
-                            ? { soft: purpleSoft, color: '#5B3FA6', label: 'Announcement' }
+                            ? { soft: purpleSoft, color: '#6F5EA8', label: 'Announcement' }
                             : { soft: primarySoft, color: C.primaryDark, label: 'New User' }
                         return (
                           <div key={n.id} className="p-3 rounded-xl transition hover:opacity-90" style={{ background: C.softPanel }}>

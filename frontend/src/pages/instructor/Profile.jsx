@@ -6,43 +6,42 @@ import API from '../../utils/api'
    COLOUR THEME (matches InstructorDashboard.jsx)
    ============================================================ */
 const C = {
-  bg: '#F7F9FC',
+  bg: '#F8FBF9',
 
-  sidebar: '#102A43',
-  sidebarText: '#D9E2EC',
-  sidebarMuted: '#829AB1',
+  sidebar: '#8BC4A3',
+  sidebarText: '#F7FCF9',
+  sidebarMuted: '#E4F2EA',
 
   panel: '#FFFFFF',
   card: '#FFFFFF',
-  border: '#E6EAF0',
+  border: '#E8EFEB',
 
-  ink: '#243B53',
-  sub: '#829AB1',
+  ink: '#3E4E5D',
+  sub: '#8E9993',
 
-  accent: '#4d6276',
-  accentDark: '#102A43',
-  accentSoft: '#E8F1FF',
+  accent: '#8BC4A3',
+  accentDark: '#78B694',
+  accentSoft: '#EEF8F2',
 
-  teal: '#20A39E',
-  tealSoft: '#E4F7F5',
+  teal: '#8BBCC9',
+  tealSoft: '#EFF8FA',
 
-  green: '#2FB171',
-  greenSoft: '#E7F8EF',
+  green: '#8BC4A3',
+  greenSoft: '#EEF8F2',
 
-  orange: '#F4A340',
-  orangeSoft: '#FFF2DE',
+  orange: '#EABF91',
+  orangeSoft: '#FDF5EC',
 
-  red: '#EF625C',
-  redSoft: '#FDEAE9',
+  red: '#DFA0AA',
+  redSoft: '#FBEFF1',
 
-  purple: '#8067D9',
-  purpleSoft: '#F0ECFF',
+  purple: '#B3A4D7',
+  purpleSoft: '#F5F2FA',
 
-  softPanel: '#F5F7FA'
+  softPanel: '#FAFCFB'
 }
 
-const cardShadow =
-  '0 2px 10px rgba(16, 42, 67, 0.06), 0 1px 3px rgba(16, 42, 67, 0.04)'
+const cardShadow = 'none'
 
 export default function Profile() {
   const { user } = useAuth()
@@ -262,9 +261,9 @@ export default function Profile() {
 
                 <button
                   onClick={() => setEditing(true)}
-                  className="text-xs px-3 py-1.5 rounded-lg text-white font-medium hover:shadow-md transition"
+                  className="text-xs px-3 py-1.5 rounded-lg text-white font-medium  transition"
                   style={{
-                    background: `linear-gradient(135deg, ${C.accentDark}, ${C.accent})`,
+                    background: C.accent,
                   }}
                 >
                   Edit
@@ -944,9 +943,9 @@ export default function Profile() {
               <button
                 onClick={handleSave}
                 disabled={loading}
-                className="px-6 py-2 rounded-lg text-xs font-bold text-white disabled:opacity-50 transition hover:shadow-lg"
+                className="px-6 py-2 rounded-lg text-xs font-bold text-white disabled:opacity-50 transition "
                 style={{
-                  background: `linear-gradient(135deg, ${C.accentDark}, ${C.accent})`,
+                  background: C.accent,
                 }}
               >
                 {loading

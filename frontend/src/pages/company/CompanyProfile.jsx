@@ -5,37 +5,39 @@ import API from '../../utils/api'
 /* ============================================================
    COLOUR THEME (matches CompanyDashboard.jsx)
    ============================================================ */
+/* ============================================================
+   COLOUR THEME (matches CompanyDashboard.jsx)
+   ============================================================ */
 const C = {
-  bg: '#FAF6F3',
+  bg: '#F4FAFB',
 
   card: '#FFFFFF',
-  border: '#E9DDD2',
+  border: '#E3EEF1',
 
-  ink: '#2B1710',
-  sub: '#8B6F5E',
+  ink: '#3E4E55',
+  sub: '#8B9AA0',
 
-  primary: '#A8434B',
-  primaryDark: '#5C0E04',
-  primarySoft: '#F7E3DF',
+  primary: '#6FA8B8',
+  primaryDark: '#5A93A3',
+  primarySoft: '#E9F5F8',
 
-  light: '#C99A6C',
-  lightSoft: '#F7EEE2',
+  light: '#A9CCD6',
+  lightSoft: '#EFF7F9',
 
-  green: '#3F7D58',
-  greenSoft: '#E3F0E7',
+  green: '#5FAE82',
+  greenSoft: '#E9F7EF',
 
-  amber: '#C08A2E',
-  amberSoft: '#F8EDD9',
+  amber: '#E0A356',
+  amberSoft: '#FBF1E4',
 
-  red: '#B23A2E',
-  redSoft: '#F8E2DE',
+  red: '#D08B95',
+  redSoft: '#FAECEF',
 
-  softPanel: '#FBF7F4'
+  softPanel: '#F6FBFC'
 }
 
 const cardShadow =
-  '0 2px 8px rgba(46, 10, 2, 0.07), 0 1px 3px rgba(46, 10, 2, 0.05)'
-
+  '0 2px 8px rgba(90, 147, 163, 0.07), 0 1px 3px rgba(90, 147, 163, 0.05)'
 /* ============================================================
    INLINE SVG ICONS
    ============================================================ */

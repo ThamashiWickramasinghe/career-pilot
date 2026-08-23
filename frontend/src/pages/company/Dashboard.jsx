@@ -8,68 +8,65 @@ import {
 } from 'recharts'
 
 /* ============================================================
-   COLOUR THEME
-   A warm espresso/rose base (matches the brand), with true
-   secondary hues added for status + category variety so the
-   dashboard doesn't read as one-tone.
+   COLOUR THEME — green, light & restrained
+   ============================================================ */
+/* ============================================================
+   COLOUR THEME — teal-blue, light & restrained
    ============================================================ */
 const C = {
-  bg: '#FAF6F3',
+  bg: '#F4FAFB',
 
-  sidebar: '#481206',
-  sidebarText: '#F3DCC5',
-  sidebarMuted: '#B98B67',
+  sidebar: '#6FA8B8',
+  sidebarText: '#FFFFFF',
+  sidebarMuted: '#E5F3F6',
 
   panel: '#FFFFFF',
   card: '#FFFFFF',
-  border: '#E9DDD2',
+  border: '#E3EEF1',
 
-  ink: '#2B1710',
-  sub: '#8B6F5E',
+  ink: '#3E4E55',
+  sub: '#8B9AA0',
 
-  primary: '#A8434B',
-  primaryDark: '#5C0E04',
-  primarySoft: '#fff1ef',
+  primary: '#6FA8B8',
+  primaryDark: '#5A93A3',
+  primarySoft: '#E9F5F8',
 
-  light: '#C99A6C',
-  lightSoft: '#F7EEE2',
+  light: '#A9CCD6',
+  lightSoft: '#EFF7F9',
 
-  accent: '#8A4B32',
-  accentSoft: '#F3E5D8',
+  accent: '#6FA8B8',
+  accentSoft: '#E9F5F8',
 
-  accent2: '#B5793B',
-  accent2Soft: '#F8ECD9',
+  accent2: '#9EC0CB',
+  accent2Soft: '#EEF6F8',
 
-  green: '#3F7D58',
-  greenSoft: '#E3F0E7',
+  green: '#5FAE82',
+  greenSoft: '#E9F7EF',
 
-  red: '#B23A2E',
-  redSoft: '#F8E2DE',
+  red: '#D08B95',
+  redSoft: '#FAECEF',
 
-  purple: '#6B5590',
-  purpleSoft: '#EAE5F2',
+  purple: '#9C8AC9',
+  purpleSoft: '#F0ECF9',
 
-  blue: '#3E6C8C',
-  blueSoft: '#E3EDF3',
+  blue: '#6FA8B8',
+  blueSoft: '#E9F5F8',
 
-  amber: '#C08A2E',
-  amberSoft: '#F8EDD9',
+  amber: '#E0A356',
+  amberSoft: '#FBF1E4',
 
-  softPanel: '#FBF7F4',
+  softPanel: '#F6FBFC',
 
-  // Individual dashboard stat-card colours — each stat gets its own hue
-  stat1: '#5C0E04',
-  stat1Soft: '#F3DED8',
-  stat2: '#3E6C8C',
-  stat2Soft: '#E3EDF3',
-  stat3: '#C08A2E',
-  stat3Soft: '#F8EDD9',
-  stat4: '#3F7D58',
-  stat4Soft: '#E3F0E7'
+  stat1: '#6FA8B8',
+  stat1Soft: '#E9F5F8',
+  stat3: '#9EC0CB',
+  stat3Soft: '#EEF6F8',
+  stat2: '#E0A356',
+  stat2Soft: '#FBF1E4',
+  stat4: '#9C8AC9',
+  stat4Soft: '#F0ECF9'
 }
-
-const cardShadow =
-  '0 2px 10px rgba(46, 10, 2, 0.07), 0 1px 3px rgba(46, 10, 2, 0.05)'
+const cardShadow = 'none'
 
 /* ============================================================
    INLINE SVG ICONS
@@ -273,7 +270,7 @@ const CustomTooltip = ({ active, payload, label }) => {
   return (
     <div
       className="px-3 py-2 rounded-lg text-xs font-medium"
-      style={{ background: C.primaryDark, color: '#ffffff', boxShadow: '0 6px 16px rgba(46,10,2,0.28)' }}
+      style={{ background: C.primaryDark, color: '#ffffff', boxShadow: 'none' }}
     >
       <p className="mb-0.5 opacity-80">{label}</p>
       <p>{payload[0].value} application{payload[0].value === 1 ? '' : 's'}</p>
@@ -567,7 +564,7 @@ export default function CompanyDashboard() {
       <div className="relative flex-shrink-0">
         <button
           onClick={() => setNotifOpen(!notifOpen)}
-          className="w-10 h-10 rounded-xl border flex items-center justify-center transition hover:shadow-sm"
+          className="w-10 h-10 rounded-xl border flex items-center justify-center transition "
           style={{ background: C.bg, borderColor: C.border }}
           title="Notifications"
         >
@@ -653,7 +650,7 @@ export default function CompanyDashboard() {
         style={{ background: C.sidebar }}
       >
         <div className="px-6 pt-6 pb-12 flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(255,230,204,0.14)' }}>
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(255,255,255,0.26)' }}>
             <IconSparkle size={24} color="#ffffff" />
           </div>
           <p className="font-bold text-xl" style={{ color: '#ffffff' }}>Career Pilot</p>
@@ -668,7 +665,7 @@ export default function CompanyDashboard() {
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
                 className={navBtnClass(item.id)}
-                style={active ? { background: 'rgba(255,230,204,0.14)', color: '#ffffff' } : { color: C.sidebarText }}
+                style={active ? { background: 'rgba(255,255,255,0.26)', color: '#ffffff' } : { color: C.sidebarText }}
               >
                 <IconComp size={18} color={active ? '#ffffff' : C.sidebarMuted} strokeWidth={2} />
                 <span>{item.label}</span>
@@ -676,7 +673,7 @@ export default function CompanyDashboard() {
             )
           })}
 
-          <div className="mx-1 my-6 border-t" style={{ borderColor: 'rgba(255,230,204,0.12)' }} />
+          <div className="mx-1 my-6 border-t" style={{ borderColor: 'rgba(255,255,255,0.18)' }} />
 
           {secondaryNavItems.map((item) => {
             const IconComp = item.icon
@@ -686,7 +683,7 @@ export default function CompanyDashboard() {
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
                 className={navBtnClass(item.id)}
-                style={active ? { background: 'rgba(255,230,204,0.14)', color: '#ffffff' } : { color: C.sidebarText }}
+                style={active ? { background: 'rgba(255,255,255,0.26)', color: '#ffffff' } : { color: C.sidebarText }}
               >
                 <IconComp size={18} color={active ? '#ffffff' : C.sidebarMuted} strokeWidth={2} />
                 <span>{item.label}</span>
@@ -695,17 +692,16 @@ export default function CompanyDashboard() {
           })}
         </nav>
 
-        <div className="px-4 py-4 border-t" style={{ borderColor: 'rgba(255,230,204,0.12)' }}>
+        <div className="px-4 py-4 border-t" style={{ borderColor: 'rgba(255,255,255,0.18)' }}>
           <div className="flex items-center gap-3 px-2 py-2">
             <div
               className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
-              style={{ background: 'rgba(255,230,204,0.16)' }}
+              style={{ background: 'rgba(255,255,255,0.30)' }}
             >
               {(user?.company_name || user?.full_name)?.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 overflow-hidden">
               <p className="text-xs font-semibold truncate" style={{ color: '#ffffff' }}>{user?.company_name || user?.full_name}</p>
-              <p className="text-[11px]" style={{ color: C.sidebarText }}>● Active</p>
             </div>
             <button onClick={handleLogout} className="p-1.5 rounded-lg hover:bg-white/10" title="Log out">
               <IconLogout size={16} color={C.sidebarMuted} />
@@ -745,21 +741,20 @@ export default function CompanyDashboard() {
             <div>
               <div
                 className="relative overflow-hidden rounded-2xl p-6 mb-6"
-                style={{
-                  background: `linear-gradient(135deg, ${C.primaryDark} 0%, ${C.primary} 100%)`,
-                  boxShadow: '0 8px 24px rgba(46,10,2,0.22)'
+                                style={{
+                  background: `linear-gradient(135deg, ${C.primaryDark} 0%, ${C.light} 100%)`,
+                  
                 }}
               >
                 <div className="relative z-10 max-w-2xl">
                   <h1 className="text-2xl font-bold mb-2" style={{ color: '#ffffff' }}>
-                    Welcome back, {user?.company_name || user?.full_name || 'there'}! 👋
+                    Welcome back, {user?.company_name || user?.full_name || 'there'}! 
                   </h1>
-                  <p className="text-sm max-w-xl leading-relaxed" style={{ color: 'rgba(255,230,204,0.88)' }}>
+                  <p className="text-sm max-w-xl leading-relaxed" style={{ color: 'rgba(255,255,255,0.88)' }}>
                     Company Account · Find the best IT talent for your team.
                   </p>
                 </div>
-                <div className="absolute -right-12 -top-16 w-44 h-44 rounded-full" style={{ background: 'rgba(255,230,204,0.10)' }} />
-                <div className="absolute right-20 -bottom-20 w-40 h-40 rounded-full" style={{ background: 'rgba(255,230,204,0.07)' }} />
+
               </div>
 
               {/* STAT CARDS */}
@@ -769,7 +764,7 @@ export default function CompanyDashboard() {
                   return (
                     <div
                       key={s.id}
-                      className="rounded-2xl overflow-hidden transition hover:-translate-y-0.5 hover:shadow-md cursor-pointer"
+                      className="rounded-2xl overflow-hidden transition hover:-translate-y-0.5  cursor-pointer"
                       style={{ background: C.card, boxShadow: cardShadow }}
                       onClick={() => setActiveTab(s.id === 'active' ? 'my-jobs' : 'applications')}
                     >
@@ -911,7 +906,7 @@ export default function CompanyDashboard() {
                           >
                             <div
                               className="w-9 h-9 rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
-                              style={{ background: `linear-gradient(135deg, ${C.primaryDark}, ${C.primary})` }}
+                              style={{ background: C.primary }}
                             >
                               {app.applicant_name?.charAt(0)}
                             </div>
@@ -1067,8 +1062,8 @@ export default function CompanyDashboard() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 rounded-xl font-semibold text-white text-sm transition disabled:opacity-60 flex items-center justify-center gap-2 hover:shadow-lg"
-                  style={{ background: `linear-gradient(135deg, ${C.primaryDark}, ${C.primary})` }}
+                  className="w-full py-3.5 rounded-xl font-semibold text-white text-sm transition disabled:opacity-60 flex items-center justify-center gap-2 "
+                  style={{ background: C.primary }}
                 >
                   {loading ? <IconLoader size={16} /> : <IconPlus size={16} color="#ffffff" />}
                   {loading ? 'Posting...' : 'Post Job Vacancy'}
@@ -1092,8 +1087,8 @@ export default function CompanyDashboard() {
                 </div>
                 <button
                   onClick={() => setActiveTab('post-job')}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition hover:shadow-md"
-                  style={{ background: `linear-gradient(135deg, ${C.primaryDark}, ${C.primary})` }}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition "
+                  style={{ background: C.primary }}
                 >
                   <IconPlus size={15} color="#ffffff" />
                   Post New Job
@@ -1113,7 +1108,7 @@ export default function CompanyDashboard() {
                   <button
                     onClick={() => setActiveTab('post-job')}
                     className="mt-3 px-5 py-2.5 rounded-xl text-sm font-semibold text-white"
-                    style={{ background: `linear-gradient(135deg, ${C.primaryDark}, ${C.primary})` }}
+                    style={{ background: C.primary }}
                   >
                     Post Your First Job
                   </button>
@@ -1196,7 +1191,7 @@ export default function CompanyDashboard() {
                     className="px-4 py-2 rounded-xl text-sm font-medium transition"
                     style={
                       appFilter === f
-                        ? { background: `linear-gradient(135deg, ${C.primaryDark}, ${C.primary})`, color: '#ffffff' }
+                        ? { background: C.primary, color: '#ffffff' }
                         : { background: C.card, color: C.sub, border: `1px solid ${C.border}` }
                     }
                   >
@@ -1236,7 +1231,7 @@ export default function CompanyDashboard() {
                                 <div className="flex items-center gap-3">
                                   <div
                                     className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
-                                    style={{ background: `linear-gradient(135deg, ${C.primaryDark}, ${C.primary})` }}
+                                    style={{ background: C.primary }}
                                   >
                                     {app.applicant_name?.charAt(0)}
                                   </div>
