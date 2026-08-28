@@ -510,9 +510,7 @@ export default function Quiz({ onComplete }) {
           <PageHeader title="Career Assessment" onBack={handleBack} />
           <div className="rounded-2xl shadow-sm overflow-hidden" style={{ background: COLORS.panel, border: `1px solid ${COLORS.border}` }}>
             <div className="p-8 text-center text-white" style={{ background: PRIMARY_GRADIENT }}>
-              <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.15)' }}>
-                <Icon name="academicCap" className="w-8 h-8" strokeWidth={1.6} />
-              </div>
+              
               <h2 className="text-2xl font-bold mb-2">Career Assessment Quiz</h2>
               <p className="text-sm" style={{ color: COLORS.softPurple }}>
                 14 categories · 10 questions each · 30 seconds per question

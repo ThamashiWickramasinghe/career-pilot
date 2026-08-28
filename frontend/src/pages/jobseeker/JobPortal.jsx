@@ -2,12 +2,7 @@ import { useState } from 'react'
 import Quiz from './Quiz'
 import AIResults from './AIResults'
 
-// ============================================================
-// COLOR TOKENS
-// ============================================================
-// ============================================================
-// COLOR TOKENS — PASTEL PURPLE THEME
-// ============================================================
+
 const COLORS = {
   // Main page background
   bg: '#F8F3F7',
@@ -102,9 +97,7 @@ export default function JobPortal() {
     <div className="h-screen overflow-hidden flex items-center justify-center px-4 py-4" style={{ background: COLORS.bg }}>
       <div className="max-w-2xl w-full">
 
-        {/* =====================================================
-            PAGE HEADER (Title + Back button on right)
-        ====================================================== */}
+        
         <div className="flex items-center justify-between mb-4">
           <h1
             className="text-2xl font-bold"

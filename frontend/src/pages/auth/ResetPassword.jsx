@@ -9,23 +9,28 @@ import API from '../../utils/api'
 ========================================================= */
 
 const C = {
-  bg: '#F7F3EA',
+  // Main Career Pilot theme
+  bg: '#F4F7FC',
   panel: '#FFFFFF',
-  ink: '#20231F',
-  inkSoft: '#697069',
-  muted: '#969D97',
-  border: '#E7E1D6',
+  ink: '#26354D',
+  inkSoft: '#68768C',
+  muted: '#98A4B5',
+  border: '#DEE5F0',
 
-  green: '#3F6B4F',
-  greenDark: '#31553E',
-  greenSoft: '#E8F1E9',
+  // Primary blue
+  green: '#5B8DEF',
+  greenDark: '#4777D4',
+  greenSoft: '#EAF1FF',
 
-  purple: '#7564A8',
-  purpleSoft: '#F0ECF8',
+  // Job Seeker / AI accent
+  purple: '#8B6FC4',
+  purpleSoft: '#F1EBFC',
 
-  teal: '#4D8D95',
-  tealSoft: '#E5F1F2',
+  // Company accent
+  teal: '#55AFC0',
+  tealSoft: '#E5F5F7',
 
+  // Error
   danger: '#B84D48',
   dangerBg: '#FBEDEC',
   dangerBorder: '#F1C8C5',

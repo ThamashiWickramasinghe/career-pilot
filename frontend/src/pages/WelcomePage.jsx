@@ -10,26 +10,32 @@ import caseInstructor from "../assets/tt.jpg";
 ========================================================= */
 
 const C = {
-  bg: "#F7F3EA",
+  // Colorful but clean overall background
+  bg: "#F4F7FC",
   panel: "#FFFFFF",
-  ink: "#20231F",
-  inkSoft: "#697069",
-  border: "#E7E1D6",
+  ink: "#26354D",
+  inkSoft: "#68768C",
+  border: "#DEE5F0",
 
-  green: "#3F6B4F",
-  greenDark: "#31553E",
+  // Main Career Pilot blue
+  green: "#5B8DEF",
+  greenDark: "#4777D4",
 
-  purple: "#7564A8",
-  purpleSoft: "#F0ECF8",
+  // Job Seeker — vibrant purple
+  purple: "#8B6FC4",
+  purpleSoft: "#F1EBFC",
 
-  sage: "#5D9871",
-  sageSoft: "#E8F2EA",
+  // Instructor — fresh green
+  sage: "#5FBE8A",
+  sageSoft: "#E8F7EE",
 
-  teal: "#4D8D95",
-  tealSoft: "#E5F1F2",
+  // Company — bright teal
+  teal: "#55AFC0",
+  tealSoft: "#E5F5F7",
 
-  orange: "#D89A4A",
-  orangeSoft: "#F8EBD8",
+  // Additional warm accent
+  orange: "#F0A653",
+  orangeSoft: "#FFF0DD",
 };
 
 const fontImport = `
@@ -69,7 +75,10 @@ function Icon({ name, color = C.ink, size = 20 }) {
     users: (
       <>
         <circle cx="9" cy="8" r="3" {...stroke} />
-        <path d="M3.5 19c.5-3.2 2.4-5 5.5-5s5 1.8 5.5 5" {...stroke} />
+        <path
+          d="M3.5 19c.5-3.2 2.4-5 5.5-5s5 1.8 5.5 5"
+          {...stroke}
+        />
         <path d="M16 5.5a3 3 0 0 1 0 5.8" {...stroke} />
         <path d="M17 14.5c2 .6 3.3 2 3.5 4.5" {...stroke} />
       </>
@@ -77,7 +86,10 @@ function Icon({ name, color = C.ink, size = 20 }) {
 
     book: (
       <>
-        <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z" {...stroke} />
+        <path
+          d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"
+          {...stroke}
+        />
         <path d="M4 5.5v15" {...stroke} />
         <path d="M8 7h8M8 10h7" {...stroke} />
       </>
@@ -85,8 +97,18 @@ function Icon({ name, color = C.ink, size = 20 }) {
 
     briefcase: (
       <>
-        <rect x="3.5" y="7.5" width="17" height="12" rx="2" {...stroke} />
-        <path d="M8.5 7.5V5.8A2.2 2.2 0 0 1 10.7 3.6h2.6a2.2 2.2 0 0 1 2.2 2.2v1.7" {...stroke} />
+        <rect
+          x="3.5"
+          y="7.5"
+          width="17"
+          height="12"
+          rx="2"
+          {...stroke}
+        />
+        <path
+          d="M8.5 7.5V5.8A2.2 2.2 0 0 1 10.7 3.6h2.6a2.2 2.2 0 0 1 2.2 2.2v1.7"
+          {...stroke}
+        />
         <path d="M3.5 12h17" {...stroke} />
       </>
     ),
@@ -102,13 +124,19 @@ function Icon({ name, color = C.ink, size = 20 }) {
     compass: (
       <>
         <circle cx="12" cy="12" r="8.5" {...stroke} />
-        <path d="M15.5 8.5l-4.5 2-2 4.5 4.5-2 2-4.5z" {...stroke} />
+        <path
+          d="M15.5 8.5l-4.5 2-2 4.5 4.5-2 2-4.5z"
+          {...stroke}
+        />
       </>
     ),
 
     roadmap: (
       <>
-        <path d="M4 18c3-1 3 2 6 2s3-3 6-3 3 2 5 1" {...stroke} />
+        <path
+          d="M4 18c3-1 3 2 6 2s3-3 6-3 3 2 5 1"
+          {...stroke}
+        />
         <circle cx="4" cy="18" r="1.3" {...stroke} />
         <circle cx="21" cy="18" r="1.3" {...stroke} />
       </>
@@ -117,7 +145,10 @@ function Icon({ name, color = C.ink, size = 20 }) {
     trophy: (
       <>
         <path d="M7 4h10v4a5 5 0 0 1-10 0V4z" {...stroke} />
-        <path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3" {...stroke} />
+        <path
+          d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3"
+          {...stroke}
+        />
         <path d="M12 13v3M9 20h6M10 20v-2h4v2" {...stroke} />
       </>
     ),
@@ -189,21 +220,32 @@ const aiFeatures = [
     icon: "ai",
     title: "AI Job Matching",
     text: "Connect job seekers with relevant IT vacancies based on their skills and profile.",
+    color: "#5B8DEF",
+    soft: "#EAF1FF",
   },
+
   {
     icon: "compass",
     title: "Career Prediction",
     text: "Predict suitable IT career paths using the user's assessment and skill information.",
+    color: "#8B6FC4",
+    soft: "#F1EBFC",
   },
+
   {
     icon: "roadmap",
     title: "Career Roadmap",
     text: "Create a practical learning journey that guides users toward their target career.",
+    color: "#5FBE8A",
+    soft: "#E8F7EE",
   },
+
   {
     icon: "trophy",
     title: "Skill Challenges",
     text: "Test knowledge through assessments and challenges that help identify skill gaps.",
+    color: "#F0A653",
+    soft: "#FFF0DD",
   },
 ];
 
@@ -242,6 +284,7 @@ export default function WelcomePage() {
         }}
       >
         {/* Logo */}
+
         <div
           style={{
             display: "flex",
@@ -276,6 +319,7 @@ export default function WelcomePage() {
         </div>
 
         {/* Navigation */}
+
         <nav
           className="cp-nav"
           style={{
@@ -290,15 +334,18 @@ export default function WelcomePage() {
           <a href="#roles" style={navLink}>
             Roles
           </a>
+
           <a href="#ai" style={navLink}>
             AI Features
           </a>
+
           <a href="#about" style={navLink}>
             About
           </a>
         </nav>
 
         {/* Header Buttons */}
+
         <div
           className="cp-header-buttons"
           style={{
@@ -356,6 +403,7 @@ export default function WelcomePage() {
           }}
         >
           {/* Heading */}
+
           <div
             className="cp-title-area"
             style={{
@@ -375,8 +423,6 @@ export default function WelcomePage() {
                   marginBottom: 14,
                 }}
               >
-                
-
                 <span
                   style={{
                     color: C.green,
@@ -406,8 +452,6 @@ export default function WelcomePage() {
                 starts <span style={{ color: C.green }}>here.</span>
               </h1>
             </div>
-
-            
           </div>
 
           {/* =================================================
@@ -431,6 +475,7 @@ export default function WelcomePage() {
                 }}
               >
                 {/* Image */}
+
                 <div
                   className="cp-card-image"
                   style={{
@@ -453,6 +498,7 @@ export default function WelcomePage() {
                   />
 
                   {/* Image overlay */}
+
                   <div
                     style={{
                       position: "absolute",
@@ -462,10 +508,10 @@ export default function WelcomePage() {
                       pointerEvents: "none",
                     }}
                   />
-
                 </div>
 
                 {/* Card content */}
+
                 <div
                   style={{
                     padding: "14px 2px 0",
@@ -505,14 +551,13 @@ export default function WelcomePage() {
                   >
                     {role.description}
                   </p>
-
-                  
                 </div>
               </article>
             ))}
           </div>
 
           {/* View all button */}
+
           <div
             style={{
               display: "flex",
@@ -538,6 +583,7 @@ export default function WelcomePage() {
               }}
             >
               Explore Career Pilot
+
               <span
                 style={{
                   width: 17,
@@ -612,8 +658,6 @@ export default function WelcomePage() {
                   AI tools built around your career.
                 </h2>
               </div>
-
-              
             </div>
 
             <div
@@ -634,12 +678,14 @@ export default function WelcomePage() {
                     background: C.bg,
                   }}
                 >
+                  {/* Colorful AI icon */}
+
                   <div
                     style={{
                       width: 35,
                       height: 35,
                       borderRadius: 9,
-                      background: C.green,
+                      background: feature.soft,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -648,7 +694,7 @@ export default function WelcomePage() {
                   >
                     <Icon
                       name={feature.icon}
-                      color="#FFFFFF"
+                      color={feature.color}
                       size={17}
                     />
                   </div>
@@ -809,13 +855,13 @@ export default function WelcomePage() {
         html, body {
           margin: 0;
           background: ${C.bg};
-          scrollbar-width: none;      /* Firefox */
-          -ms-overflow-style: none;   /* IE / Edge */
+          scrollbar-width: none;
+          -ms-overflow-style: none;
         }
 
         html::-webkit-scrollbar,
         body::-webkit-scrollbar {
-          display: none;              /* Chrome / Safari / Opera */
+          display: none;
           width: 0;
           height: 0;
         }

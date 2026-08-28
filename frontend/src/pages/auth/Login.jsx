@@ -8,24 +8,27 @@ import API from '../../utils/api'
 ========================================================= */
 
 const C = {
-  bg: '#F7F3EA',
+  // Main Career Pilot theme
+  bg: '#F4F7FC',
   panel: '#FFFFFF',
-  ink: '#20231F',
-  inkSoft: '#697069',
-  border: '#E7E1D6',
+  ink: '#26354D',
+  inkSoft: '#68768C',
+  border: '#DEE5F0',
 
-  green: '#3F6B4F',
-  greenDark: '#31553E',
-  greenSoft: '#E8F1E9',
+  // Primary blue
+  green: '#5B8DEF',
+  greenDark: '#4777D4',
+  greenSoft: '#EAF1FF',
 
-  purple: '#7564A8',
-  purpleSoft: '#F0ECF8',
+  // Secondary purple
+  purple: '#8B6FC4',
+  purpleSoft: '#F1EBFC',
 
+  // Error colors
   danger: '#B84D48',
   dangerBg: '#FBEDEC',
   dangerBorder: '#F1C8C5',
 }
-
 const fontImport = `
   @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 `
