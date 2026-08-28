@@ -12,6 +12,12 @@ dist
 dist-ssr
 *.local
 
+# Machine Learning
+ml_training/
+
+# Backend uploaded files
+backend/uploads/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
