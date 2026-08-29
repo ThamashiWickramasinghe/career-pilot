@@ -4,8 +4,6 @@
 
 **An AI-Powered Web Platform for IT Career Guidance, Personalized Skill Development and Intelligent Job Recommendation**
 
-CIS 6002 – Software Engineering Dissertation Project
-_Wepitiyage Thamashi Kaveena Wickramasinghe_
 
 ![React](https://img.shields.io/badge/Frontend-React.js-61DAFB?logo=react&logoColor=white)
 ![Tailwind](https://img.shields.io/badge/Styling-Tailwind_CSS-38B2AC?logo=tailwind-css&logoColor=white)
@@ -17,23 +15,6 @@ _Wepitiyage Thamashi Kaveena Wickramasinghe_
 ![License](https://img.shields.io/badge/License-Academic-lightgrey)
 
 </div>
-
----
-
-## 📑 Table of Contents
-
-- [Overview](#-overview)
-- [Core Features](#-core-features)
-- [Why AI?](#-why-ai)
-- [Tech Stack](#️-tech-stack)
-- [User Roles & Dashboards](#-user-roles--dashboards)
-- [System Architecture](#️-system-architecture)
-- [Getting Started](#-getting-started)
-- [Environment Variables](#-environment-variables)
-- [Project Structure](#-project-structure)
-- [Branch Workflow](#-branch-workflow)
-- [Project Status](#-project-status)
-- [License](#-license)
 
 ---
 
@@ -170,26 +151,6 @@ career-pilot/
 │   └── app.py
 └── README.md
 ```
-
-## 🌿 Branch Workflow
-
-Development happens on `develop` and is merged into `main` for stable releases.
-
-```bash
-git checkout develop
-# make changes
-git add .
-git commit -m "feat: description of change"
-git push origin develop
-# merge develop → main when ready
-```
-
-## 📌 Project Status
-
-Actively in development as part of a dissertation project. Core AI quiz, analysis, roadmap, skill challenge, learning hub, job portal, and admin features are implemented; UI/UX refinement across all role dashboards is ongoing.
-
-**Known issue:** AI full-analysis endpoint (`/ai/full-analysis`) occasionally fails silently — under investigation.
-
 
 ---
 
