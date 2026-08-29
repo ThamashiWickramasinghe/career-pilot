@@ -123,18 +123,6 @@ python app.py
 # API runs at http://localhost:5000
 ```
 
-## 🔑 Environment Variables
-
-Create a `.env` file in `backend/` with:
-
-```env
-DATABASE_URL=mysql+pymysql://<user>:<password>@localhost/career_pilot
-JWT_SECRET_KEY=your_jwt_secret
-MAIL_USERNAME=your_email@example.com
-MAIL_PASSWORD=your_email_app_password
-GEMINI_API_KEY=your_gemini_api_key
-```
-
 ## 📂 Project Structure
 
 ```
