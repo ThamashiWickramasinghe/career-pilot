@@ -2,9 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import API from '../../utils/api'
 
-/* ============================================================
-   COLOUR THEME (matches AdminDashboard.jsx)
-   ============================================================ */
+/*COLOUR THEME (matches AdminDashboard.jsx) */
 const C = {
   bg: '#F4F7FB',
 
@@ -32,9 +30,7 @@ const redSoft = 'rgba(217,140,152,0.14)'
 
 const cardShadow = 'none'
 
-/* ============================================================
-   INLINE SVG ICONS
-   ============================================================ */
+/* INLINE SVG ICONS */
 
 const Icon = ({ path, size = 18, color = 'currentColor', strokeWidth = 2 }) => (
   <svg
@@ -75,9 +71,7 @@ const IconLoader = (p) => (
   </svg>
 )
 
-/* ============================================================
-   ADMIN PROFILE
-   ============================================================ */
+/* ADMIN PROFILE*/
 
 export default function AdminProfile() {
   const { user } = useAuth()

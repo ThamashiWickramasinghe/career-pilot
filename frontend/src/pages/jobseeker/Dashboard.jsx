@@ -11,9 +11,7 @@ import CareerRoadmap from './CareerRoadmap'
 import SkillChallenge from './SkillChallenge'
 import Help from './Help'
 
-/* ============================================================
-   COLOUR THEME
-   ============================================================ */
+/* COLOUR THEME */
 const C = {
   /* User-provided pastel purple: #DBBCD4 */
   pastelPurple: '#DBBCD4',

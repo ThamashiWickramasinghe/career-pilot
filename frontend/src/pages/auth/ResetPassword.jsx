@@ -1,11 +1,10 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import API from '../../utils/api'
 
 /* =========================================================
-   CAREER PILOT — LOGIN PAGE
-   Simple Professional Card Design
+   CAREER PILOT — RESET PASSWORD PAGE
+   (matches Login / ForgotPassword design system)
 ========================================================= */
 
 const C = {
@@ -14,21 +13,12 @@ const C = {
   panel: '#FFFFFF',
   ink: '#26354D',
   inkSoft: '#68768C',
-  muted: '#98A4B5',
   border: '#DEE5F0',
 
-  // Primary blue
+  // Primary Career Pilot blue
   green: '#5B8DEF',
   greenDark: '#4777D4',
   greenSoft: '#EAF1FF',
-
-  // Job Seeker / AI accent
-  purple: '#8B6FC4',
-  purpleSoft: '#F1EBFC',
-
-  // Company accent
-  teal: '#55AFC0',
-  tealSoft: '#E5F5F7',
 
   // Error
   danger: '#B84D48',
@@ -41,89 +31,14 @@ const fontImport = `
 `
 
 /* =========================================================
-   LOGO
-========================================================= */
-
-function LogoIcon({ color = '#FFFFFF', size = 18 }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-    >
-      <path
-        d="M12 3l1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3z"
-        stroke={color}
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-/* =========================================================
-   EMAIL ICON
-========================================================= */
-
-function EmailIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-    >
-      <rect
-        x="3"
-        y="5"
-        width="18"
-        height="14"
-        rx="2"
-        stroke="currentColor"
-        strokeWidth="1.7"
-      />
-
-      <path
-        d="M4 7l8 6 8-6"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-/* =========================================================
-   PASSWORD ICON
+   LOCK ICON
 ========================================================= */
 
 function LockIcon() {
   return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-    >
-      <rect
-        x="4"
-        y="10"
-        width="16"
-        height="11"
-        rx="2"
-        stroke="currentColor"
-        strokeWidth="1.7"
-      />
-
-      <path
-        d="M8 10V7a4 4 0 018 0v3"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-      />
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <rect x="4" y="10" width="16" height="11" rx="2" stroke="currentColor" strokeWidth="1.7" />
+      <path d="M8 10V7a4 4 0 018 0v3" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
     </svg>
   )
 }
@@ -134,12 +49,7 @@ function LockIcon() {
 
 function EyeIcon({ visible }) {
   return visible ? (
-    <svg
-      width="17"
-      height="17"
-      viewBox="0 0 24 24"
-      fill="none"
-    >
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
       <path
         d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z"
         stroke="currentColor"
@@ -147,36 +57,17 @@ function EyeIcon({ visible }) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-
-      <circle
-        cx="12"
-        cy="12"
-        r="2.5"
-        stroke="currentColor"
-        strokeWidth="1.7"
-      />
+      <circle cx="12" cy="12" r="2.5" stroke="currentColor" strokeWidth="1.7" />
     </svg>
   ) : (
-    <svg
-      width="17"
-      height="17"
-      viewBox="0 0 24 24"
-      fill="none"
-    >
-      <path
-        d="M3 3l18 18"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-      />
-
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+      <path d="M3 3l18 18" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
       <path
         d="M10.6 6.2C11.05 6.07 11.52 6 12 6c6 0 9.5 6 9.5 6a17.4 17.4 0 01-3.1 3.6"
         stroke="currentColor"
         strokeWidth="1.7"
         strokeLinecap="round"
       />
-
       <path
         d="M6.4 9.1C4.1 10.5 2.5 12 2.5 12s3.5 6 9.5 6c1.1 0 2.2-.2 3.1-.5"
         stroke="currentColor"
@@ -188,393 +79,234 @@ function EyeIcon({ visible }) {
 }
 
 /* =========================================================
-   LOGIN
+   SUCCESS ICON
 ========================================================= */
 
-export default function Login() {
+function CheckIcon() {
+  return (
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M4 12.5l5 5L20 6"
+        stroke={C.green}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+/* =========================================================
+   RESET PASSWORD
+========================================================= */
+
+export default function ResetPassword() {
+
+  const { token } = useParams()
+  const navigate = useNavigate()
 
   const [form, setForm] = useState({
-    email: '',
     password: '',
+    confirmPassword: '',
   })
 
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [done, setDone] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-
-  const { login } = useAuth()
-  const navigate = useNavigate()
-
-  /* =======================================================
-     EXISTING LOGIN FUNCTIONALITY
-  ======================================================= */
+  const [showConfirm, setShowConfirm] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-
-    setLoading(true)
     setError('')
 
+    if (form.password.length < 8) {
+      setError('Password must be at least 8 characters')
+      return
+    }
+
+    if (form.password !== form.confirmPassword) {
+      setError('Passwords do not match')
+      return
+    }
+
+    setLoading(true)
+
     try {
-
-      const res = await API.post('/auth/login', form)
-
-      login(res.data.user, res.data.token)
-
-      const role = res.data.user.role
-
-      if (role === 'admin') {
-        navigate('/admin/dashboard')
-      } else if (role === 'instructor') {
-        navigate('/instructor/dashboard')
-      } else if (role === 'company') {
-        navigate('/company/dashboard')
-      } else {
-        navigate('/dashboard')
-      }
-
+      await API.post('/auth/reset-password', {
+        token,
+        password: form.password,
+        confirm_password: form.confirmPassword,
+      })
+      setDone(true)
     } catch (err) {
-
-      setError(
-        err.response?.data?.message || 'Login failed'
-      )
-
+      setError(err.response?.data?.message || 'This link is invalid or has expired')
     }
 
     setLoading(false)
   }
 
   return (
-    <div className="cp-login-page">
+    <div className="cp-rp-page">
 
       <style>{fontImport}</style>
 
-      {/* ===================================================
-          TOP BRAND
-      =================================================== */}
+      <div className="cp-rp-card">
 
-      <header className="cp-login-header">
-
-        <Link
-          to="/"
-          className="cp-brand"
-        >
-
-          <div className="cp-brand-icon">
-            <LogoIcon />
-          </div>
-
-          <span>
-            Career Pilot
-          </span>
-
-        </Link>
-
-        <div className="cp-header-text">
-          Your career journey starts here.
-        </div>
-
-      </header>
-
-
-      {/* ===================================================
-          MAIN
-      =================================================== */}
-
-      <main className="cp-login-main">
-
-        <div className="cp-login-card">
-
-          {/* Green top line */}
-          <div className="cp-card-top-line" />
-
-
-          {/* =================================================
-              CARD HEADER
-          ================================================= */}
-
-          <div className="cp-card-header">
-
-            <div className="cp-welcome-icon">
-              <LogoIcon
-                color={C.green}
-                size={21}
-              />
-            </div>
-
-            <div>
-
-              <div className="cp-small-title">
-                WELCOME BACK
-              </div>
+        {!done ? (
+          <>
+            {/* Heading */}
+            <div className="cp-rp-heading">
 
               <h1>
-                Sign in to Career Pilot
+                Set a new password
               </h1>
 
               <p>
-                Continue your career journey with us.
+                Choose a strong password you haven't used before.
               </p>
 
             </div>
 
-          </div>
-
-
-          {/* =================================================
-              ERROR
-          ================================================= */}
-
-          {error && (
-            <div className="cp-error">
-
-              <span className="cp-error-symbol">
-                !
-              </span>
-
-              <span>
+            {/* Error */}
+            {error && (
+              <div className="cp-rp-error">
                 {error}
-              </span>
-
-            </div>
-          )}
-
-
-          {/* =================================================
-              FORM
-          ================================================= */}
-
-          <form
-            onSubmit={handleSubmit}
-            className="cp-login-form"
-          >
-
-            {/* EMAIL */}
-
-            <div className="cp-field">
-
-              <label htmlFor="email">
-                Email address
-              </label>
-
-              <div className="cp-input">
-
-                <span className="cp-input-icon">
-                  <EmailIcon />
-                </span>
-
-                <input
-                  id="email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  value={form.email}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      email: e.target.value,
-                    })
-                  }
-                  placeholder="Enter your email address"
-                />
-
               </div>
+            )}
 
-            </div>
+            {/* Form */}
+            <form onSubmit={handleSubmit}>
 
-
-            {/* PASSWORD */}
-
-            <div className="cp-field">
-
-              <div className="cp-label-row">
+              <div className="cp-rp-field">
 
                 <label htmlFor="password">
-                  Password
+                  New password
                 </label>
 
-                <Link
-                  to="/forgot-password"
-                  className="cp-forgot"
-                >
-                  Forgot password?
-                </Link>
+                <div className="cp-rp-input">
 
-              </div>
+                  <span className="cp-rp-input-icon">
+                    <LockIcon />
+                  </span>
 
-              <div className="cp-input">
-
-                <span className="cp-input-icon">
-                  <LockIcon />
-                </span>
-
-                <input
-                  id="password"
-                  type={
-                    showPassword
-                      ? 'text'
-                      : 'password'
-                  }
-                  required
-                  autoComplete="current-password"
-                  value={form.password}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      password: e.target.value,
-                    })
-                  }
-                  placeholder="Enter your password"
-                />
-
-                <button
-                  type="button"
-                  className="cp-eye"
-                  onClick={() =>
-                    setShowPassword(!showPassword)
-                  }
-                  aria-label={
-                    showPassword
-                      ? 'Hide password'
-                      : 'Show password'
-                  }
-                >
-                  <EyeIcon
-                    visible={showPassword}
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    autoComplete="new-password"
+                    value={form.password}
+                    onChange={(e) =>
+                      setForm({ ...form, password: e.target.value })
+                    }
+                    placeholder="Enter new password"
                   />
-                </button>
+
+                  <button
+                    type="button"
+                    className="cp-rp-eye"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    <EyeIcon visible={showPassword} />
+                  </button>
+
+                </div>
 
               </div>
 
+              <div className="cp-rp-field">
+
+                <label htmlFor="confirmPassword">
+                  Confirm password
+                </label>
+
+                <div className="cp-rp-input">
+
+                  <span className="cp-rp-input-icon">
+                    <LockIcon />
+                  </span>
+
+                  <input
+                    id="confirmPassword"
+                    type={showConfirm ? 'text' : 'password'}
+                    required
+                    autoComplete="new-password"
+                    value={form.confirmPassword}
+                    onChange={(e) =>
+                      setForm({ ...form, confirmPassword: e.target.value })
+                    }
+                    placeholder="Re-enter new password"
+                  />
+
+                  <button
+                    type="button"
+                    className="cp-rp-eye"
+                    onClick={() => setShowConfirm(!showConfirm)}
+                    aria-label={showConfirm ? 'Hide password' : 'Show password'}
+                  >
+                    <EyeIcon visible={showConfirm} />
+                  </button>
+
+                </div>
+
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="cp-rp-button"
+              >
+                {loading ? 'Updating...' : 'Update password'}
+              </button>
+
+            </form>
+
+            {/* Divider */}
+            <div className="cp-rp-divider">
+              <span />
+              <small>Career Pilot</small>
+              <span />
             </div>
 
+            {/* Login */}
+            <p className="cp-rp-login">
+              Remember your password?{' '}
+              <Link to="/login">
+                Sign in
+              </Link>
+            </p>
 
-            {/* =================================================
-                REMEMBER
-            ================================================= */}
+          </>
+        ) : (
+          /* =================================================
+              SUCCESS STATE
+          ================================================= */
+          <div className="cp-rp-success">
 
-            <div className="cp-options">
-
-              <label className="cp-remember">
-
-                <input
-                  type="checkbox"
-                />
-
-                <span className="cp-check" />
-
-                <span>
-                  Remember me
-                </span>
-
-              </label>
-
+            <div className="cp-rp-success-icon">
+              <CheckIcon />
             </div>
 
+            <h2>
+              Password updated
+            </h2>
 
-            {/* =================================================
-                LOGIN BUTTON
-            ================================================= */}
+            <p className="cp-rp-success-message">
+              Your password has been changed successfully.
+            </p>
 
             <button
-              type="submit"
-              disabled={loading}
-              className="cp-submit"
+              onClick={() => navigate('/login')}
+              className="cp-rp-button"
             >
-
-              {loading
-                ? 'Signing in...'
-                : 'Sign In'}
-
-              {!loading && (
-                <span className="cp-submit-arrow">
-                  →
-                </span>
-              )}
-
+              Sign in
             </button>
 
-          </form>
-
-
-          {/* =================================================
-              DIVIDER
-          ================================================= */}
-
-          <div className="cp-divider">
-
-            <span />
-
-            <small>
-              or
-            </small>
-
-            <span />
-
           </div>
+        )}
 
-
-          {/* =================================================
-              QUICK FEATURES
-          ================================================= */}
-
-          <div className="cp-features">
-
-            <div className="cp-feature purple">
-              <span>✦</span>
-              AI Career
-            </div>
-
-            <div className="cp-feature teal">
-              <span>↗</span>
-              Job Matching
-            </div>
-
-            <div className="cp-feature green">
-              <span>✓</span>
-              Career Roadmap
-            </div>
-
-          </div>
-
-
-          {/* =================================================
-              REGISTER
-          ================================================= */}
-
-          <div className="cp-register">
-
-            <span>
-              Don't have an account?
-            </span>
-
-            <Link to="/register">
-              Create account
-            </Link>
-
-          </div>
-
-        </div>
-
-      </main>
-
-
-      {/* ===================================================
-          FOOTER
-      =================================================== */}
-
-      <footer className="cp-footer">
-
-        <span>
-          © {new Date().getFullYear()} Career Pilot
-        </span>
-
-        <span>
-          AI-Powered IT Career Guidance
-        </span>
-
-      </footer>
-
+      </div>
 
       {/* ===================================================
           STYLES
@@ -590,273 +322,117 @@ export default function Login() {
           margin: 0;
         }
 
-        /* ================================================
-           PAGE
-        ================================================ */
-
-        .cp-login-page {
+        .cp-rp-page {
           min-height: 100vh;
           background: ${C.bg};
-          color: ${C.ink};
-          font-family: Inter, sans-serif;
           display: flex;
           flex-direction: column;
-        }
-
-
-        /* ================================================
-           HEADER
-        ================================================ */
-
-        .cp-login-header {
-          width: 100%;
-          max-width: 1120px;
-          margin: 0 auto;
-          padding: 24px 30px;
-          display: flex;
           align-items: center;
-          justify-content: space-between;
-        }
-
-        .cp-brand {
-          display: flex;
-          align-items: center;
-          gap: 9px;
+          justify-content: center;
+          padding: 35px 20px;
+          font-family: Inter, sans-serif;
           color: ${C.ink};
-          text-decoration: none;
         }
 
-        .cp-brand-icon {
-          width: 35px;
-          height: 35px;
-          border-radius: 9px;
-          background: ${C.green};
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .cp-brand span {
-          font-family: Manrope, sans-serif;
-          font-size: 19px;
-          font-weight: 800;
-          letter-spacing: -0.025em;
-        }
-
-        .cp-header-text {
-          color: ${C.inkSoft};
-          font-size: 11px;
-        }
-
-
-        /* ================================================
-           MAIN
-        ================================================ */
-
-        .cp-login-main {
-          flex: 1;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 20px 20px 45px;
-        }
-
-
-        /* ================================================
+        /* =================================================
            CARD
-        ================================================ */
+        ================================================= */
 
-        .cp-login-card {
+        .cp-rp-card {
           width: 100%;
-          max-width: 430px;
-          position: relative;
+          max-width: 410px;
           background: ${C.panel};
           border: 1px solid ${C.border};
           border-radius: 18px;
           padding: 34px 36px 30px;
-          box-shadow:
-            0 18px 45px rgba(39, 44, 39, 0.08);
-          overflow: hidden;
+          box-shadow: 0 15px 40px rgba(40, 45, 40, 0.07);
         }
 
-        .cp-card-top-line {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 4px;
-          background: ${C.green};
+        /* =================================================
+           HEADING
+        ================================================= */
+
+        .cp-rp-heading {
+          margin-bottom: 25px;
         }
 
-
-        /* ================================================
-           CARD HEADER
-        ================================================ */
-
-        .cp-card-header {
-          display: flex;
-          align-items: flex-start;
-          gap: 14px;
-          margin-bottom: 27px;
-        }
-
-        .cp-welcome-icon {
-          width: 43px;
-          height: 43px;
-          flex-shrink: 0;
-          border-radius: 11px;
-          background: ${C.greenSoft};
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .cp-small-title {
-          color: ${C.green};
-          font-size: 9px;
-          font-weight: 800;
-          letter-spacing: 0.13em;
-          margin-bottom: 5px;
-        }
-
-        .cp-card-header h1 {
-          margin: 0 0 5px;
+        .cp-rp-heading h1 {
+          margin: 0 0 7px;
           font-family: Manrope, sans-serif;
-          font-size: 24px;
+          font-size: 28px;
           line-height: 1.15;
           font-weight: 800;
           letter-spacing: -0.025em;
         }
 
-        .cp-card-header p {
+        .cp-rp-heading p {
           margin: 0;
           color: ${C.inkSoft};
-          font-size: 11.5px;
-          line-height: 1.5;
+          font-size: 13px;
+          line-height: 1.55;
         }
 
-
-        /* ================================================
+        /* =================================================
            ERROR
-        ================================================ */
+        ================================================= */
 
-        .cp-error {
-          display: flex;
-          align-items: center;
-          gap: 8px;
+        .cp-rp-error {
           background: ${C.dangerBg};
           border: 1px solid ${C.dangerBorder};
           color: ${C.danger};
           border-radius: 9px;
           padding: 10px 12px;
-          margin-bottom: 17px;
-          font-size: 11px;
+          margin-bottom: 18px;
+          font-size: 12px;
           line-height: 1.4;
         }
 
-        .cp-error-symbol {
-          width: 18px;
-          height: 18px;
-          flex-shrink: 0;
-          border-radius: 50%;
-          background: ${C.danger};
-          color: white;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 10px;
-          font-weight: 800;
+        /* =================================================
+           FIELD
+        ================================================= */
+
+        .cp-rp-field {
+          margin-bottom: 18px;
         }
 
-
-        /* ================================================
-           FORM
-        ================================================ */
-
-        .cp-login-form {
-          display: flex;
-          flex-direction: column;
-          gap: 17px;
-        }
-
-        .cp-field {
-          width: 100%;
-        }
-
-        .cp-field label {
+        .cp-rp-field label {
           display: block;
           margin-bottom: 7px;
-          font-size: 11.5px;
+          font-size: 12px;
           font-weight: 700;
           color: ${C.ink};
         }
 
-        .cp-label-row {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-bottom: 7px;
-        }
-
-        .cp-label-row label {
-          margin: 0;
-        }
-
-        .cp-forgot {
-          color: ${C.green};
-          font-size: 10px;
-          font-weight: 700;
-          text-decoration: none;
-        }
-
-        .cp-forgot:hover {
-          text-decoration: underline;
-        }
-
-
-        /* ================================================
-           INPUT
-        ================================================ */
-
-        .cp-input {
+        .cp-rp-input {
           width: 100%;
-          height: 46px;
+          height: 45px;
           position: relative;
         }
 
-        .cp-input input {
+        .cp-rp-input input {
           width: 100%;
           height: 100%;
-          padding:
-            0
-            42px
-            0
-            40px;
-          border:
-            1px solid ${C.border};
+          padding: 0 42px 0 40px;
+          border: 1px solid ${C.border};
           border-radius: 9px;
           outline: none;
           background: #FFFFFF;
           color: ${C.ink};
           font-family: Inter, sans-serif;
-          font-size: 11.5px;
-          transition:
-            border-color 0.18s ease,
-            box-shadow 0.18s ease;
+          font-size: 12.5px;
+          transition: border-color 0.18s ease, box-shadow 0.18s ease;
         }
 
-        .cp-input input::placeholder {
-          color: #A4AAA5;
+        .cp-rp-input input::placeholder {
+          color: #A3AAA4;
         }
 
-        .cp-input input:focus {
+        .cp-rp-input input:focus {
           border-color: ${C.green};
-          box-shadow:
-            0 0 0 3px
-            rgba(63,107,79,0.08);
+          box-shadow: 0 0 0 3px rgba(91,141,239,0.08);
         }
 
-        .cp-input-icon {
+        .cp-rp-input-icon {
           position: absolute;
           left: 13px;
           top: 50%;
@@ -867,7 +443,7 @@ export default function Login() {
           z-index: 2;
         }
 
-        .cp-eye {
+        .cp-rp-eye {
           position: absolute;
           right: 8px;
           top: 50%;
@@ -884,296 +460,137 @@ export default function Login() {
           cursor: pointer;
         }
 
-        .cp-eye:hover {
+        .cp-rp-eye:hover {
           background: ${C.bg};
           color: ${C.green};
-          transform: translateY(-50%);
         }
 
+        /* =================================================
+           BUTTON
+        ================================================= */
 
-        /* ================================================
-           REMEMBER
-        ================================================ */
-
-        .cp-options {
-          margin-top: -2px;
-        }
-
-        .cp-remember {
-          display: inline-flex;
-          align-items: center;
-          gap: 7px;
-          color: ${C.inkSoft};
-          font-size: 10.5px;
-          cursor: pointer;
-        }
-
-        .cp-remember input {
-          display: none;
-        }
-
-        .cp-check {
-          width: 16px;
-          height: 16px;
-          border:
-            1px solid ${C.border};
-          border-radius: 4px;
-          background: white;
-          position: relative;
-        }
-
-        .cp-remember input:checked + .cp-check {
-          background: ${C.green};
-          border-color: ${C.green};
-        }
-
-        .cp-remember input:checked + .cp-check::after {
-          content: '';
-          position: absolute;
-          width: 5px;
-          height: 9px;
-          left: 5px;
-          top: 2px;
-          border:
-            solid white;
-          border-width:
-            0
-            2px
-            2px
-            0;
-          transform: rotate(45deg);
-        }
-
-
-        /* ================================================
-           SUBMIT
-        ================================================ */
-
-        .cp-submit {
+        .cp-rp-button {
           width: 100%;
           height: 46px;
           border: none;
           border-radius: 9px;
           background: ${C.green};
-          color: white;
+          color: #FFFFFF;
           font-family: Inter, sans-serif;
-          font-size: 12px;
+          font-size: 13px;
           font-weight: 700;
           cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 10px;
-          transition:
-            background 0.18s ease,
-            transform 0.18s ease;
+          transition: background 0.18s ease, transform 0.18s ease;
         }
 
-        .cp-submit:hover:not(:disabled) {
+        .cp-rp-button:hover:not(:disabled) {
           background: ${C.greenDark};
           transform: translateY(-1px);
         }
 
-        .cp-submit:disabled {
-          opacity: 0.6;
+        .cp-rp-button:disabled {
+          opacity: 0.65;
           cursor: not-allowed;
         }
 
-        .cp-submit-arrow {
-          width: 23px;
-          height: 23px;
-          border-radius: 6px;
-          background:
-            rgba(255,255,255,0.12);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 13px;
-        }
-
-
-        /* ================================================
+        /* =================================================
            DIVIDER
-        ================================================ */
+        ================================================= */
 
-        .cp-divider {
+        .cp-rp-divider {
           display: flex;
           align-items: center;
-          gap: 9px;
-          margin: 23px 0 16px;
+          gap: 10px;
+          margin: 25px 0 20px;
         }
 
-        .cp-divider span {
+        .cp-rp-divider span {
           flex: 1;
           height: 1px;
           background: ${C.border};
         }
 
-        .cp-divider small {
-          color: ${C.muted};
-          font-size: 9px;
+        .cp-rp-divider small {
+          color: #9BA29C;
+          font-size: 9.5px;
         }
 
+        /* =================================================
+           LOGIN LINK
+        ================================================= */
 
-        /* ================================================
-           FEATURES
-        ================================================ */
-
-        .cp-features {
-          display: flex;
-          justify-content: center;
-          gap: 6px;
-          flex-wrap: wrap;
-        }
-
-        .cp-feature {
-          display: flex;
-          align-items: center;
-          gap: 4px;
-          padding: 6px 9px;
-          border-radius: 6px;
-          font-size: 8.5px;
-          font-weight: 700;
-        }
-
-        .cp-feature span {
-          font-size: 10px;
-        }
-
-        .cp-feature.purple {
-          color: ${C.purple};
-          background: ${C.purpleSoft};
-        }
-
-        .cp-feature.teal {
-          color: ${C.teal};
-          background: ${C.tealSoft};
-        }
-
-        .cp-feature.green {
-          color: ${C.green};
-          background: ${C.greenSoft};
-        }
-
-
-        /* ================================================
-           REGISTER
-        ================================================ */
-
-        .cp-register {
-          margin: 22px 0 0;
-          padding-top: 19px;
-          border-top: 1px solid ${C.border};
+        .cp-rp-login {
+          margin: 0;
           text-align: center;
           color: ${C.inkSoft};
-          font-size: 11px;
+          font-size: 12px;
         }
 
-        .cp-register a {
+        .cp-rp-login a {
           color: ${C.green};
-          text-decoration: none;
           font-weight: 700;
-          margin-left: 3px;
+          text-decoration: none;
         }
 
-        .cp-register a:hover {
-          text-decoration: underline;
+        .cp-rp-login a:hover {
+          color: ${C.greenDark};
         }
 
+        /* =================================================
+           SUCCESS STATE
+        ================================================= */
 
-        /* ================================================
-           FOOTER
-        ================================================ */
+        .cp-rp-success {
+          text-align: center;
+        }
 
-        .cp-footer {
-          width: 100%;
-          max-width: 1120px;
-          margin: 0 auto;
-          padding: 0 30px 20px;
+        .cp-rp-success-icon {
+          width: 58px;
+          height: 58px;
+          border-radius: 50%;
+          background: ${C.greenSoft};
           display: flex;
-          justify-content: space-between;
-          color: ${C.muted};
-          font-size: 9px;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 18px;
         }
 
+        .cp-rp-success h2 {
+          margin: 0 0 9px;
+          font-family: Manrope, sans-serif;
+          font-size: 22px;
+          font-weight: 800;
+          letter-spacing: -0.02em;
+        }
 
-        /* ================================================
-           TABLET
-        ================================================ */
+        .cp-rp-success-message {
+          margin: 0 0 22px;
+          color: ${C.inkSoft};
+          font-size: 13px;
+          line-height: 1.55;
+        }
 
-        @media (max-width: 650px) {
+        /* =================================================
+           MOBILE
+        ================================================= */
 
-          .cp-login-header {
-            padding:
-              20px
-              20px
-              10px;
+        @media (max-width: 480px) {
+
+          .cp-rp-page {
+            padding: 25px 15px;
           }
 
-          .cp-header-text {
-            display: none;
-          }
-
-          .cp-login-main {
-            padding:
-              20px
-              15px
-              35px;
-          }
-
-          .cp-login-card {
-            padding:
-              30px
-              24px
-              27px;
+          .cp-rp-card {
+            padding: 28px 22px 25px;
             border-radius: 15px;
           }
 
-          .cp-footer {
-            padding:
-              0
-              20px
-              17px;
-            justify-content: center;
+          .cp-rp-heading h1 {
+            font-size: 25px;
           }
 
-          .cp-footer span:last-child {
-            display: none;
-          }
-
-        }
-
-
-        /* ================================================
-           SMALL MOBILE
-        ================================================ */
-
-        @media (max-width: 400px) {
-
-          .cp-login-card {
-            padding:
-              27px
-              19px
-              24px;
-          }
-
-          .cp-card-header h1 {
-            font-size: 21px;
-          }
-
-          .cp-card-header p {
-            font-size: 10.5px;
-          }
-
-          .cp-features {
-            gap: 4px;
-          }
-
-          .cp-feature {
-            font-size: 8px;
-            padding:
-              5px
-              7px;
+          .cp-rp-heading p {
+            font-size: 12px;
           }
 
         }

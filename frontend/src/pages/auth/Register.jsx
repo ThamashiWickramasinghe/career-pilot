@@ -32,6 +32,11 @@ const C = {
   danger: '#B84D48',
   dangerBg: '#FBEDEC',
   dangerBorder: '#F1C8C5',
+
+  // Success
+  success: '#3E8E5A',
+  successBg: '#EAF7EF',
+  successBorder: '#C7E9D3',
 }
 
 const fontImport = `
@@ -64,6 +69,7 @@ export default function Register() {
   })
 
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -77,17 +83,19 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    setError('')
+    setSuccess('')
+
     if (form.password !== form.confirm_password) {
       setError('Passwords do not match')
       return
     }
 
     setLoading(true)
-    setError('')
 
     try {
-      await API.post('/auth/register', form)
-      navigate('/login')
+      const res = await API.post('/auth/register', form)
+      setSuccess(res.data?.message || 'Registration successful!')
     } catch (err) {
       setError(
         err.response?.data?.message || 'Registration failed'
@@ -120,6 +128,13 @@ export default function Register() {
           </p>
 
         </div>
+
+        {/* Success */}
+        {success && (
+          <div className="cp-reg-success">
+            {success}
+          </div>
+        )}
 
         {/* Error */}
         {error && (
@@ -400,6 +415,22 @@ export default function Register() {
           color: ${C.inkSoft};
           font-size: 13px;
           line-height: 1.55;
+        }
+
+        /* =================================================
+           SUCCESS
+        ================================================= */
+
+        .cp-reg-success {
+          background: ${C.successBg};
+          border: 1px solid ${C.successBorder};
+          color: ${C.success};
+          border-radius: 9px;
+          padding: 10px 12px;
+          margin-bottom: 18px;
+          font-size: 12px;
+          line-height: 1.4;
+          font-weight: 600;
         }
 
         /* =================================================

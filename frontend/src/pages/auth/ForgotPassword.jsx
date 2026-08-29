@@ -326,7 +326,7 @@ export default function ForgotPassword() {
         .cp-fp-field input:focus {
           border-color: ${C.green};
           box-shadow:
-            0 0 0 3px rgba(63,107,79,0.08);
+            0 0 0 3px rgba(91,141,239,0.08);
         }
 
         /* =================================================
